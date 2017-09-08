@@ -7,30 +7,26 @@ import java.util.concurrent.Callable;
 
 public class Main {
     private static final IPersistentMap EXAMPLE_DATA = (IPersistentMap)EdnReader.readString(
-            "{\"players\" [{\"name\" \"John\" \"password\" \"abc123\"} " +
+            "{\"users\" [{\"name\" \"John\" \"password\" \"abc123\"} " +
                     "{\"name\" \"Suzy\" \"password\" \"correcthorsebatterystaple\"}]}",
             PersistentHashMap.EMPTY);
-    private static final Ref state = new Ref(EXAMPLE_DATA);
+    static final Ref state = new Ref(EXAMPLE_DATA);
 
     static final IFn assocIn = Clojure.var("clojure.core", "assoc-in");
     static final IFn getIn = Clojure.var("clojure.core", "get-in");
+    static final IFn hashMap = Clojure.var("clojure.core", "hash-map");
 
     public static void main(String[] args) {
         System.out.println(state.deref());
-        setPassword(0, "12345");
+
+        User john = User.getUser(0);
+        System.out.println(john);
+        System.out.println(john.getName());
+        System.out.println(john.getPassword());
+
+        User fred = User.createUser("Fred", "ilikecheese");
+        User.setUser(fred, 2);
         System.out.println(state.deref());
-        System.out.println("Suzy's password: " + getPassword(1));
-    }
-
-    public static void setPassword(int userPosition, String newPassword) {
-        updateState(() -> {
-            state.set(assoc(newPassword, "players", userPosition, "password"));
-            return null;
-        });
-    }
-
-    public static String getPassword(int userPosition) {
-        return (String)get("players", userPosition, "password");
     }
 
     public static Object assoc(Object value, Object... path) {
