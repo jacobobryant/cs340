@@ -16,6 +16,7 @@ public class Main {
     static final IFn getIn = Clojure.var("clojure.core", "get-in");
     static final IFn hashMap = Clojure.var("clojure.core", "hash-map");
 
+    // DEMO: how to use the data objects
     public static void main(String[] args) {
         System.out.println(state.deref());
 
@@ -25,19 +26,19 @@ public class Main {
         System.out.println(john.getPassword());
 
         john = john.setPassword("mynewpassword");
-        john.commit(0);
+        john.commit();
         System.out.println(john);
 
-        User fred = new User("Fred", "ilikecheese");
-        fred.commit(2);
+        User fred = new User("Fred", "ilikecheese", 2);
+        fred.commit();
         System.out.println(state.deref());
     }
 
-    public static Object assoc(Object value, Object... path) {
+    public static Object assoc(Object[] path, Object value) {
         return assocIn.invoke(state.deref(), path, value);
     }
 
-    public static Object get(Object... path) {
+    public static Object get(Object[] path) {
         return getIn.invoke(state.deref(), path);
     }
 

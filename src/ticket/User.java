@@ -2,7 +2,17 @@ package ticket;
 
 import java.util.Map;
 
+// DEMO: how to create a new data model
 public class User extends BaseModel {
+    public User(String name, String password, int userPosition) {
+        super((Map)Main.hashMap.invoke("name", name, "password", password),
+                new Object[] {"users", userPosition});
+    }
+
+    protected User(Map data, Object[] path) {
+        super(data, path);
+    }
+
     public String getName() {
         return (String)data.get("name");
     }
@@ -11,31 +21,12 @@ public class User extends BaseModel {
         return (String)data.get("password");
     }
 
-    public User(Map data) {
-        super(data);
-    }
-
-    public User(String name, String password) {
-        this((Map)Main.hashMap.invoke("name", name, "password", password));
-    }
-
     public User setPassword(String newPassword) {
-        return new User(getName(), newPassword);
-    }
-
-    public void commit(int userPosition) {
-        Main.updateState(() -> {
-            Main.state.set(Main.assoc(this.data, "users", userPosition));
-            return null;
-        });
+        return new User(set("password", newPassword), this.path);
     }
 
     public static User getUser(int userPosition) {
-        return new User((Map)Main.get("users", userPosition));
-    }
-
-
-    public String toString() {
-        return data.toString();
+        Object[] path = new Object[] {"users", userPosition};
+        return new User((Map)Main.get(path), path);
     }
 }
