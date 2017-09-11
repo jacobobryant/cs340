@@ -24,8 +24,12 @@ public class Main {
         System.out.println(john.getName());
         System.out.println(john.getPassword());
 
-        User fred = User.createUser("Fred", "ilikecheese");
-        User.setUser(fred, 2);
+        john = john.setPassword("mynewpassword");
+        john.commit(0);
+        System.out.println(john);
+
+        User fred = new User("Fred", "ilikecheese");
+        fred.commit(2);
         System.out.println(state.deref());
     }
 
