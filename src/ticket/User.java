@@ -9,7 +9,7 @@ public class User extends BaseModel {
                 new Object[] {"users", userPosition});
     }
 
-    protected User(Map data, Object[] path) {
+    public User(Map data, Object[] path) {
         super(data, path);
     }
 
@@ -22,7 +22,7 @@ public class User extends BaseModel {
     }
 
     public User setPassword(String newPassword) {
-        return new User(set("password", newPassword), this.path);
+        return (User)set("password", newPassword, User.class);
     }
 
     public static User getUser(int userPosition) {

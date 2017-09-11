@@ -1,5 +1,7 @@
 package ticket;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 public class BaseModel {
@@ -18,8 +20,15 @@ public class BaseModel {
         });
     }
 
-    protected Map set(Object key, Object value) {
-        return (Map)Main.assocIn.invoke(this.data, new Object[] {key}, value);
+    protected BaseModel set(Object key, Object value, Class<? extends BaseModel> clazz) {
+        Map data = (Map)Main.assocIn.invoke(this.data, new Object[] {key}, value);
+        try {
+            Constructor<?> constructor = clazz.getConstructor(Map.class, Object[].class);
+            return (BaseModel)constructor.newInstance(new Object[]{data, this.path});
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            // Programming error, no way to handle.
+            throw new RuntimeException(e);
+        }
     }
 
     public String toString() {
