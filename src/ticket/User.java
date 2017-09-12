@@ -4,9 +4,8 @@ import java.util.Map;
 
 // DEMO: how to create a new data model
 public class User extends BaseModel {
-    public User(String name, String password, int userPosition) {
-        super(new Object[] {"name", name, "password", password},
-                new Object[] {"users", userPosition});
+    public User(String name, String password, Object[] path) {
+        super(new Object[] {"name", name, "password", password}, path);
     }
 
     public User(Map data, Object[] path) {
@@ -25,8 +24,7 @@ public class User extends BaseModel {
         return (User)set("password", newPassword, User.class);
     }
 
-    public static User getUser(int userPosition) {
-        Object[] path = new Object[] {"users", userPosition};
-        return new User((Map)Main.get(path), path);
+    public User setName(String newName) {
+        return (User)set("name", newName, User.class);
     }
 }

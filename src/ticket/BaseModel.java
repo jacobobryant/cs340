@@ -5,11 +5,11 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 public class BaseModel {
-    protected final Map data;
-    protected final Object[] path;
+    public final Map data;
+    public final Object[] path;
 
     protected BaseModel(Object[] associations, Object[] path) {
-        this.data = (Map)Main.apply.invoke(Main.hashMap, associations);
+        this.data = (Map)C.apply.invoke(C.hashMap, associations);
         this.path = path;
     }
 
@@ -18,13 +18,8 @@ public class BaseModel {
         this.path = path;
     }
 
-    public void commit() {
-        Main.Swapper swap = (oldState) -> Main.assoc(this.path, this.data);
-        Main.swap.invoke(Main.state, Main.swapperToFn, swap);
-    }
-
     protected BaseModel set(Object key, Object value, Class<? extends BaseModel> clazz) {
-        Map data = (Map)Main.assocIn.invoke(this.data, new Object[] {key}, value);
+        Map data = (Map)C.assocIn.invoke(this.data, new Object[] {key}, value);
         try {
             Constructor<?> constructor = clazz.getConstructor(Map.class, Object[].class);
             return (BaseModel)constructor.newInstance(new Object[]{data, this.path});
