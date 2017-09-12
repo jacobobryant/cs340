@@ -19,10 +19,8 @@ public class BaseModel {
     }
 
     public void commit() {
-        Main.updateState(() -> {
-            Main.state.set(Main.assoc(this.path, this.data));
-            return null;
-        });
+        Main.Swapper swap = (oldState) -> Main.assoc(this.path, this.data);
+        Main.swap.invoke(Main.state, Main.swapperToFn, swap);
     }
 
     protected BaseModel set(Object key, Object value, Class<? extends BaseModel> clazz) {
