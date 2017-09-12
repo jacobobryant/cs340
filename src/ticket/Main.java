@@ -15,6 +15,7 @@ public class Main {
     static final IFn assocIn = Clojure.var("clojure.core", "assoc-in");
     static final IFn getIn = Clojure.var("clojure.core", "get-in");
     static final IFn hashMap = Clojure.var("clojure.core", "hash-map");
+    static final IFn apply = Clojure.var("clojure.core", "apply");
 
     // DEMO: how to use the data objects
     public static void main(String[] args) {

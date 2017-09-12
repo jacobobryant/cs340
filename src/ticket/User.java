@@ -5,7 +5,7 @@ import java.util.Map;
 // DEMO: how to create a new data model
 public class User extends BaseModel {
     public User(String name, String password, int userPosition) {
-        super((Map)Main.hashMap.invoke("name", name, "password", password),
+        super(new Object[] {"name", name, "password", password},
                 new Object[] {"users", userPosition});
     }
 

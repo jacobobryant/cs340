@@ -8,6 +8,11 @@ public class BaseModel {
     protected final Map data;
     protected final Object[] path;
 
+    protected BaseModel(Object[] associations, Object[] path) {
+        this.data = (Map)Main.apply.invoke(Main.hashMap, associations);
+        this.path = path;
+    }
+
     protected BaseModel(Map data, Object[] path) {
         this.data = data;
         this.path = path;
