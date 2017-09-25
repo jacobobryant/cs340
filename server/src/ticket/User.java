@@ -4,12 +4,12 @@ import java.util.Map;
 
 // DEMO: how to create a new data model
 public class User extends BaseModel {
-    public User(String name, String password, Object[] path) {
-        super(new Object[] {"name", name, "password", password}, path);
-    }
-
     public User(Map data, Object[] path) {
         super(data, path);
+    }
+
+    public User(String name, String password, Object[] path) {
+        super(new Object[] {"name", name, "password", password}, path);
     }
 
     public String getName() {
