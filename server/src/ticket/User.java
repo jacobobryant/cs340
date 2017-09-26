@@ -1,5 +1,6 @@
 package ticket;
 
+import java.util.List;
 import java.util.Map;
 
 // DEMO: how to create a new data model
@@ -9,7 +10,8 @@ public class User extends BaseModel {
     }
 
     public User(String name, String password, Object[] path) {
-        super(new Object[] {"name", name, "password", password}, path);
+        super(new Object[] {"name", name, "password", password,
+                            "sessions", C.vector.invoke()}, path);
     }
 
     public String getName() {
@@ -20,11 +22,15 @@ public class User extends BaseModel {
         return (String)data.get("password");
     }
 
-    public User setPassword(String newPassword) {
-        return (User)set("password", newPassword, User.class);
+    public int countSessions() {
+        return ((List)data.get("sessions")).size();
     }
 
-    public User setName(String newName) {
-        return (User)set("name", newName, User.class);
-    }
+    //public User setPassword(String newPassword) {
+    //    return (User)set("password", newPassword, User.class);
+    //}
+
+    //public User setName(String newName) {
+    //    return (User)set("name", newName, User.class);
+    //}
 }
