@@ -3,6 +3,10 @@ package ticket;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * Holds the global state. Includes methods that provide interaction between individually
+ * models and the entire model.
+ */
 public class Model {
     private static final Object globalState = C.atom.invoke(new Model());
     private final Object state;
@@ -35,7 +39,7 @@ public class Model {
         return (Model)C.deref.invoke(globalState);
     }
 
-    // DEMO: how to integrate a model with the entire state
+    // USER
     public Model createUser(String name, String password) {
         return commit(new User(name, password, userPath(name)));
     }
@@ -61,8 +65,8 @@ public class Model {
     private Object[] userPath(String name) {
         return new Object[] {"users", name};
     }
-    // ----------------------------------------------------
 
+    // SESSION
     public Model createSession(String username) {
         String id = UUID.randomUUID().toString();
         int size = getUser(username).countSessions();
