@@ -77,6 +77,9 @@ public class Server extends NanoHTTPD {
                 String username = (String)get(body, "username");
                 String password = (String)get(body, "password");
                 method = () -> Facade.login(username, password);
+            } else if (endpoint.equals("/create")) {
+                String sessionId = (String)get(body, "sessionId");
+                method = () -> Facade.create(sessionId);
             } else {
                 return error(E.CLIENT_CODE, "endpoint " + endpoint + " doesn't exist");
             }

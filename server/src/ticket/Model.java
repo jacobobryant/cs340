@@ -1,5 +1,6 @@
 package ticket;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -16,7 +17,7 @@ public class Model {
     }
 
     private Model() {
-        this(C.readString.invoke("{\"users\" {}}"));
+        this(C.readString.invoke("{\"users\" {}, \"games\" []}"));
     }
 
     public Model(Object state) {
@@ -39,6 +40,10 @@ public class Model {
         return (Model)C.deref.invoke(globalState);
     }
 
+    private int count(Object... path) {
+        return ((List)C.getIn.invoke(state, path)).size();
+    }
+
     // USER
     public Model createUser(String name, String password) {
         return commit(new User(name, password, userPath(name)));
@@ -56,6 +61,10 @@ public class Model {
         if (!getUser(username).getPassword().equals(password)) {
             throw new E.LoginException();
         }
+    }
+
+    public void authenticate(String sessionId) {
+        // TODO
     }
 
     public boolean userExists(String name) {
@@ -78,5 +87,27 @@ public class Model {
         int lastIndex = getUser(username).countSessions() - 1;
         Object[] path = {"users", username, "sessions", lastIndex};
         return new Session((Map)C.getIn.invoke(state, path), path);
+    }
+
+    // GAME
+    public Model createGame(String sessionId) {
+        if (getGame(sessionId) != null) {
+            throw new E.HasGameException();
+        }
+        String gameId = UUID.randomUUID().toString();
+        Object[] path = {"games", count("games")};
+        return commit(new Game(gameId, sessionId, false, path));
+    }
+
+    public Game getGame(String sessionId) {
+        int size = count("games");
+        for (int position = 0; position < size; position++) {
+            Object[] path = {"games", position};
+            Game game = new Game((Map)C.getIn.invoke(state, path), path);
+            if (game.hasPlayer(sessionId)) {
+                return game;
+            }
+        }
+        return null;
     }
 }

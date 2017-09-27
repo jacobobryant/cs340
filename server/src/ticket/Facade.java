@@ -32,4 +32,24 @@ public class Facade {
         Session session = model.getNewestSession(username);
         return (Map)C.hashMap.invoke("sessionId", session.getId());
     }
+
+    public static Map create(String sessionId) {
+        Model model;
+        try {
+            model = Model.swap((state) -> {
+                state.authenticate(sessionId);
+                return state.createGame(sessionId);
+            });
+        } catch (E.SessionException e) {
+            return Server.error(E.INVALID_SESSION_ID, "Invalid session ID");
+        } catch (E.HasGameException e) {
+            return Server.error(E.HAS_GAME, "Session is already part of a game");
+        }
+        Game game = model.getGame(sessionId);
+        return (Map)C.hashMap.invoke("currentGame",
+                C.hashMap.invoke(
+                    "gameId", game.getId(),
+                    "started", game.started(),
+                    "players", game.getPlayers()));
+    }
 }
