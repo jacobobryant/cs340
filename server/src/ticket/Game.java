@@ -10,12 +10,8 @@ public class Game extends BaseModel {
 
     public Game(String gameId, String sessionId, boolean started, Object[] path) {
         super(new Object[] {"gameId", gameId, 
-            "players", C.vector.invoke(sessionId),
+            "sessions", C.vector.invoke(sessionId),
             "started", started}, path);
-    }
-
-    public boolean hasPlayer(String sessionId) {
-        return ((List)data.get("players")).contains(sessionId);
     }
 
     public String getId() {
@@ -26,7 +22,7 @@ public class Game extends BaseModel {
         return (boolean)data.get("started");
     }
 
-    public List getPlayers() {
-        return (List)data.get("players");
+    public List<String> getSessions() {
+        return (List<String>)data.get("sessions");
     }
 }

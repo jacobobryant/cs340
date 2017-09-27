@@ -1,5 +1,7 @@
 package ticket;
 
+import clojure.lang.IFn;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
@@ -14,6 +16,9 @@ public class BaseModel {
     }
 
     protected BaseModel(Map data, Object[] path) {
+        if (data == null) {
+            throw new NullPointerException();
+        }
         this.data = data;
         this.path = path;
     }
@@ -27,6 +32,10 @@ public class BaseModel {
             // Programming error, no way to handle.
             throw new RuntimeException(e);
         }
+    }
+
+    protected Map update(Object key, IFn fn, Object... fnargs) {
+        return (Map)C.apply.invoke(C.update, this.data, key, fn, fnargs);
     }
 
     public String toString() {

@@ -3,6 +3,7 @@ package ticket;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Holds the global state. Includes methods that provide interaction between individually
@@ -17,7 +18,7 @@ public class Model {
     }
 
     private Model() {
-        this(C.readString.invoke("{\"users\" {}, \"games\" []}"));
+        this(C.readString.invoke("{\"users\" {}, \"games\" {}, \"sessions\" {}}"));
     }
 
     public Model(Object state) {
@@ -40,8 +41,8 @@ public class Model {
         return (Model)C.deref.invoke(globalState);
     }
 
-    private int count(Object... path) {
-        return ((List)C.getIn.invoke(state, path)).size();
+    private boolean exists(Object... path) {
+        return C.getIn.invoke(state, path) != null;
     }
 
     // USER
@@ -55,20 +56,19 @@ public class Model {
     }
 
     public void authenticate(String username, String password) {
-        if (!userExists(username)) {
-            throw new E.LoginException();
-        }
-        if (!getUser(username).getPassword().equals(password)) {
+        if (!userExists(username) || !getUser(username).getPassword().equals(password)) {
             throw new E.LoginException();
         }
     }
 
     public void authenticate(String sessionId) {
-        // TODO
+        if (!exists("sessions", sessionId)) {
+            throw new E.SessionException();
+        }
     }
 
     public boolean userExists(String name) {
-        return C.getIn.invoke(state, userPath(name)) != null; 
+        return exists("users", name);
     }
 
     private Object[] userPath(String name) {
@@ -78,36 +78,43 @@ public class Model {
     // SESSION
     public Model createSession(String username) {
         String id = UUID.randomUUID().toString();
-        int size = getUser(username).countSessions();
-        Object[] path = {"users", username, "sessions", size};
-        return commit(new Session(id, path));
+        Object[] path = {"sessions", id};
+        return commit(new Session(id, username, path))
+              .commit(getUser(username).addSession(id));
     }
 
-    public Session getNewestSession(String username) {
-        int lastIndex = getUser(username).countSessions() - 1;
-        Object[] path = {"users", username, "sessions", lastIndex};
+    public String getNewestSession(String username) {
+        return (String)C.last.invoke(getUser(username).getSessions());
+    }
+
+    public Session getSession(String sessionId) {
+        Object[] path = {"sessions", sessionId};
         return new Session((Map)C.getIn.invoke(state, path), path);
     }
 
     // GAME
     public Model createGame(String sessionId) {
-        if (getGame(sessionId) != null) {
+        if (exists("sessions", sessionId, "gameId")) {
             throw new E.HasGameException();
         }
         String gameId = UUID.randomUUID().toString();
-        Object[] path = {"games", count("games")};
-        return commit(new Game(gameId, sessionId, false, path));
+        Object[] path = {"games", gameId};
+        return commit(new Game(gameId, sessionId, false, path))
+              .commit(getSession(sessionId).setGame(gameId));
     }
 
-    public Game getGame(String sessionId) {
-        int size = count("games");
-        for (int position = 0; position < size; position++) {
-            Object[] path = {"games", position};
-            Game game = new Game((Map)C.getIn.invoke(state, path), path);
-            if (game.hasPlayer(sessionId)) {
-                return game;
-            }
-        }
-        return null;
+    public Game getGameBySession(String sessionId) {
+        return getGame(getSession(sessionId).getGame());
+    }
+
+    public Game getGame(String gameId) {
+        Object[] path = {"games", gameId};
+        return new Game((Map)C.getIn.invoke(state, path), path);
+    }
+
+    public List<String> getPlayerNames(String gameId) {
+        return getGame(gameId).getSessions().stream()
+            .map((sessionId) -> getSession(sessionId).getUsername())
+            .collect(Collectors.toList());
     }
 }

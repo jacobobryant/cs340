@@ -14,23 +14,15 @@ public class User extends BaseModel {
                             "sessions", C.vector.invoke()}, path);
     }
 
-    public String getName() {
-        return (String)data.get("name");
-    }
-
     public String getPassword() {
         return (String)data.get("password");
     }
 
-    public int countSessions() {
-        return ((List)data.get("sessions")).size();
+    public List<String> getSessions() {
+        return (List<String>)data.get("sessions");
     }
 
-    //public User setPassword(String newPassword) {
-    //    return (User)set("password", newPassword, User.class);
-    //}
-
-    //public User setName(String newName) {
-    //    return (User)set("name", newName, User.class);
-    //}
+    public User addSession(String sessionId) {
+        return new User(update("sessions", C.conj, sessionId), path);
+    }
 }

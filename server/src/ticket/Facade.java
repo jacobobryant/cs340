@@ -29,8 +29,7 @@ public class Facade {
             return Server.error(E.LOGIN_FAILED,
                     "Invalid username/password combination");
         }
-        Session session = model.getNewestSession(username);
-        return (Map)C.hashMap.invoke("sessionId", session.getId());
+        return (Map)C.hashMap.invoke("sessionId", model.getNewestSession(username));
     }
 
     public static Map create(String sessionId) {
@@ -45,11 +44,11 @@ public class Facade {
         } catch (E.HasGameException e) {
             return Server.error(E.HAS_GAME, "Session is already part of a game");
         }
-        Game game = model.getGame(sessionId);
+        Game game = model.getGameBySession(sessionId);
         return (Map)C.hashMap.invoke("currentGame",
                 C.hashMap.invoke(
                     "gameId", game.getId(),
                     "started", game.started(),
-                    "players", game.getPlayers()));
+                    "players", model.getPlayerNames(game.getId())));
     }
 }
