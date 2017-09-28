@@ -2,7 +2,7 @@
   <library name="org.nanohttpd:nanohttpd:2.2.0" type="repository">
     <properties maven-id="org.nanohttpd:nanohttpd:2.2.0" />
     <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/org/nanohttpd/nanohttpd/2.2.0/nanohttpd-2.2.0.jar!/" />
+      <root url="jar://$APPLICATION_HOME_DIR$/bin/$MAVEN_REPOSITORY$/org/nanohttpd/nanohttpd/2.2.0/nanohttpd-2.2.0.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
