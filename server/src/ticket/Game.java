@@ -10,11 +10,11 @@ public class Game extends BaseModel {
 
     public Game(String gameId, String sessionId, boolean started, Object[] path) {
         super(new Object[] {"gameId", gameId, 
-            "sessions", C.vector.invoke(sessionId),
+            "sessionIds", C.vector.invoke(sessionId),
             "started", started}, path);
     }
 
-    public String getId() {
+    public String getGameId() {
         return (String)data.get("gameId");
     }
 
@@ -22,7 +22,7 @@ public class Game extends BaseModel {
         return (boolean)data.get("started");
     }
 
-    public List<String> getSessions() {
-        return (List<String>)data.get("sessions");
+    public List<String> getSessionIds() {
+        return (List<String>)data.get("sessionIds");
     }
 }
