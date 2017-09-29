@@ -47,8 +47,8 @@ public class Facade {
         Game game = model.getGameBySession(sessionId);
         return (Map)C.hashMap.invoke("currentGame",
                 C.hashMap.invoke(
-                    "gameId", game.getId(),
+                    "gameId", game.getGameId(),
                     "started", game.started(),
-                    "players", model.getPlayerNames(game.getId())));
+                    "players", model.getPlayerNames(game.getGameId())));
     }
 }

@@ -2,7 +2,7 @@
   <library name="org.clojure:clojure:1.8.0" type="repository">
     <properties maven-id="org.clojure:clojure:1.8.0" />
     <CLASSES>
-      <root url="jar://$APPLICATION_HOME_DIR$/bin/$MAVEN_REPOSITORY$/org/clojure/clojure/1.8.0/clojure-1.8.0.jar!/" />
+      <root url="jar://$PROJECT_DIR$/lib/clojure-1.8.0.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

@@ -80,11 +80,11 @@ public class Model {
         String id = UUID.randomUUID().toString();
         Object[] path = {"sessions", id};
         return commit(new Session(id, username, path))
-              .commit(getUser(username).addSession(id));
+              .commit(getUser(username).addSessionId(id));
     }
 
     public String getNewestSession(String username) {
-        return (String)C.last.invoke(getUser(username).getSessions());
+        return (String)C.last.invoke(getUser(username).getSessionIds());
     }
 
     public Session getSession(String sessionId) {
@@ -100,11 +100,11 @@ public class Model {
         String gameId = UUID.randomUUID().toString();
         Object[] path = {"games", gameId};
         return commit(new Game(gameId, sessionId, false, path))
-              .commit(getSession(sessionId).setGame(gameId));
+              .commit(getSession(sessionId).setGameId(gameId));
     }
 
     public Game getGameBySession(String sessionId) {
-        return getGame(getSession(sessionId).getGame());
+        return getGame(getSession(sessionId).getGameId());
     }
 
     public Game getGame(String gameId) {
@@ -113,7 +113,7 @@ public class Model {
     }
 
     public List<String> getPlayerNames(String gameId) {
-        return getGame(gameId).getSessions().stream()
+        return getGame(gameId).getSessionIds().stream()
             .map((sessionId) -> getSession(sessionId).getUsername())
             .collect(Collectors.toList());
     }

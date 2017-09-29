@@ -51,18 +51,22 @@ public class Server extends NanoHTTPD {
         String endpoint = session.getUri();
         System.out.println(session.getMethod() + ": " + endpoint);
 
+        // read post body
         Map<String, String> files = new HashMap<>();
         try {
             session.parseBody(files);
         } catch (IOException | ResponseException e) {
             return error(E.CLIENT_CODE, "couldn't parse request body");
         }
+        String json = (files.containsKey("postData"))
+            ? files.get("postData") : session.getQueryParameterString();
 
-        String json = session.getQueryParameterString();
+        // parse json
         Map body;
         try {
             body = new ObjectMapper().readValue(json, HashMap.class);
         } catch (IOException | NullPointerException e) {
+            System.out.println(json);
             return error(E.CLIENT_CODE, "couldn't parse json from request body");
         }
 

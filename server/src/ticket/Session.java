@@ -8,10 +8,10 @@ public class Session extends BaseModel {
     }
 
     public Session(String id, String username, Object[] path) {
-        super(new Object[] {"id", id, "username", username, "gameId", null}, path);
+        super(new Object[] {"sessionId", id, "username", username, "gameId", null}, path);
     }
 
-    public String getGame() {
+    public String getGameId() {
         return (String)data.get("gameId");
     }
 
@@ -19,7 +19,7 @@ public class Session extends BaseModel {
         return (String)data.get("username");
     }
 
-    public Session setGame(String gameId) {
+    public Session setGameId(String gameId) {
         return (Session)set("gameId", gameId, Session.class);
     }
 }
