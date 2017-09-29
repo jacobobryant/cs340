@@ -1,6 +1,7 @@
 package com.thefunteam.android;
 
 import com.google.gson.Gson;
+import com.thefunteam.android.model.Login;
 
 public class NextLayerFacade {
     private static NextLayerFacade ourInstance = new NextLayerFacade();
@@ -9,7 +10,7 @@ public class NextLayerFacade {
 
     private NextLayerFacade() { }
 
-    void login(String username, String password) {
+    public void login(String username, String password) {
         Gson gson = new Gson();
         ClientCommunicator.getInstance().post(
                 "/login",
@@ -17,7 +18,7 @@ public class NextLayerFacade {
         );
     }
 
-    void register(String username, String password) {
+    public void register(String username, String password) {
         Gson gson = new Gson();
         ClientCommunicator.getInstance().post(
                 "/register",
@@ -25,19 +26,19 @@ public class NextLayerFacade {
         );
     }
 
-    void joinGame(String gameId) {
+    public void joinGame(String gameId) {
 
     }
 
-    void createGame() {
+    public void createGame() {
 
     }
 
-    void startGame() {
+    public void startGame() {
 
     }
 
-    void leaveGame() {
+    public void leaveGame() {
 
     }
 

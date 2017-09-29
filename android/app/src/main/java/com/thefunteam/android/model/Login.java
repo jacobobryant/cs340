@@ -1,4 +1,4 @@
-package com.thefunteam.android;
+package com.thefunteam.android.model;
 
 public class Login {
     String username;

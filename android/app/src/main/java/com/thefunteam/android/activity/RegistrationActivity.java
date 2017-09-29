@@ -1,6 +1,5 @@
-package com.thefunteam.android;
+package com.thefunteam.android.activity;
 
-import android.support.v7.app.AppCompatActivity;
 
 import android.os.Bundle;
 import android.view.View;
@@ -8,14 +7,16 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import com.thefunteam.android.R;
+import com.thefunteam.android.presenter.RegistrationPresenter;
 
 
 /**
  * A login screen that offers login via email/password.
  */
-public class RegistrationActivity extends AppCompatActivity {
+public class RegistrationActivity extends ObservingActivity {
 
-    private RegistrationPresenter presenter = new RegistrationPresenter();
+    private RegistrationPresenter registrationPresenter = new RegistrationPresenter(this);
 
     // UI references.
     private AutoCompleteTextView mEmailView;
@@ -23,6 +24,11 @@ public class RegistrationActivity extends AppCompatActivity {
     private EditText mReenterPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+
+    RegistrationActivity() {
+        super();
+        presenter = registrationPresenter;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +44,7 @@ public class RegistrationActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (mPasswordView.getText().toString().equals(mReenterPasswordView.getText().toString())) {
-                    presenter.register(mEmailView.getText().toString(), mPasswordView.getText().toString());
+                    registrationPresenter.register(mEmailView.getText().toString(), mPasswordView.getText().toString());
                 } else {
                     Toast toast = Toast.makeText(getApplicationContext(), "Passwords don't match!", Toast.LENGTH_SHORT);
                     toast.show();
