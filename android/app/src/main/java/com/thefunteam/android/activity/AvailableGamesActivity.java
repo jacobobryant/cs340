@@ -9,7 +9,7 @@ import com.thefunteam.android.presenter.AvailableGamesPresenter;
 
 public class AvailableGamesActivity extends ObservingActivity {
 
-    AvailableGamesPresenter availableGamesPresenter = new AvailableGamesPresenter();
+    AvailableGamesPresenter availableGamesPresenter = new AvailableGamesPresenter(this);
 
     AvailableGamesActivity() {
         super();
