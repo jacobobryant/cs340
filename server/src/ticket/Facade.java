@@ -51,4 +51,18 @@ public class Facade {
                     "started", game.started(),
                     "players", model.getPlayerNames(game.getGameId())));
     }
+
+    public static Map join(String sessionId, String gameId){
+        Model model;
+        try {
+            model = Model.swap((state) -> {
+                    state.authenticate(sessionId);
+                    return state.joinGame(gameId, sessionId);
+                });
+        } catch (E.SessionException e) {
+            return Server.error(E.INVALID_SESSION_ID, "Invalid session ID");
+        } catch (E.HasGameException e) {
+            return Server.error(E.HAS_GAME, "Session is already part of a game");
+        }
+    }
 }

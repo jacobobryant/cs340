@@ -84,6 +84,10 @@ public class Server extends NanoHTTPD {
             } else if (endpoint.equals("/create")) {
                 String sessionId = (String)get(body, "sessionId");
                 method = () -> Facade.create(sessionId);
+            } else if (endpoint.equals("/join")) {
+                String sessionId = (String)get(body, "sessionId");
+                String gameId = (String)get(body, "gameId");
+                method = () -> Facade.join(sessionId, gameId);
             } else {
                 return error(E.CLIENT_CODE, "endpoint " + endpoint + " doesn't exist");
             }
