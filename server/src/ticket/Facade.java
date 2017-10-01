@@ -68,7 +68,10 @@ public class Facade {
         return (Map)C.hashMap.invoke("currentGame",
                                      "gameId", game.getGameId(),
                                      "started", game.started(),
-                                     "players", model.getPlayerNames(game.getGameId())));
+                                     "players", model.getPlayerNames(game.getGameId()));
 
     }
+
+    
+
 }
