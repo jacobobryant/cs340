@@ -64,5 +64,11 @@ public class Facade {
         } catch (E.HasGameException e) {
             return Server.error(E.HAS_GAME, "Session is already part of a game");
         }
+        Game game = model.getGame(gameId);
+        return (Map)C.hashMap.invoke("currentGame",
+                                     "gameId", game.getGameId(),
+                                     "started", game.started(),
+                                     "players", model.getPlayerNames(game.getGameId())));
+
     }
 }
