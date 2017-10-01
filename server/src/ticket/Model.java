@@ -103,12 +103,16 @@ public class Model {
               .commit(getSession(sessionId).setGameId(gameId));
     }
 
-    public Game joinGame(String sessionId, String gameId){
+    public Model joinGame(String sessionId, String gameId){
         if (exists("sessions", sessionId, "gameId")){
             throw new E.HasGameException();
         }
         return commit(this.getGame(gameId))
             .commit(getSession(sessionId).setGameId(gameId));
+    }
+
+    public Model startGame(String sessionId, String gameId){
+        return commit(this.getGame(gameId));
     }
 
     public Game getGameBySession(String sessionId) {
