@@ -72,7 +72,7 @@ public class Facade {
 
     }
 
-    public static Map start(String sessionId, String gameId){
+    public static Map start(String sessionId){
         Model model;
         try {
             model = Model.swap((state) -> {
