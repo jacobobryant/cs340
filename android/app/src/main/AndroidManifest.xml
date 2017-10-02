@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.thefunteam.android">
 
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
@@ -13,12 +14,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activity.RegistrationActivity" android:label="@string/title_activity_registration"
-            android:parentActivityName=".activity.LoginActivity">
-            <meta-data android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.thefunteam.android.activity.LoginActivity" />
+        <activity
+            android:name=".RegistrationActivity"
+            android:label="@string/title_activity_registration"
+            android:parentActivityName=".LoginActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.thefunteam.android.LoginActivity" />
         </activity>
-        <activity android:name=".activity.AvailableGamesActivity"></activity>
+        <activity android:name=".AvailableGamesActivity"></activity>
+        <activity android:name=".CurrentGameActivity"></activity>
     </application>
 
 </manifest>

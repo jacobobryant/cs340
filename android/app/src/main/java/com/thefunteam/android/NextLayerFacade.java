@@ -26,8 +26,13 @@ public class NextLayerFacade {
         );
     }
 
-    public void joinGame(String gameId) {
 
+    void joinGame(String gameId) {
+        Gson gson = new Gson();
+//        ClientCommunicator.getInstance().get(
+//                "/join",
+//                gson.toJson()
+//        )
     }
 
     public void createGame() {

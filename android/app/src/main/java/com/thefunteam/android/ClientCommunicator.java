@@ -26,7 +26,7 @@ public class ClientCommunicator {
             protected Void doInBackground(Void... voids) {
                 try {
                     URL url = new URL(ClientCommunicator.this.url + path);
-                    HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                     connection.setRequestMethod("GET");
                     connection.setRequestProperty("Host", "localhost");
                     connection.setRequestProperty("Accept-Charset", "UTF-8");
@@ -45,7 +45,7 @@ public class ClientCommunicator {
                     getResponse(connection);
                 } catch (IOException e) {
                     e.printStackTrace();
-                } catch (Exception e ) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
                 return null;
