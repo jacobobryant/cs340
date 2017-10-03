@@ -89,7 +89,8 @@ public class Server extends NanoHTTPD {
                 String gameId = (String)get(body, "gameId");
                 method = () -> Facade.join(sessionId, gameId);
             } else if (endpoint.equals("/leave")){
-                
+                String sessionId = (String)get(body, "sessionId");
+                method = () -> Facade.leave(sessionId);
             } else if (endpoint.equals("/start")) {
                 String sessionId = (String)get(body, "sessionId");
                 method = () -> Facade.start(sessionId);
