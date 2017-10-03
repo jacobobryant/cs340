@@ -24,11 +24,16 @@ public class Facade {
     }
 
     private static Map success(Model m, String sessionId) {
-        return m.getClientModel(sessionId);
+        Map clientModel = m.getClientModel(sessionId);
+        ClientProxy cp = new ClientProxy();
+        cp.setClientModel(clientModel);
+        return cp.getResponse();
     }
 
     private static Map error(E.BaseException e) {
-        return Server.error(e.getCode(), e.getMessage());
+        ClientProxy cp = new ClientProxy();
+        cp.showError(e);
+        return cp.getResponse();
     }
 
 
