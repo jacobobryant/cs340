@@ -68,10 +68,10 @@ public class Facade {
         }, sessionId);
     }
 
-    public static Map start(String sessionId, String gameId){
+    public static Map start(String sessionId){
         return run((state) -> {
             state.authenticate(sessionId);
-            return state.startGame(sessionId, gameId);
+            return state.startGame(sessionId);
         }, sessionId);
     }
 
