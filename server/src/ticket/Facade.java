@@ -68,6 +68,13 @@ public class Facade {
         }, sessionId);
     }
 
+    public static Map leave(String sessionId){
+        return run((state) -> {
+                state.authenticate(sessionId);
+                return state.leaveGame(sessionId);
+            }, sessionId);
+    }
+
     public static Map start(String sessionId){
         return run((state) -> {
             state.authenticate(sessionId);

@@ -109,6 +109,10 @@ public class Model {
             .commit(getSession(sessionId).setGameId(gameId));
     }
 
+    public Model leaveGame(String sessionId){
+        return commit(getSession(sessionId).setGameId(null));
+    }
+
     public Model startGame(String sessionId){
         return this.getGameBySession(sessionId).setStarted(true);
     }
