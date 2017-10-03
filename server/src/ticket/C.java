@@ -6,6 +6,7 @@ import clojure.lang.IFn;
 public class C {
     public static final IFn assocIn = Clojure.var("clojure.core", "assoc-in");
     public static final IFn getIn = Clojure.var("clojure.core", "get-in");
+    public static final IFn get = Clojure.var("clojure.core", "get");
     public static final IFn hashMap = Clojure.var("clojure.core", "hash-map");
     public static final IFn apply = Clojure.var("clojure.core", "apply");
     public static final IFn atom = Clojure.var("clojure.core", "atom");

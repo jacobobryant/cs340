@@ -1,8 +1,6 @@
 package ticket;
 
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -128,5 +126,40 @@ public class Model {
         return getGame(gameId).getSessionIds().stream()
             .map((sessionId) -> getSession(sessionId).getUsername())
             .collect(Collectors.toList());
+    }
+
+    // OTHER
+    public Map getClientModel(String sessionId) {
+        String gameId = getSession(sessionId).getGameId();
+        List<Map> availableGames = null;
+        Map currentGame = null;
+        if (gameId == null) {
+            availableGames = getAvailableGames();
+        } else {
+            currentGame = getClientGameModel(gameId);
+        }
+
+        return (Map)C.hashMap.invoke(
+                "sessionId", sessionId,
+                "currentGame", currentGame,
+                "availableGames", availableGames);
+    }
+
+    public List<Map> getAvailableGames() {
+        List<Map> availableGames = new ArrayList<>();
+        for (Map gameData : (Collection<Map>)((Map)C.get.invoke(state, "games")).values()) {
+            Game game = new Game(gameData, null);
+            if (!game.started() && game.getSessionIds().size() < 5) {
+                availableGames.add(getClientGameModel(game.getGameId()));
+            }
+        }
+        return availableGames;
+    }
+
+    public Map getClientGameModel(String gameId) {
+        return (Map)C.hashMap.invoke(
+                "gameId", gameId,
+                "started", getGame(gameId).started(),
+                "players", getPlayerNames(gameId));
     }
 }

@@ -29,7 +29,7 @@ public class Facade {
             return Server.error(E.LOGIN_FAILED,
                     "Invalid username/password combination");
         }
-        return (Map)C.hashMap.invoke("sessionId", model.getNewestSession(username));
+        return model.getClientModel(model.getNewestSession(username));
     }
 
     public static Map create(String sessionId) {
@@ -44,12 +44,7 @@ public class Facade {
         } catch (E.HasGameException e) {
             return Server.error(E.HAS_GAME, "Session is already part of a game");
         }
-        Game game = model.getGameBySession(sessionId);
-        return (Map)C.hashMap.invoke("currentGame",
-                C.hashMap.invoke(
-                    "gameId", game.getGameId(),
-                    "started", game.started(),
-                    "players", model.getPlayerNames(game.getGameId())));
+        return model.getClientModel(sessionId);
     }
 
     public static Map join(String sessionId, String gameId){
@@ -64,12 +59,7 @@ public class Facade {
         } catch (E.HasGameException e) {
             return Server.error(E.HAS_GAME, "Session is already part of a game");
         }
-        Game game = model.getGame(gameId);
-        return (Map)C.hashMap.invoke("currentGame",
-                                     "gameId", game.getGameId(),
-                                     "started", game.started(),
-                                     "players", model.getPlayerNames(game.getGameId()));
-
+        return model.getClientModel(sessionId);
     }
 
     public static Map start(String sessionId, String gameId){
@@ -84,11 +74,10 @@ public class Facade {
         } catch (E.HasGameException e) {
             return Server.error(E.HAS_GAME, "Session is already part of a game");
         }
-        Game game = model.getGame(gameId);
-        return (Map)C.hashMap.invoke("currentgame",
-                                     "gameId", game.getGameId(),
-                                     "started", "true",
-                                     "players", model.getPlayerNames(game.getGameId()));
+        return model.getClientModel(sessionId);
     }
 
+    public static Map state(String sessionId) {
+        return Model.getState().getClientModel(sessionId);
+    }
 }
