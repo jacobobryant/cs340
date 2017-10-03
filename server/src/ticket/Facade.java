@@ -3,81 +3,74 @@ package ticket;
 import java.util.Map;
 
 public class Facade {
-    public static Map register(String username, String password) {
+    private static Map run(Model.Swapper swapper, String key, boolean getByUsername) {
+        Model m;
         try {
-            Model.swap((state) -> {
-                if (state.userExists(username)) {
-                    throw new E.UserExistsException();
-                }
-                return state.createUser(username, password);
-            });
-        } catch (E.UserExistsException e) {
-            return Server.error(E.USERNAME_TAKEN,
-                    "That username has already been taken");
+            m = Model.swap(swapper);
+        } catch (E.BaseException e) {
+            return error(e);
         }
-        return login(username, password);
+        String sessionId;
+        if (getByUsername) {
+            sessionId = m.getNewestSession(key);
+        } else {
+            sessionId = key;
+        }
+        return success(m, sessionId);
+    }
+
+    private static Map run(Model.Swapper swapper, String sessionId) {
+        return run(swapper, sessionId, false);
+    }
+
+    private static Map success(Model m, String sessionId) {
+        return m.getClientModel(sessionId);
+    }
+
+    private static Map error(E.BaseException e) {
+        return Server.error(e.getCode(), e.getMessage());
+    }
+
+
+    public static Map register(String username, String password) {
+        return run((state) -> {
+            if (state.userExists(username)) {
+                throw new E.UserExistsException();
+            }
+            return state.createUser(username, password)
+                .createSession(username);
+        }, username, true);
     }
 
     public static Map login(String username, String password) {
-        Model model;
-        try {
-            model = Model.swap((state) -> {
+        return run((state) -> {
                 state.authenticate(username, password);
                 return state.createSession(username);
-            });
-        } catch (E.LoginException e) {
-            return Server.error(E.LOGIN_FAILED,
-                    "Invalid username/password combination");
-        }
-        return model.getClientModel(model.getNewestSession(username));
+        }, username, true);
     }
 
     public static Map create(String sessionId) {
-        Model model;
-        try {
-            model = Model.swap((state) -> {
-                state.authenticate(sessionId);
-                return state.createGame(sessionId);
-            });
-        } catch (E.SessionException e) {
-            return Server.error(E.INVALID_SESSION_ID, "Invalid session ID");
-        } catch (E.HasGameException e) {
-            return Server.error(E.HAS_GAME, "Session is already part of a game");
-        }
-        return model.getClientModel(sessionId);
+        return run((state) -> {
+            state.authenticate(sessionId);
+            return state.createGame(sessionId);
+        }, sessionId);
     }
 
-    public static Map join(String sessionId, String gameId){
-        Model model;
-        try {
-            model = Model.swap((state) -> {
-                    state.authenticate(sessionId);
-                    return state.joinGame(gameId, sessionId);
-                });
-        } catch (E.SessionException e) {
-            return Server.error(E.INVALID_SESSION_ID, "Invalid session ID");
-        } catch (E.HasGameException e) {
-            return Server.error(E.HAS_GAME, "Session is already part of a game");
-        }
-        return model.getClientModel(sessionId);
+    public static Map join(String sessionId, String gameId) {
+        return run((state) -> {
+            state.authenticate(sessionId);
+            return state.joinGame(gameId, sessionId);
+        }, sessionId);
     }
 
     public static Map start(String sessionId, String gameId){
-        Model model;
-        try {
-            model = Model.swap((state) -> {
-                    state.authenticate(sessionId);
-                    return state.startGame(sessionId, gameId);
-                });
-        } catch (E.SessionException e) {
-            return Server.error(E.INVALID_SESSION_ID, "Invalid session ID");
-        } catch (E.HasGameException e) {
-            return Server.error(E.HAS_GAME, "Session is already part of a game");
-        }
-        return model.getClientModel(sessionId);
+        return run((state) -> {
+            state.authenticate(sessionId);
+            return state.startGame(sessionId, gameId);
+        }, sessionId);
     }
 
     public static Map state(String sessionId) {
-        return Model.getState().getClientModel(sessionId);
+        return success(Model.getState(), sessionId);
     }
 }
