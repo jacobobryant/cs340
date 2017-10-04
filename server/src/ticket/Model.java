@@ -110,6 +110,9 @@ public class Model {
     }
 
     public Model leaveGame(String sessionId){
+        if(!exists("sessions", sessionId, "gameId")){
+            throw new E.
+        }
         return commit(getSession(sessionId).setGameId(null));
     }
 

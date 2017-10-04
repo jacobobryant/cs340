@@ -7,6 +7,7 @@ public class E {
     public static final int LOGIN_FAILED = 1;
     public static final int INVALID_SESSION_ID = 2;
     public static final int HAS_GAME = 3;
+    public static final int NO_CURRENT_GAME = 4;
 
     public static class BaseException extends RuntimeException {
         @Override
@@ -64,6 +65,18 @@ public class E {
         @Override
         public int getCode() {
             return E.HAS_GAME;
+        }
+    }
+
+    public static class NoCurrentGameException extends BaseException {
+        @Override
+        public String getMessage() {
+            return "Session is not a member of a game";
+        }
+
+        @Override
+        public int getCode() {
+            return E.NO_CURRENT_GAME;
         }
     }
 }
