@@ -1,4 +1,4 @@
-package com.thefunteam.android;
+package com.thefunteam.android.activity;
 
 import android.app.LauncherActivity;
 import android.support.v7.app.AppCompatActivity;
@@ -11,10 +11,17 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.thefunteam.android.ListAdapter;
+import com.thefunteam.android.ListItem;
+import com.thefunteam.android.R;
+import com.thefunteam.android.presenter.CurrentGamePresenter;
+
 import java.util.ArrayList;
 import java.util.List;
 
-public class CurrentGameActivity extends AppCompatActivity {
+public class CurrentGameActivity extends ObservingActivity {
+
+    CurrentGamePresenter currentGamePresenter = new CurrentGamePresenter(this);
 
     //gameName Text
     private TextView gameName;
@@ -30,6 +37,12 @@ public class CurrentGameActivity extends AppCompatActivity {
 
     //leave button
     private Button leaveButton;
+
+    CurrentGameActivity() {
+        super();
+
+        this.presenter = currentGamePresenter;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

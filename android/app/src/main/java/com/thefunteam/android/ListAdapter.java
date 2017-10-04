@@ -1,7 +1,6 @@
 package com.thefunteam.android;
 
 import android.app.ActivityManager;
-import android.app.LauncherActivity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,6 +12,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.thefunteam.android.activity.AvailableGamesActivity;
+import com.thefunteam.android.activity.CurrentGameActivity;
+import com.thefunteam.android.model.Model;
 
 import java.util.List;
 
@@ -56,14 +59,14 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
                 if(cn.equals(AvailableGamesActivity.class)){
                     AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
                     builder
-                            .setTitle("Erase hard drive")
-                            .setMessage("Are you sure?")
+                            .setTitle("Join Game")
+                            .setMessage("Do you want to join this game?")
                             .setIcon(android.R.drawable.ic_dialog_alert)
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-                                    //Yes button clicked, do something
-                                    Intent i = new Intent(view.getContext(), CurrentGameActivity.class);
-                                    view.getContext().startActivity(i);
+//                                    Intent i = new Intent(view.getContext(), CurrentGameActivity.class);
+//                                    view.getContext().startActivity(i);
+                                    NextLayerFacade.getInstance().joinGame();
                                 }
                             })
                             .setNegativeButton("No", null)

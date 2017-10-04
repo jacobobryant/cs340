@@ -1,7 +1,10 @@
 package com.thefunteam.android;
 
 import com.google.gson.Gson;
+import com.thefunteam.android.model.Atom;
 import com.thefunteam.android.model.Login;
+
+import java.util.concurrent.atomic.AtomicIntegerArray;
 
 public class NextLayerFacade {
     private static NextLayerFacade ourInstance = new NextLayerFacade();
@@ -27,7 +30,8 @@ public class NextLayerFacade {
     }
 
 
-    void joinGame(String gameId) {
+    public void joinGame(String gameId) {
+        String sessionId =  Atom.getInstance().getModel().getSessionId();
         Gson gson = new Gson();
 //        ClientCommunicator.getInstance().get(
 //                "/join",

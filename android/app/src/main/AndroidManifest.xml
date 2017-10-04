@@ -22,8 +22,8 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.thefunteam.android.LoginActivity" />
         </activity>
-        <activity android:name=".AvailableGamesActivity"></activity>
-        <activity android:name=".CurrentGameActivity"></activity>
+        <activity android:name=".activity.AvailableGamesActivity"></activity>
+        <activity android:name=".activity.CurrentGameActivity"></activity>
     </application>
 
 </manifest>
