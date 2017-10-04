@@ -11,7 +11,7 @@ public class AvailableGamesActivity extends ObservingActivity {
 
     AvailableGamesPresenter availableGamesPresenter = new AvailableGamesPresenter(this);
 
-    AvailableGamesActivity() {
+    public AvailableGamesActivity() {
         super();
 
         presenter = availableGamesPresenter;

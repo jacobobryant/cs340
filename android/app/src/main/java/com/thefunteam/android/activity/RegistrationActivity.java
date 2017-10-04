@@ -25,7 +25,7 @@ public class RegistrationActivity extends ObservingActivity {
     private View mProgressView;
     private View mLoginFormView;
 
-    RegistrationActivity() {
+    public RegistrationActivity() {
         super();
         presenter = registrationPresenter;
     }

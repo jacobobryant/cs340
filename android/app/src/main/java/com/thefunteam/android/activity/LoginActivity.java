@@ -24,7 +24,7 @@ public class LoginActivity extends ObservingActivity {
     private View mProgressView;
     private View mLoginFormView;
 
-    LoginActivity() {
+    public LoginActivity() {
         super();
         presenter = loginPresenter;
     }
