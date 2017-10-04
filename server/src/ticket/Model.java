@@ -105,18 +105,22 @@ public class Model {
         if (exists("sessions", sessionId, "gameId")){
             throw new E.HasGameException();
         }
+        if(exist(
         return commit(this.getGame(gameId))
             .commit(getSession(sessionId).setGameId(gameId));
     }
 
     public Model leaveGame(String sessionId){
         if(!exists("sessions", sessionId, "gameId")){
-            throw new E.
+            throw new E.NoCurrentGameException();
         }
         return commit(getSession(sessionId).setGameId(null));
     }
 
     public Model startGame(String sessionId){
+        if(!exists("sessions", sessionId, "gameId")){
+            throw new E.NoCurrentGameException();
+        }
         return commit(this.getGameBySession(sessionId).setStarted(true));
     }
 
