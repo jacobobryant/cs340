@@ -114,7 +114,7 @@ public class Model {
         if(!exists("sessions", sessionId, "gameId")){
             throw new E.NoCurrentGameException();
         }
-        return commit(getSession(sessionId).setGameId(null));
+        return commit(getSession(sessionId).removeSessionId(sessionId));
     }
 
     public Model startGame(String sessionId){

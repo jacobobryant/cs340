@@ -23,7 +23,7 @@ public class Game extends BaseModel {
     }
 
     public Game setStarted(boolean p){
-        return this.set("started", p, Game.class);
+        return (Game)this.set("started", p, Game.class);
     }
 
     public List<String> getSessionIds() {
