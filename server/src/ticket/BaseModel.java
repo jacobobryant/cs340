@@ -38,6 +38,10 @@ public class BaseModel {
         return (Map)C.apply.invoke(C.update, this.data, key, fn, fnargs);
     }
 
+    protected Map remove(Object key, Object item) {
+        return update(key, C.vecrm, item);
+    }
+
     public String toString() {
         return data.toString();
     }
