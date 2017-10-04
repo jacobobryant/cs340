@@ -20,4 +20,6 @@ public class C {
     public static final IFn last = Clojure.var("clojure.core", "last");
     public static final IFn swapperToFn = (IFn)eval.invoke(readString.invoke(
                 "(fn [old-state swapper] (.swap swapper old-state))"));
+    public static final IFn vecrm = (IFn)eval.invoke(readString.invoke(
+                "(defn vecrm [v item] (vec (remove #(= item %) v)))"));
 }

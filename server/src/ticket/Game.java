@@ -29,4 +29,8 @@ public class Game extends BaseModel {
     public List<String> getSessionIds() {
         return (List<String>)data.get("sessionIds");
     }
+
+    public Game removeSessionId(String sessionId) {
+        return new Game(remove("sessionIds", sessionId), path);
+    }
 }
