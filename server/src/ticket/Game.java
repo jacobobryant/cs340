@@ -22,7 +22,7 @@ public class Game extends BaseModel {
         return (boolean)data.get("started");
     }
 
-    public Object[] setStarted(boolean p){
+    public Game setStarted(boolean p){
         return this.set("started", p, Game.class);
     }
 
