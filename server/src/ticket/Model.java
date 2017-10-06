@@ -101,29 +101,32 @@ public class Model {
               .commit(getSession(sessionId).setGameId(gameId));
     }
 
-    public Model joinGame(String sessionId, String gameId){
-        // check if sessionId is part of a game
+    public Model joinGame(String sessionId, String gameId) {
         if (exists("sessions", sessionId, "gameId")){
             throw new E.HasGameException();
         }
-        // check if gameId is valid
-        
-        //        if(exist(
-        return commit(this.getGame(gameId))
-            .commit(getSession(sessionId).setGameId(gameId));
+        // TODO throw exception if game already has 5 users or has already started
+        return commit(getGame(gameId).addSessionId(sessionId))
+              .commit(getSession(sessionId).setGameId(gameId));
     }
 
-    public Model leaveGame(String sessionId){
-        if(!exists("sessions", sessionId, "gameId")){
+    public Model leaveGame(String sessionId) {
+        Session session = getSession(sessionId);
+        String gameId = session.getGameId();
+        if (gameId == null) {
             throw new E.NoCurrentGameException();
         }
-        return commit(getSession(sessionId).removeSessionId(sessionId));
+        // TODO throw exception if game has already started
+        //      delete game if it doesn't have any users
+        return commit(session.setGameId(null))
+              .commit(getGame(gameId).removeSessionId(sessionId));
     }
 
     public Model startGame(String sessionId){
-        if(!exists("sessions", sessionId, "gameId")){
+        if (!exists("sessions", sessionId, "gameId")) {
             throw new E.NoCurrentGameException();
         }
+        // TODO throw exception if the game only has one user
         return commit(this.getGameBySession(sessionId).setStarted(true));
     }
 
