@@ -30,6 +30,10 @@ public class Game extends BaseModel {
         return (List<String>)data.get("sessionIds");
     }
 
+    public Game addSessionId(String sessionId) {
+        return new Game(update("sessionIds", C.conj, sessionId), path);
+    }
+
     public Game removeSessionId(String sessionId) {
         return new Game(remove("sessionIds", sessionId), path);
     }
