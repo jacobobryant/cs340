@@ -10,7 +10,7 @@ public class AvailableGamesPresenter extends Presenter {
 
     AvailableGamesActivity availableGamesActivity;
 
-    AvailableGamesPresenter(AvailableGamesActivity availableGamesActivity) {
+    public AvailableGamesPresenter(AvailableGamesActivity availableGamesActivity) {
         super();
 
         this.availableGamesActivity = availableGamesActivity;
