@@ -1,21 +1,23 @@
 package com.thefunteam.android;
 
+import com.thefunteam.android.model.Game;
+
 /**
  * Created by msi on 2017-10-01.
  */
 
 public class ListItem {
-    private String description;
+    private Game description;
 
-    public ListItem(String description) {
+    public ListItem(Game description) {
         this.description = description;
     }
 
-    public String getDescription() {
+    public Game getDescription() {
         return description;
     }
 
-    public void setDescription(String description) {
+    public void setDescription(Game description) {
         this.description = description;
     }
 }

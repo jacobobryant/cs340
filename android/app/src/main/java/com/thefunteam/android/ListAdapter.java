@@ -15,6 +15,8 @@ import android.widget.TextView;
 
 import com.thefunteam.android.activity.AvailableGamesActivity;
 import com.thefunteam.android.activity.CurrentGameActivity;
+import com.thefunteam.android.model.Atom;
+import com.thefunteam.android.model.Game;
 import com.thefunteam.android.model.Model;
 
 import java.util.List;
@@ -49,24 +51,38 @@ public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        final Game game = Atom.getInstance().getModel().getAvailableGames().get(position);
+
         ListItem listitem = listitems.get(position);
-        holder.textDescription.setText(listitem.getDescription());
+        holder.textDescription.setText(listitem.getDescription().getGameId());
         holder.cardview.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(final View view) {
 
                 if(cn.equals(AvailableGamesActivity.class)){
-                    AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
                     builder
                             .setTitle("Join Game")
                             .setMessage("Do you want to join this game?")
                             .setIcon(android.R.drawable.ic_dialog_alert)
                             .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
-//                                    Intent i = new Intent(view.getContext(), CurrentGameActivity.class);
-//                                    view.getContext().startActivity(i);
-                                    NextLayerFacade.getInstance().joinGame();
+                                    if(game.isStarted()){
+                                        AlertDialog.Builder error = new AlertDialog.Builder(view.getContext());
+                                        error.setMessage("the game arleady started")
+                                                .setTitle("error")
+                                                .show();
+                                    }
+                                    else if (game.getPlayers().size() == 6){
+                                        AlertDialog.Builder error2 = new AlertDialog.Builder(view.getContext());
+                                        error2.setMessage("too much people!")
+                                                .setTitle("error")
+                                                .show();
+                                    }
+                                    else {
+                                        NextLayerFacade.getInstance().joinGame(game.getGameId());
+                                    }
                                 }
                             })
                             .setNegativeButton("No", null)

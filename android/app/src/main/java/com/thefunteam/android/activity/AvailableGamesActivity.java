@@ -5,11 +5,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.Button;
 
 import com.thefunteam.android.ListAdapter;
 import com.thefunteam.android.ListItem;
 import com.thefunteam.android.R;
+import com.thefunteam.android.model.Atom;
+import com.thefunteam.android.model.Game;
 import com.thefunteam.android.presenter.AvailableGamesPresenter;
 
 import java.util.ArrayList;
@@ -22,7 +25,7 @@ public class AvailableGamesActivity extends ObservingActivity {
     private RecyclerView gameList;
     private RecyclerView.Adapter adapter;
 
-    private List<ListItem> listItems;
+    private List<Game> listItems;
 
     private Button createGame;
 
@@ -42,7 +45,7 @@ public class AvailableGamesActivity extends ObservingActivity {
         gameList.setLayoutManager(new LinearLayoutManager(this));
 
         listItems = new ArrayList<>();
-
+        listItems = Atom.getInstance().getModel().getAvailableGames();
         //add fetching list fucntions here
 
         adapter = new ListAdapter(listItems, this);
@@ -50,9 +53,24 @@ public class AvailableGamesActivity extends ObservingActivity {
 
         //createGame.setOnClickListener(new );
 
+        Button creategameButton = (Button) findViewById(R.id.createGame);
+        creategameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
+
     }
 
     public void showCurrentGame() {
         startActivity(new Intent(this, CurrentGameActivity.class));
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        AvailableGamesPresenter.update();
+    }
+
 }
