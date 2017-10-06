@@ -102,18 +102,28 @@ public class Model {
     }
 
     public Model joinGame(String sessionId, String gameId){
+        // check if sessionId is part of a game
         if (exists("sessions", sessionId, "gameId")){
             throw new E.HasGameException();
         }
+        // check if gameId is valid
+        
+        //        if(exist(
         return commit(this.getGame(gameId))
             .commit(getSession(sessionId).setGameId(gameId));
     }
 
     public Model leaveGame(String sessionId){
-        return commit(getSession(sessionId).setGameId(null));
+        if(!exists("sessions", sessionId, "gameId")){
+            throw new E.NoCurrentGameException();
+        }
+        return commit(getSession(sessionId).removeSessionId(sessionId));
     }
 
     public Model startGame(String sessionId){
+        if(!exists("sessions", sessionId, "gameId")){
+            throw new E.NoCurrentGameException();
+        }
         return commit(this.getGameBySession(sessionId).setStarted(true));
     }
 
