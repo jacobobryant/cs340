@@ -102,10 +102,13 @@ public class Model {
     }
 
     public Model joinGame(String sessionId, String gameId){
+        // check if sessionId is part of a game
         if (exists("sessions", sessionId, "gameId")){
             throw new E.HasGameException();
         }
-        if(exist(
+        // check if gameId is valid
+        
+        //        if(exist(
         return commit(this.getGame(gameId))
             .commit(getSession(sessionId).setGameId(gameId));
     }
