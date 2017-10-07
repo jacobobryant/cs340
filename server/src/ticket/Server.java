@@ -31,7 +31,9 @@ public class Server extends NanoHTTPD {
     public Response serve(IHTTPSession session) {
         try {
             Map response = serveHelper(session);
-            System.out.println(Model.getState());
+            //System.out.println(Model.getState());
+            Model.getState().pprint();
+            System.out.println();
             return newFixedLengthResponse(
                     new ObjectMapper().writeValueAsString(response));
         } catch (Exception e) {
@@ -97,6 +99,8 @@ public class Server extends NanoHTTPD {
             } else if (endpoint.equals("/state")) {
                 String sessionId = (String)get(body, "sessionId");
                 method = () -> Facade.state(sessionId);
+            } else if (endpoint.equals("/clear")) {
+                method = () -> Facade.clear();
             } else {
                 return error(E.CLIENT_CODE, "endpoint " + endpoint + " doesn't exist");
             }

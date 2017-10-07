@@ -18,8 +18,22 @@ public class C {
     public static final IFn conj = Clojure.var("clojure.core", "conj");
     public static final IFn update = Clojure.var("clojure.core", "update");
     public static final IFn last = Clojure.var("clojure.core", "last");
+    public static final IFn vec = Clojure.var("clojure.core", "vec");
+
     public static final IFn swapperToFn = (IFn)eval.invoke(readString.invoke(
                 "(fn [old-state swapper] (.swap swapper old-state))"));
     public static final IFn vecrm = (IFn)eval.invoke(readString.invoke(
-                "(defn vecrm [v item] (vec (remove #(= item %) v)))"));
+                "(fn [v item] (vec (remove #(= item %) v)))"));
+    public static final IFn dissocIn = (IFn)eval.invoke(readString.invoke(
+                "(fn [m path] (update-in m (butlast path) dissoc (last path)))"));
+    //public static final IFn prettify = (IFn)eval.invoke(readString.invoke(
+                //"(fn [o] (with-out-str (pprint o)))"));
+
+    static {
+        IFn require = Clojure.var("clojure.core", "require");
+        require.invoke(Clojure.read("clojure.pprint"));
+    }
+
+    public static final IFn pprint = Clojure.var("clojure.pprint", "pprint");
+    //public static final IFn withOutStr = Clojure.var("clojure.core", "with-out-str");
 }

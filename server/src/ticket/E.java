@@ -8,6 +8,9 @@ public class E {
     public static final int INVALID_SESSION_ID = 2;
     public static final int HAS_GAME = 3;
     public static final int NO_CURRENT_GAME = 4;
+    public static final int NOT_ENOUGH_USERS = 5;
+    public static final int GAME_UNAVAILABLE = 6;
+    public static final int GAME_ALREADY_STARTED = 6;
 
     public static class BaseException extends RuntimeException {
         @Override
@@ -77,6 +80,42 @@ public class E {
         @Override
         public int getCode() {
             return E.NO_CURRENT_GAME;
+        }
+    }
+
+    public static class NotEnoughUsersException extends BaseException {
+        @Override
+        public String getMessage() {
+            return "Game doesn't have enough users to start";
+        }
+
+        @Override
+        public int getCode() {
+            return E.NOT_ENOUGH_USERS;
+        }
+    }
+
+    public static class GameUnavailableException extends BaseException {
+        @Override
+        public String getMessage() {
+            return "Game isn't available";
+        }
+
+        @Override
+        public int getCode() {
+            return E.GAME_UNAVAILABLE;
+        }
+    }
+
+    public static class GameAlreadyStartedException extends BaseException {
+        @Override
+        public String getMessage() {
+            return "Game already started";
+        }
+
+        @Override
+        public int getCode() {
+            return E.GAME_ALREADY_STARTED;
         }
     }
 }

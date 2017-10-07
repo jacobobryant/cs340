@@ -17,7 +17,8 @@ public class BaseModel {
 
     protected BaseModel(Map data, Object[] path) {
         if (data == null) {
-            throw new NullPointerException();
+            throw new NullPointerException("BaseModel data is null. path=" +
+                    C.vec.invoke(path));
         }
         this.data = data;
         this.path = path;

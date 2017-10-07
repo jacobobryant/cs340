@@ -15,7 +15,7 @@ public class Model {
         Model swap(Model oldState);
     }
 
-    private Model() {
+    public Model() {
         this(C.readString.invoke("{\"users\" {}, \"games\" {}, \"sessions\" {}}"));
     }
 
@@ -28,7 +28,11 @@ public class Model {
     }
 
     public String toString() {
-        return this.state.toString();
+        return state.toString();
+    }
+
+    public void pprint() {
+        C.pprint.invoke(state);
     }
 
     public static Model swap(Swapper swapper) {
@@ -43,6 +47,10 @@ public class Model {
         return C.getIn.invoke(state, path) != null;
     }
 
+    private Model delete(BaseModel bm) {
+        return new Model(C.dissocIn.invoke(this.state, bm.path));
+    }
+
     // USER
     public Model createUser(String name, String password) {
         return commit(new User(name, password, userPath(name)));
@@ -53,18 +61,6 @@ public class Model {
         return new User((Map)C.getIn.invoke(state, path), path);
     }
 
-    public void authenticate(String username, String password) {
-        if (!userExists(username) || !getUser(username).getPassword().equals(password)) {
-            throw new E.LoginException();
-        }
-    }
-
-    public void authenticate(String sessionId) {
-        if (!exists("sessions", sessionId)) {
-            throw new E.SessionException();
-        }
-    }
-
     public boolean userExists(String name) {
         return exists("users", name);
     }
@@ -72,6 +68,11 @@ public class Model {
     private Object[] userPath(String name) {
         return new Object[] {"users", name};
     }
+
+    public User getUserBySessionId(String sessionId) {
+        return getUser(getSession(sessionId).getUsername());
+    }
+
 
     // SESSION
     public Model createSession(String username) {
@@ -104,9 +105,14 @@ public class Model {
     public Model joinGame(String sessionId, String gameId) {
         if (exists("sessions", sessionId, "gameId")){
             throw new E.HasGameException();
+        } else if (!exists("games", gameId)) {
+            throw new E.GameUnavailableException();
         }
-        // TODO throw exception if game already has 5 users or has already started
-        return commit(getGame(gameId).addSessionId(sessionId))
+        Game game = getGame(gameId);
+        if (!game.isAvailable(getUserBySessionId(sessionId))) {
+            throw new E.GameUnavailableException();
+        }
+        return commit(game.addSessionId(sessionId))
               .commit(getSession(sessionId).setGameId(gameId));
     }
 
@@ -116,17 +122,26 @@ public class Model {
         if (gameId == null) {
             throw new E.NoCurrentGameException();
         }
-        // TODO throw exception if game has already started
-        //      delete game if it doesn't have any users
-        return commit(session.setGameId(null))
-              .commit(getGame(gameId).removeSessionId(sessionId));
+        Game game = getGame(gameId);
+        if (game.started()) {
+            throw new E.GameAlreadyStartedException();
+        }
+        Model m = commit(session.setGameId(null));
+        if (game.getSessionIds().size() == 1) {
+            return m.delete(game);
+        } else {
+            return m.commit(game.removeSessionId(sessionId));
+        }
     }
 
     public Model startGame(String sessionId){
         if (!exists("sessions", sessionId, "gameId")) {
             throw new E.NoCurrentGameException();
         }
-        // TODO throw exception if the game only has one user
+        Game game = getGameBySession(sessionId);
+        if (game.getSessionIds().size() < 2) {
+            throw new E.NotEnoughUsersException();
+        }
         return commit(this.getGameBySession(sessionId).setStarted(true));
     }
 
@@ -145,28 +160,11 @@ public class Model {
             .collect(Collectors.toList());
     }
 
-    // OTHER
-    public Map getClientModel(String sessionId) {
-        String gameId = getSession(sessionId).getGameId();
-        List<Map> availableGames = null;
-        Map currentGame = null;
-        if (gameId == null) {
-            availableGames = getAvailableGames();
-        } else {
-            currentGame = getClientGameModel(gameId);
-        }
-
-        return (Map)C.hashMap.invoke(
-                "sessionId", sessionId,
-                "currentGame", currentGame,
-                "availableGames", availableGames);
-    }
-
-    public List<Map> getAvailableGames() {
+    public List<Map> getAvailableGames(String sessionId) {
         List<Map> availableGames = new ArrayList<>();
         for (Map gameData : (Collection<Map>)((Map)C.get.invoke(state, "games")).values()) {
             Game game = new Game(gameData, null);
-            if (!game.started() && game.getSessionIds().size() < 5) {
+            if (game.isAvailable(getUserBySessionId(sessionId))) {
                 availableGames.add(getClientGameModel(game.getGameId()));
             }
         }
@@ -178,5 +176,34 @@ public class Model {
                 "gameId", gameId,
                 "started", getGame(gameId).started(),
                 "players", getPlayerNames(gameId));
+    }
+
+    // OTHER
+    public Map getClientModel(String sessionId) {
+        String gameId = getSession(sessionId).getGameId();
+        List<Map> availableGames = null;
+        Map currentGame = null;
+        if (gameId == null) {
+            availableGames = getAvailableGames(sessionId);
+        } else {
+            currentGame = getClientGameModel(gameId);
+        }
+
+        return (Map)C.hashMap.invoke(
+                "sessionId", sessionId,
+                "currentGame", currentGame,
+                "availableGames", availableGames);
+    }
+
+    public void authenticate(String username, String password) {
+        if (!userExists(username) || !getUser(username).getPassword().equals(password)) {
+            throw new E.LoginException();
+        }
+    }
+
+    public void authenticate(String sessionId) {
+        if (!exists("sessions", sessionId)) {
+            throw new E.SessionException();
+        }
     }
 }

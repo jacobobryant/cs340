@@ -1,5 +1,6 @@
 package ticket;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class Facade {
@@ -64,7 +65,7 @@ public class Facade {
     public static Map join(String sessionId, String gameId) {
         return run((state) -> {
             state.authenticate(sessionId);
-            return state.joinGame(gameId, sessionId);
+            return state.joinGame(sessionId, gameId);
         }, sessionId);
     }
 
@@ -84,5 +85,12 @@ public class Facade {
 
     public static Map state(String sessionId) {
         return success(Model.getState(), sessionId);
+    }
+
+    public static Map clear() {
+        // For testing purposes. Hopefully none of our users find out
+        // about this endpoint.
+        Model.swap((state) -> new Model());
+        return new HashMap();
     }
 }

@@ -3,6 +3,8 @@ package ticket;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.stream.Collectors.toList;
+
 public class Game extends BaseModel {
     public Game(Map data, Object[] path) {
         super(data, path);
@@ -36,5 +38,12 @@ public class Game extends BaseModel {
 
     public Game removeSessionId(String sessionId) {
         return new Game(remove("sessionIds", sessionId), path);
+    }
+
+    public boolean isAvailable(User u) {
+        List<String> ids = getSessionIds();
+        return (!started() && ids.size() < 5 &&
+                ids.stream().filter(u.getSessionIds()::contains)
+                .collect(toList()).size() == 0);
     }
 }
