@@ -12,8 +12,6 @@ import java.net.URL;
 public class ClientCommunicator {
     String url = "http://10.0.2.2:8080";
 
-    public String mockData = "{}";
-
     private static ClientCommunicator ourInstance = new ClientCommunicator();
 
     public static ClientCommunicator getInstance() { return ourInstance; }
@@ -90,8 +88,8 @@ public class ClientCommunicator {
             BufferedReader reader = new BufferedReader(new InputStreamReader(responseBody));
 
             Gson gson = new Gson();
-//            Model model = gson.fromJson(reader, Model.class);
-            Model model = gson.fromJson(this.mockData, Model.class);
+            Model model = gson.fromJson(reader, Model.class);
+//            Model model = gson.fromJson(this.mockData, Model.class);
             Atom.getInstance().setModel(model);
         } else {
             // SERVER RETURNED AN HTTP ERROR

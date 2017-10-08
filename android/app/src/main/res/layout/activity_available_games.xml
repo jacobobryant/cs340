@@ -4,4 +4,41 @@
     android:layout_width="match_parent" android:layout_height="match_parent"
     tools:context="com.thefunteam.android.activity.AvailableGamesActivity">
 
+    <RelativeLayout
+        android:layout_width="368dp"
+        android:layout_height="495dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="11dp"
+            android:text="Available Games"
+            android:textSize="18sp"/>
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/gameList"
+            android:layout_width="340dp"
+            android:layout_height="330dp"
+            android:layout_below="@+id/textView5"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="14dp"/>
+
+        <Button
+            android:id="@+id/createGame"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="22dp"
+            android:text="Create Game"
+            android:layout_below="@+id/gameList"
+            android:layout_centerHorizontal="true"/>
+
+    </RelativeLayout>
 </android.support.constraint.ConstraintLayout>

@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import com.thefunteam.android.presenter.LoginPresenter;
@@ -19,7 +18,7 @@ public class LoginActivity extends ObservingActivity {
     private LoginPresenter loginPresenter = new LoginPresenter(this);
 
     // UI references.
-    private AutoCompleteTextView mEmailView;
+    private EditText mUsernameView;
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
@@ -33,16 +32,15 @@ public class LoginActivity extends ObservingActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
-        // Set up the login form.
-        mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
 
+        mUsernameView = (EditText) findViewById(R.id.email);
         mPasswordView = (EditText) findViewById(R.id.password);
 
         Button mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                loginPresenter.login(mEmailView.getText().toString(), mPasswordView.getText().toString());
+            loginPresenter.login(mUsernameView.getText().toString(), mPasswordView.getText().toString());
             }
         });
 
@@ -50,7 +48,7 @@ public class LoginActivity extends ObservingActivity {
         mRegisterButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivityForResult(new Intent(LoginActivity.this, RegistrationActivity.class), 0);
+            startActivity(new Intent(LoginActivity.this, RegistrationActivity.class));
             }
         });
 

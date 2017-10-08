@@ -11,39 +11,6 @@ import java.util.Observer;
 
 public class LoginPresenter extends Presenter {
 
-    public static String mockData = "{\n" +
-            "  \"sessionId\": \"abcd\",\n" +
-            "  \"availableGames\": [\n" +
-            "    {\n" +
-            "      \"gameId\": \"xyz\",\n" +
-            "      \"started\": false,\n" +
-            "      \"players\": [\n" +
-            "        \"Bob\",\n" +
-            "        \"Jim\"\n" +
-            "      ]\n" +
-            "    },\n" +
-            "    {\n" +
-            "      \"gameId\": \"pqr\",\n" +
-            "      \"started\": false,\n" +
-            "      \"players\": [\n" +
-            "        \"Joe\",\n" +
-            "        \"Jill\"\n" +
-            "      ]\n" +
-            "    },\n" +
-            "\n" +
-            "    {\n" +
-            "      \"gameId\": \"asd\",\n" +
-            "      \"started\": false,\n" +
-            "      \"players\": [\n" +
-            "        \"Joe\",\n" +
-            "        \"Jill\",\n" +
-            "        \"Bill\"\n" +
-            "      ]\n" +
-            "    }\n" +
-            "  ],\n" +
-            "  \"currentGame\": null\n" +
-            "}";
-
     private final LoginActivity loginActivity;
 
     public LoginPresenter(LoginActivity loginActivity) {
@@ -51,7 +18,6 @@ public class LoginPresenter extends Presenter {
     }
 
     public void login(String username, String password) {
-        ClientCommunicator.getInstance().mockData = mockData;
         NextLayerFacade.getInstance().login(username, password);
     }
 

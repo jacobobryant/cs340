@@ -1,6 +1,8 @@
 package com.thefunteam.android;
 
 import com.google.gson.Gson;
+import com.thefunteam.android.model.Atom;
+import com.thefunteam.android.model.GameCommand;
 import com.thefunteam.android.model.Login;
 
 public class NextLayerFacade {
@@ -27,19 +29,38 @@ public class NextLayerFacade {
     }
 
     public void joinGame(String gameId) {
-
+        String sessionId = Atom.getInstance().getModel().getSessionId();
+        Gson gson = new Gson();
+        ClientCommunicator.getInstance().post(
+                "/joinGame",
+                gson.toJson(new GameCommand(sessionId, gameId))
+        );
     }
 
-    public void createGame() {
-
+    public void createGame(String gameId) {
+        String sessionId = Atom.getInstance().getModel().getSessionId();
+        Gson gson = new Gson();
+        ClientCommunicator.getInstance().post(
+                "/createGame",
+                gson.toJson(new GameCommand(sessionId, gameId))
+        );
     }
 
-    public void startGame() {
-
+    public void startGame(String gameId) {
+        String sessionId = Atom.getInstance().getModel().getSessionId();
+        Gson gson = new Gson();
+        ClientCommunicator.getInstance().post(
+                "/startGame",
+                gson.toJson(new GameCommand(sessionId, gameId))
+        );
     }
 
-    public void leaveGame() {
-
+    public void leaveGame(String gameId) {
+        String sessionId = Atom.getInstance().getModel().getSessionId();
+        Gson gson = new Gson();
+        ClientCommunicator.getInstance().post(
+                "/leaveGame",
+                gson.toJson(new GameCommand(sessionId, gameId))
+        );
     }
-
 }
