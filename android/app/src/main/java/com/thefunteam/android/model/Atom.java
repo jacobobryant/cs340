@@ -25,4 +25,14 @@ public class Atom extends Observable {
         setChanged();
         notifyObservers();
     }
+
+    public void setError(String error) {
+        model.setErrorMessage(error);
+        setChanged();
+        notifyObservers();
+    }
+
+    public static void reset() {
+        ourInstance.model = new Model();
+    }
 }

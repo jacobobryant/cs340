@@ -1,6 +1,5 @@
 package com.thefunteam.android.presenter;
 
-import com.thefunteam.android.ClientCommunicator;
 import com.thefunteam.android.NextLayerFacade;
 import com.thefunteam.android.activity.AvailableGamesActivity;
 import com.thefunteam.android.model.Atom;
@@ -22,12 +21,30 @@ public class AvailableGamesPresenter extends Presenter {
         NextLayerFacade.getInstance().joinGame(gameId);
     }
 
+    public void createGame() {
+        NextLayerFacade.getInstance().createGame();
+    }
+
     @Override
     public void update(Observable observable, Object o) {
-        Model model = Atom.getInstance().getModel();
+        availableGamesActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Model model = Atom.getInstance().getModel();
 
-        if (model.getCurrentGame() != null) {
-            availableGamesActivity.presentCurrentGame();
-        }
+                if (model.getSessionId() == null) {
+                    Atom.reset();
+                    availableGamesActivity.finish();
+                    return;
+                } else if (model.getCurrentGame() != null) {
+                    availableGamesActivity.presentCurrentGame();
+                }
+                availableGamesActivity.update(model);
+
+                if(model.getErrorMessage() != null) {
+                    availableGamesActivity.showError(model.getErrorMessage());
+                }
+            }
+        });
     }
 }

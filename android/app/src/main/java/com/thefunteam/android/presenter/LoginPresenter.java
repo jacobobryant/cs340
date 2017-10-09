@@ -28,10 +28,19 @@ public class LoginPresenter extends Presenter {
     }
 
     public void update() {
-        Model model = Atom.getInstance().getModel();
+        loginActivity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Model model = Atom.getInstance().getModel();
 
-        if (model.getSessionId() != null) {
-            this.loginActivity.presentAvailableGames();
-        }
+                if (model.getSessionId() != null) {
+                    loginActivity.presentAvailableGames();
+                }
+
+                if(model.getErrorMessage() != null) {
+                    loginActivity.showError(model.getErrorMessage());
+                }
+            }
+        });
     }
 }

@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import com.thefunteam.android.Poller;
 import com.thefunteam.android.presenter.LoginPresenter;
 import com.thefunteam.android.R;
 
@@ -25,12 +26,14 @@ public class LoginActivity extends ObservingActivity {
 
     public LoginActivity() {
         super();
+
         presenter = loginPresenter;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_login);
 
         mUsernameView = (EditText) findViewById(R.id.email);
@@ -54,6 +57,14 @@ public class LoginActivity extends ObservingActivity {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
+
+        Poller.getInstance().startPolling();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Poller.getInstance().stopPolling();
     }
 
     public void presentAvailableGames() {

@@ -1,5 +1,6 @@
 package com.thefunteam.android.activity;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,16 +14,27 @@ import android.widget.TextView;
 import com.thefunteam.android.R;
 import com.thefunteam.android.model.Atom;
 import com.thefunteam.android.model.Game;
+import com.thefunteam.android.model.Model;
+import com.thefunteam.android.presenter.CurrentGamePresenter;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class CurrentGameActivity extends AppCompatActivity {
+public class CurrentGameActivity extends ObservingActivity {
+
+    CurrentGamePresenter currentGamePresenter = new CurrentGamePresenter(this);
 
     private RecyclerView playerListView;
-    private List<String> playerList;
+    private List<String> playerList = new ArrayList<>();
     private RecyclerView.Adapter adapter;
-    Button startGameButton;
-    Button leaveGameButton;
+    private Button startGameButton;
+    private Button leaveGameButton;
+
+    public CurrentGameActivity() {
+        super();
+
+        this.presenter = currentGamePresenter;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,20 +43,47 @@ public class CurrentGameActivity extends AppCompatActivity {
 
         playerListView = (RecyclerView) findViewById(R.id.playerList);
         playerListView.setLayoutManager(new LinearLayoutManager(this));
-        playerList = Atom.getInstance().getModel().getCurrentGame().getPlayers();
         adapter = new ListAdapter(playerList);
         playerListView.setAdapter(adapter);
 
-        startGameButton = (Button) findViewById(R.id.leaveGame);
-        leaveGameButton = (Button) findViewById(R.id.startGame);
+        startGameButton = (Button) findViewById(R.id.startGame);
+        startGameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                currentGamePresenter.startGame();
+            }
+        });
 
+        leaveGameButton = (Button) findViewById(R.id.leaveGame);
+        leaveGameButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                currentGamePresenter.leaveGame();
+            }
+        });
+
+        update(Atom.getInstance().getModel());
+    }
+
+    public void update(Model model) {
+        List<String> players = model.getCurrentGame().getPlayers();
+        playerList.clear();
+        if (players != null) {
+            playerList.addAll(players);
+            startGameButton.setEnabled(playerList.size() > 1 && playerList.size() < 6);
+        }
+        adapter.notifyDataSetChanged();
+    }
+
+    public void presentGame() {
+        startActivity(new Intent(this, GameActivity.class));
     }
 
     public class ListAdapter extends RecyclerView.Adapter<CurrentGameActivity.ListAdapter.ViewHolder>{
 
         private List<String> listItems;
 
-        public ListAdapter(List<String> listItems) {
+        ListAdapter(List<String> listItems) {
             this.listItems = listItems;
         }
 
@@ -68,12 +107,12 @@ public class CurrentGameActivity extends AppCompatActivity {
             return listItems.size();
         }
 
-        public class ViewHolder extends RecyclerView.ViewHolder {
+        class ViewHolder extends RecyclerView.ViewHolder {
 
-            public TextView textDescription;
-            public LinearLayout cardview;
+            TextView textDescription;
+            LinearLayout cardview;
 
-            public ViewHolder(View itemView) {
+            ViewHolder(View itemView) {
                 super(itemView);
 
                 textDescription = (TextView) itemView.findViewById(R.id.description);

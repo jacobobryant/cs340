@@ -32,6 +32,8 @@
         <activity android:name=".activity.AvailableGamesActivity"/>
         <activity android:name=".activity.CurrentGameActivity">
         </activity>
+        <activity android:name=".activity.GameActivity">
+        </activity>
     </application>
 
 </manifest>

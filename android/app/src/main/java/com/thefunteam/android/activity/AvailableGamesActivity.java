@@ -1,5 +1,6 @@
 package com.thefunteam.android.activity;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.v7.app.AlertDialog;
@@ -26,7 +27,7 @@ public class AvailableGamesActivity extends ObservingActivity {
 
     private RecyclerView gameListView;
     private List<Game> gameList;
-    private RecyclerView.Adapter adapter;
+    private ListAdapter adapter;
     private Button createGameButton;
 
     public AvailableGamesActivity() {
@@ -52,14 +53,14 @@ public class AvailableGamesActivity extends ObservingActivity {
         createGameButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                presentCurrentGame();
+                availableGamesPresenter.createGame();
             }
         });
     }
 
     private void askToJoinGame(View view, final Game game) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-        builder .setTitle("Join Game")
+        builder.setTitle("Join Game")
                 .setMessage("Do you want to join this game?")
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
@@ -75,18 +76,20 @@ public class AvailableGamesActivity extends ObservingActivity {
         startActivity(new Intent(this, CurrentGameActivity.class));
     }
 
-    @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-
-        Atom.getInstance().setModel(new Model());
+    public void update(Model model) {
+        List<Game> games = model.getAvailableGames();
+        gameList.clear();
+        if (games != null) {
+            gameList.addAll(games);
+        }
+        adapter.notifyDataSetChanged();
     }
 
-    public class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
+    class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
 
-        private List<Game> listItems;
+        public List<Game> listItems;
 
-        public ListAdapter(List<Game> listItems) {
+        ListAdapter(List<Game> listItems) {
             this.listItems = listItems;
         }
 
@@ -102,7 +105,7 @@ public class AvailableGamesActivity extends ObservingActivity {
             final Game game = listItems.get(position);
 
             String ownerName = game.getPlayers().get(0);
-            holder.textDescription.setText(ownerName + "'s game");
+            holder.textDescription.setText(ownerName + "'s game (" + Integer.toString(game.getPlayers().size()) + " players)");
 
             holder.cardview.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -115,15 +118,19 @@ public class AvailableGamesActivity extends ObservingActivity {
 
         @Override
         public int getItemCount() {
-            return listItems.size();
+            if(listItems != null) {
+                return listItems.size();
+            } else {
+                return 0;
+            }
         }
 
-        public class ViewHolder extends RecyclerView.ViewHolder {
+        class ViewHolder extends RecyclerView.ViewHolder {
 
-            public TextView textDescription;
-            public LinearLayout cardview;
+            TextView textDescription;
+            LinearLayout cardview;
 
-            public ViewHolder(View itemView) {
+            ViewHolder(View itemView) {
                 super(itemView);
 
                 textDescription = (TextView) itemView.findViewById(R.id.description);

@@ -3,7 +3,8 @@ package com.thefunteam.android;
 import com.google.gson.Gson;
 import com.thefunteam.android.model.Atom;
 import com.thefunteam.android.model.GameCommand;
-import com.thefunteam.android.model.Login;
+import com.thefunteam.android.model.LoginCommand;
+import com.thefunteam.android.model.UserCommand;
 
 public class NextLayerFacade {
     private static NextLayerFacade ourInstance = new NextLayerFacade();
@@ -16,7 +17,7 @@ public class NextLayerFacade {
         Gson gson = new Gson();
         ClientCommunicator.getInstance().post(
                 "/login",
-                gson.toJson(new Login(username, password))
+                gson.toJson(new LoginCommand(username, password))
         );
     }
 
@@ -24,7 +25,7 @@ public class NextLayerFacade {
         Gson gson = new Gson();
         ClientCommunicator.getInstance().post(
                 "/register",
-                gson.toJson(new Login(username, password))
+                gson.toJson(new LoginCommand(username, password))
         );
     }
 
@@ -32,35 +33,35 @@ public class NextLayerFacade {
         String sessionId = Atom.getInstance().getModel().getSessionId();
         Gson gson = new Gson();
         ClientCommunicator.getInstance().post(
-                "/joinGame",
+                "/join",
                 gson.toJson(new GameCommand(sessionId, gameId))
         );
     }
 
-    public void createGame(String gameId) {
+    public void createGame() {
         String sessionId = Atom.getInstance().getModel().getSessionId();
         Gson gson = new Gson();
         ClientCommunicator.getInstance().post(
-                "/createGame",
-                gson.toJson(new GameCommand(sessionId, gameId))
+                "/create",
+                gson.toJson(new UserCommand(sessionId))
         );
     }
 
-    public void startGame(String gameId) {
+    public void startGame() {
         String sessionId = Atom.getInstance().getModel().getSessionId();
         Gson gson = new Gson();
         ClientCommunicator.getInstance().post(
-                "/startGame",
-                gson.toJson(new GameCommand(sessionId, gameId))
+                "/start",
+                gson.toJson(new UserCommand(sessionId))
         );
     }
 
-    public void leaveGame(String gameId) {
+    public void leaveGame() {
         String sessionId = Atom.getInstance().getModel().getSessionId();
         Gson gson = new Gson();
         ClientCommunicator.getInstance().post(
-                "/leaveGame",
-                gson.toJson(new GameCommand(sessionId, gameId))
+                "/leave",
+                gson.toJson(new UserCommand(sessionId))
         );
     }
 }
