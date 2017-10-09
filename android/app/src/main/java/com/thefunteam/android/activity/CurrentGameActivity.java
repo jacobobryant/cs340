@@ -66,6 +66,7 @@ public class CurrentGameActivity extends ObservingActivity {
     }
 
     public void update(Model model) {
+        if(model.getCurrentGame() == null) { return; }
         List<String> players = model.getCurrentGame().getPlayers();
         playerList.clear();
         if (players != null) {
