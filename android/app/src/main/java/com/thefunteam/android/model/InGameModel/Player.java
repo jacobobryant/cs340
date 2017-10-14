@@ -48,5 +48,5 @@ public class Player {
     public int getPersonalScore() {
         return personalScore;
     }
-    
+
 }
