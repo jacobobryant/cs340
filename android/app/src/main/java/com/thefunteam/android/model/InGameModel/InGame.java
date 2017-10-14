@@ -6,20 +6,60 @@ public class InGame {
 
     //list of players
     private List<Player> players;
-    //face down deck - train
-    private List<Card> trainDeck;
 
-    //face down deck - route
-    private List<Card> destDeck2;
+    //number of cards in face down train deck - train
+    private int trainDeck;
 
-    //face up deck - train
-    private List<Card> faceUpDeck;
+    //number of cards in face up train deck - train
+    private int faceUpDeck;
 
-    //all trains that will be used by the game
-    private List<Train> trains;
+    //number of cards in face down destination deck - route
+    private int destDeck;
+
+    //number of all trains that will be used by the game
+    private int trains;
 
     //game board
-    private gameBoard gameboard;
+    private GameBoard gameboard;
     //score board
-    private scoreBoard scoreboard;
+    private ScoreBoard scoreboard;
+
+    public InGame(List<Player> players, int trainDeck, int faceUpDeck, int destDeck, int trains, GameBoard gameboard, ScoreBoard scoreboard) {
+        this.players = players;
+        this.trainDeck = trainDeck;
+        this.faceUpDeck = faceUpDeck;
+        this.destDeck = destDeck;
+        this.trains = trains;
+        this.gameboard = gameboard;
+        this.scoreboard = scoreboard;
+    }
+
+    public List<Player> getPlayers() {
+        return players;
+    }
+
+    public int getTrainDeck() {
+        return trainDeck;
+    }
+
+    public int getFaceUpDeck() {
+        return faceUpDeck;
+    }
+
+    public int getDestDeck() {
+        return destDeck;
+    }
+
+    public int getTrains() {
+        return trains;
+    }
+
+    public GameBoard getGameboard() {
+        return gameboard;
+    }
+
+    public ScoreBoard getScoreboard() {
+        return scoreboard;
+    }
+
 }
