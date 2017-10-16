@@ -8,21 +8,26 @@ public class Player {
     //player's color
     private String color;
     //cards that belongs to the player
-    private List<DestCard> cards;
+    private List<DestinationCard> cards;
     //route that belongs to the player
-    private List<Route> claimedroute;
+    private List<Route> claimedRoute;
     //trains that belongs to the player
-    private List<TrainCard> trains;
-    //score of the player
-    private int personalScore;
+    private List<TrainType> trainCards;
 
-    public Player(String username, String color, List<DestCard> cards, List<Route> claimedroute, List<TrainCard> trains, int personalScore) {
+    private List<DestinationCard> destCards;
+
+    private int trainsLeft;
+    //score of the player
+    private int score;
+
+    public Player(String username, String color, List<DestinationCard> cards, List<Route> claimedRoute, List<TrainType> trainCards, List<DestinationCard> destCards, int score) {
         this.username = username;
         this.color = color;
         this.cards = cards;
-        this.claimedroute = claimedroute;
-        this.trains = trains;
-        this.personalScore = personalScore;
+        this.claimedRoute = claimedRoute;
+        this.trainCards = trainCards;
+        this.destCards = destCards;
+        this.score = score;
     }
 
     public String getUsername() {
@@ -33,20 +38,23 @@ public class Player {
         return color;
     }
 
-    public List<DestCard> getCards() {
+    public List<DestinationCard> getCards() {
         return cards;
     }
 
-    public List<Route> getClaimedroute() {
-        return claimedroute;
+    public List<Route> getClaimedRoute() {
+        return claimedRoute;
     }
 
-    public List<TrainCard> getTrains() {
-        return trains;
+    public List<TrainType> getTrainCards() {
+        return trainCards;
     }
 
-    public int getPersonalScore() {
-        return personalScore;
+    public int getScore() {
+        return score;
     }
 
+    public List<DestinationCard> getDestCards() {
+        return destCards;
+    }
 }

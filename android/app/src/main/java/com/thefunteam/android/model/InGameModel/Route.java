@@ -3,20 +3,17 @@ package com.thefunteam.android.model.InGameModel;
 import java.util.List;
 
 public class Route {
-    //the master of the route
-    private String master;
-    //private cities that is connected by the route
+
     private City city1;
     private City city2;
+    private TrainType type;
+    private int length;
 
-    public Route(String master, City city1, City city2) {
-        this.master = master;
+    public Route(City city1, City city2, TrainType type, int length) {
         this.city1 = city1;
         this.city2 = city2;
-    }
-
-    public String getMaster() {
-        return master;
+        this.type = type;
+        this.length = length;
     }
 
     public City getCity1() {
@@ -27,4 +24,11 @@ public class Route {
         return city2;
     }
 
+    public TrainType getType() {
+        return type;
+    }
+
+    public int getLength() {
+        return length;
+    }
 }

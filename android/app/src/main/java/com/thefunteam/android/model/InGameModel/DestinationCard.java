@@ -1,21 +1,21 @@
 package com.thefunteam.android.model.InGameModel;
 
-public class DestCard {
+public class DestinationCard {
     //type represents type of the card.
-    private String type;
+    private int points;
 
-    //DestCard has holds two city that makes each others are destination
+    //DestinationCard has holds two city that makes each others are destination
     private City city1;
     private City city2;
 
-    public DestCard(String type, City city1, City city2) {
-        this.type = type;
+    public DestinationCard(int points, City city1, City city2) {
+        this.points = points;
         this.city1 = city1;
         this.city2 = city2;
     }
 
-    public String getType() {
-        return type;
+    public int getPoints() {
+        return points;
     }
 
     public City getCity1() {
@@ -25,5 +25,4 @@ public class DestCard {
     public City getCity2() {
         return city2;
     }
-
 }
