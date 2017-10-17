@@ -35,8 +35,9 @@ public class CurrentGamePresenter extends Presenter {
                     currentGameActivity.finish();
                 } else if (model.getCurrentGame().isStarted()) {
                     currentGameActivity.presentGame();
+                } else {
+                    currentGameActivity.update(model);
                 }
-                currentGameActivity.update(model);
 
                 if(model.getErrorMessage() != null) {
                     currentGameActivity.showError(model.getErrorMessage());

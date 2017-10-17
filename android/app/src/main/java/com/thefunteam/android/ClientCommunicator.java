@@ -11,8 +11,8 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class ClientCommunicator {
-//    String url = "http://10.0.2.2:8080";
-    String url = "http://192.168.0.105:8080";
+    String url = "http://10.0.2.2:8080";
+//    String url = "http://192.168.0.105:8080";
 
     private static ClientCommunicator ourInstance = new ClientCommunicator();
 
