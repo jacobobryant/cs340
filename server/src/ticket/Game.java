@@ -6,14 +6,24 @@ import java.util.Map;
 import static java.util.stream.Collectors.toList;
 
 public class Game extends BaseModel {
+            
     public Game(Map data, Object[] path) {
         super(data, path);
     }
 
     public Game(String gameId, String sessionId, boolean started, Object[] path) {
         super(new Object[] {"gameId", gameId, 
-            "sessionIds", C.vector.invoke(sessionId),
-            "started", started}, path);
+                            "sessionIds", C.vector.invoke(sessionId),
+                            "started", started,
+                            "trainDeck", C.shuffle.invoke(TrainType.DECK),
+                            "faceUpTrainCards", C.vector.invoke(),
+                            "trainDiscard", C.vector.invoke(),
+                            "destinationDeck", C.shuffle.invoke(DestinationCard.DECK),
+                            "destinationDiscard", C.vector.invoke(),
+                            "openRoutes", Route.ROUTES,
+                            "messages", C.vector.invoke(),
+                            "gameHistory", C.vector.invoke()},
+                path);
     }
 
     public String getGameId() {

@@ -8,7 +8,16 @@ public class Session extends BaseModel {
     }
 
     public Session(String id, String username, Object[] path) {
-        super(new Object[] {"sessionId", id, "username", username, "gameId", null}, path);
+        super(new Object[] {"sessionId", id,
+                            "username", username,
+                            "gameId", null,
+                            "routes", C.vector.invoke(),
+                            "trainsLeft", 45,
+                            "destinationCards", C.vector.invoke(),
+                            "trainCards", C.vector.invoke(),
+                            "longestPath", 0,
+                            "score", 0},
+              path);
     }
 
     public String getGameId() {

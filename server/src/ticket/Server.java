@@ -32,8 +32,8 @@ public class Server extends NanoHTTPD {
         try {
             Map response = serveHelper(session);
             //System.out.println(Model.getState());
-            Model.getState().pprint();
-            System.out.println();
+            //Model.getState().pprint();
+            //System.out.println();
             return newFixedLengthResponse(
                     new ObjectMapper().writeValueAsString(response));
         } catch (Exception e) {

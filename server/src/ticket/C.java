@@ -19,6 +19,7 @@ public class C {
     public static final IFn update = Clojure.var("clojure.core", "update");
     public static final IFn last = Clojure.var("clojure.core", "last");
     public static final IFn vec = Clojure.var("clojure.core", "vec");
+    public static final IFn shuffle = Clojure.var("clojure.core", "shuffle");
 
     public static final IFn swapperToFn = (IFn)eval.invoke(readString.invoke(
                 "(fn [old-state swapper] (.swap swapper old-state))"));
