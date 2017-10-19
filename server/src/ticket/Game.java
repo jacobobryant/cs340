@@ -81,12 +81,15 @@ public class Game extends BaseModel {
         for (Session ses : getSessions(state)) {
             for (int i = 0; i < 4; i++) {
                 ses = ses.giveTrain(game.topTrain());
-                game = game.drawCard();
+                game = game.drawCard("trainDeck");
+            }
+            for (int i = 0; i < 3; i++) {
+                ses = ses.giveDest(game.topDest());
+                game = game.drawCard("destDeck");
             }
             state = state.commit(ses);
         }
-        state = state.commit(game);
-        return state;
+        return state.commit(game);
     }
 
     private List<Session> getSessions(State state) {
@@ -99,8 +102,12 @@ public class Game extends BaseModel {
         return getTrainDeck().get(0);
     }
 
-    private Game drawCard() {
-        return new Game(update("trainDeck", C.subvec, 1), path);
+    private DestinationCard topDest() {
+        return getDestDeck().get(0);
+    }
+
+    private Game drawCard(String deck) {
+        return new Game(update(deck, C.subvec, 1), path);
     }
 
     public List<String> getSessionIds() {

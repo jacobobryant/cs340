@@ -37,6 +37,10 @@ public class Session extends BaseModel {
         return new Session(update("trainCards", C.conj, train), path);
     }
 
+    public Session giveDest(DestinationCard dest) {
+        return new Session(update("destCards", C.conj, dest), path);
+    }
+
     public List<TrainType> getTrainCards() {
         return (List)data.get("trainCards");
     }

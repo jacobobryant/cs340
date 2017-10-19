@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class DestinationCard extends BaseModel {
+public class DestinationCard {
     public static final List<DestinationCard> DECK;
     static {
         List<DestinationCard> ddeck = new ArrayList<>();
@@ -40,22 +40,13 @@ public class DestinationCard extends BaseModel {
         ddeck.add(new DestinationCard(City.Seattle, City.NewYork, 22));
         DECK = (List)C.vec.invoke(ddeck);
     }
+    public final City city1;
+    public final City city2;
+    public final int points;
 
     public DestinationCard(City city1, City city2, int points) {
-        super(new Object[] {"city1", city1,
-                            "city2", city2,
-                            "points", points}, null);
-    }
-
-    public City getCity1() {
-        return (City)data.get("city1");
-    }
-
-    public City getCity2() {
-        return (City)data.get("city2");
-    }
-
-    public int getPoints() {
-        return (int)data.get("points");
+        this.city1 = city1;
+        this.city2 = city2;
+        this.points = points;
     }
 }
