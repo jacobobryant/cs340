@@ -33,6 +33,10 @@ public class Session extends BaseModel {
         return ret;
     }
 
+    public Session giveTrain(TrainType train) {
+        return new Session(update("trainCards", C.conj, train), path);
+    }
+
     public List<TrainType> getTrainCards() {
         return (List)data.get("trainCards");
     }
@@ -50,6 +54,6 @@ public class Session extends BaseModel {
     }
 
     public Session setGameId(String gameId) {
-        return (Session)set("gameId", gameId, Session.class);
+        return new Session(set("gameId", gameId), path);
     }
 }

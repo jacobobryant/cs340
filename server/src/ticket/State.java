@@ -7,24 +7,24 @@ import java.util.stream.Collectors;
  * Holds the global state. Includes methods that provide interaction between individually
  * models and the entire model.
  */
-public class Model {
-    private static final Object globalState = C.atom.invoke(new Model());
+public class State {
+    private static final Object globalState = C.atom.invoke(new State());
     private final Object state;
 
     public interface Swapper {
-        Model swap(Model oldState);
+        State swap(State oldState);
     }
 
-    public Model() {
+    public State() {
         this(C.readString.invoke("{\"users\" {}, \"games\" {}, \"sessions\" {}}"));
     }
 
-    public Model(Object state) {
+    public State(Object state) {
         this.state = state;
     }
 
-    public Model commit(BaseModel model) {
-        return new Model(C.assocIn.invoke(this.state, model.path, model.data));
+    public State commit(BaseModel model) {
+        return new State(C.assocIn.invoke(this.state, model.path, model.data));
     }
 
     public String toString() {
@@ -35,24 +35,24 @@ public class Model {
         C.pprint.invoke(state);
     }
 
-    public static Model swap(Swapper swapper) {
-        return (Model)C.swap.invoke(globalState, C.swapperToFn, swapper);
+    public static State swap(Swapper swapper) {
+        return (State)C.swap.invoke(globalState, C.swapperToFn, swapper);
     }
 
-    public static Model getState() {
-        return (Model)C.deref.invoke(globalState);
+    public static State getState() {
+        return (State)C.deref.invoke(globalState);
     }
 
     private boolean exists(Object... path) {
         return C.getIn.invoke(state, path) != null;
     }
 
-    private Model delete(BaseModel bm) {
-        return new Model(C.dissocIn.invoke(this.state, bm.path));
+    private State delete(BaseModel bm) {
+        return new State(C.dissocIn.invoke(this.state, bm.path));
     }
 
     // USER
-    public Model createUser(String name, String password) {
+    public State createUser(String name, String password) {
         return commit(new User(name, password, userPath(name)));
     }
 
@@ -75,7 +75,7 @@ public class Model {
 
 
     // SESSION
-    public Model createSession(String username) {
+    public State createSession(String username) {
         String id = UUID.randomUUID().toString();
         Object[] path = {"sessions", id};
         return commit(new Session(id, username, path))
@@ -92,7 +92,7 @@ public class Model {
     }
 
     // GAME
-    public Model createGame(String sessionId) {
+    public State createGame(String sessionId) {
         if (exists("sessions", sessionId, "gameId")) {
             throw new E.HasGameException();
         }
@@ -102,7 +102,7 @@ public class Model {
               .commit(getSession(sessionId).setGameId(gameId));
     }
 
-    public Model joinGame(String sessionId, String gameId) {
+    public State joinGame(String sessionId, String gameId) {
         if (exists("sessions", sessionId, "gameId")){
             throw new E.HasGameException();
         } else if (!exists("games", gameId)) {
@@ -116,7 +116,7 @@ public class Model {
               .commit(getSession(sessionId).setGameId(gameId));
     }
 
-    public Model leaveGame(String sessionId) {
+    public State leaveGame(String sessionId) {
         Session session = getSession(sessionId);
         String gameId = session.getGameId();
         if (gameId == null) {
@@ -126,7 +126,7 @@ public class Model {
         if (game.started()) {
             throw new E.GameAlreadyStartedException();
         }
-        Model m = commit(session.setGameId(null));
+        State m = commit(session.setGameId(null));
         if (game.getSessionIds().size() == 1) {
             return m.delete(game);
         } else {
@@ -134,7 +134,7 @@ public class Model {
         }
     }
 
-    public Model startGame(String sessionId){
+    public State startGame(String sessionId){
         if (!exists("sessions", sessionId, "gameId")) {
             throw new E.NoCurrentGameException();
         }
@@ -142,7 +142,7 @@ public class Model {
         if (game.getSessionIds().size() < 2) {
             throw new E.NotEnoughUsersException();
         }
-        return commit(game.setStarted(true));
+        return game.start(this);
     }
 
     public Game getGameBySession(String sessionId) {

@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Facade {
-    private static Map run(Model.Swapper swapper, String key, boolean getByUsername) {
-        Model m;
+    private static Map run(State.Swapper swapper, String key, boolean getByUsername) {
+        State m;
         try {
-            m = Model.swap(swapper);
+            m = State.swap(swapper);
         } catch (E.BaseException e) {
             return error(e);
         }
@@ -20,11 +20,11 @@ public class Facade {
         return success(m, sessionId);
     }
 
-    private static Map run(Model.Swapper swapper, String sessionId) {
+    private static Map run(State.Swapper swapper, String sessionId) {
         return run(swapper, sessionId, false);
     }
 
-    private static Map success(Model m, String sessionId) {
+    private static Map success(State m, String sessionId) {
         return m.getClientModel(sessionId);
     }
 
@@ -78,13 +78,13 @@ public class Facade {
     }
 
     public static Map state(String sessionId) {
-        return success(Model.getState(), sessionId);
+        return success(State.getState(), sessionId);
     }
 
     public static Map clear() {
         // For testing purposes. Hopefully none of our users find out
         // about this endpoint.
-        Model.swap((state) -> new Model());
+        State.swap((state) -> new State());
         return new HashMap();
     }
 }

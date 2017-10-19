@@ -6,6 +6,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
+// Base class for data objects that must remember their location in the state
+// (e.g. for use with State.commit). For example, Route doesn't extend this
+// class because we never need to change an individual Route object.
 public class BaseModel {
     public final Map data;
     public final Object[] path;
@@ -24,15 +27,8 @@ public class BaseModel {
         this.path = path;
     }
 
-    protected BaseModel set(Object key, Object value, Class<? extends BaseModel> clazz) {
-        Map data = (Map)C.assocIn.invoke(this.data, new Object[] {key}, value);
-        try {
-            Constructor<?> constructor = clazz.getConstructor(Map.class, Object[].class);
-            return (BaseModel)constructor.newInstance(new Object[]{data, this.path});
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            // Programming error, no way to handle.
-            throw new RuntimeException(e);
-        }
+    protected Map set(Object key, Object value) {
+        return (Map)C.assocIn.invoke(this.data, new Object[] {key}, value);
     }
 
     protected Map update(Object key, IFn fn, Object... fnargs) {

@@ -28,15 +28,15 @@ public class Game extends BaseModel {
                 path);
     }
 
-    public Map getCurrentModel(String curSession, Model model) {
+    public Map getCurrentModel(String curSession, State state) {
         List<Map> players = getSessionIds().stream()
-            .map((sessionId) -> model.getSession(sessionId)
+            .map((sessionId) -> state.getSession(sessionId)
                         .getClientModel(sessionId.equals(curSession)))
             .collect(Collectors.toList());
 
         String holder = getLongestRouteHolder();
         String username = (holder == null) ? null
-                    : model.getSession(holder).getUsername();
+                    : state.getSession(holder).getUsername();
 
         Map ret = (Map)C.selectKeys.invoke(data, new String[] {
                     "faceUpDeck", "openRoutes", "messages", "gameHistory"});
@@ -47,9 +47,9 @@ public class Game extends BaseModel {
                 "longestRouteHolder", username);
     }
 
-    public Map getAvailableModel(Model model) {
+    public Map getAvailableModel(State state) {
         List<String> players = getSessionIds().stream()
-            .map((sessionId) -> model.getSession(sessionId).getUsername())
+            .map((sessionId) -> state.getSession(sessionId).getUsername())
             .collect(Collectors.toList());
         return (Map)C.hashMap.invoke(
             "gameId", getGameId(),
@@ -76,8 +76,31 @@ public class Game extends BaseModel {
         return (boolean)data.get("started");
     }
 
-    public Game setStarted(boolean p){
-        return (Game)this.set("started", p, Game.class);
+    public State start(State state) {
+        Game game = new Game(set("started", true), path);
+        for (Session ses : getSessions(state)) {
+            for (int i = 0; i < 4; i++) {
+                ses = ses.giveTrain(game.topTrain());
+                game = game.drawCard();
+            }
+            state = state.commit(ses);
+        }
+        state = state.commit(game);
+        return state;
+    }
+
+    private List<Session> getSessions(State state) {
+        return getSessionIds().stream()
+            .map((sessionId) -> state.getSession(sessionId))
+            .collect(Collectors.toList());
+    }
+
+    private TrainType topTrain() {
+        return getTrainDeck().get(0);
+    }
+
+    private Game drawCard() {
+        return new Game(update("trainDeck", C.subvec, 1), path);
     }
 
     public List<String> getSessionIds() {

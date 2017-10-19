@@ -20,6 +20,7 @@ public class C {
     public static final IFn update = Clojure.var("clojure.core", "update");
     public static final IFn last = Clojure.var("clojure.core", "last");
     public static final IFn vec = Clojure.var("clojure.core", "vec");
+    public static final IFn subvec = Clojure.var("clojure.core", "subvec");
     public static final IFn shuffle = Clojure.var("clojure.core", "shuffle");
     public static final IFn selectKeys = Clojure.var("clojure.core", "select-keys");
 
