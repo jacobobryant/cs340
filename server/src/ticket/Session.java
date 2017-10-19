@@ -1,5 +1,6 @@
 package ticket;
 
+import java.util.List;
 import java.util.Map;
 
 public class Session extends BaseModel {
@@ -13,11 +14,31 @@ public class Session extends BaseModel {
                             "gameId", null,
                             "routes", C.vector.invoke(),
                             "trainsLeft", 45,
-                            "destinationCards", C.vector.invoke(),
+                            "destCards", C.vector.invoke(),
                             "trainCards", C.vector.invoke(),
-                            "longestPath", 0,
                             "score", 0},
               path);
+    }
+
+    public Map getClientModel(boolean isCurrentPlayer) {
+        Map ret = (Map)C.selectKeys.invoke(data, new String[] {"username",
+            "routes", "trainsLeft", "destCards", "trainCards", "score"});
+
+        if (!isCurrentPlayer) {
+            ret = (Map)C.assoc.invoke(ret,
+                    "trainCards", new Object[getTrainCards().size()],
+                    "destCards", new Object[getDestCards().size()]);
+        }
+
+        return ret;
+    }
+
+    public List<TrainType> getTrainCards() {
+        return (List)data.get("trainCards");
+    }
+
+    public List<DestinationCard> getDestCards() {
+        return (List)data.get("destCards");
     }
 
     public String getGameId() {

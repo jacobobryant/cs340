@@ -142,7 +142,7 @@ public class Model {
         if (game.getSessionIds().size() < 2) {
             throw new E.NotEnoughUsersException();
         }
-        return commit(this.getGameBySession(sessionId).setStarted(true));
+        return commit(game.setStarted(true));
     }
 
     public Game getGameBySession(String sessionId) {
@@ -154,28 +154,16 @@ public class Model {
         return new Game((Map)C.getIn.invoke(state, path), path);
     }
 
-    public List<String> getPlayerNames(String gameId) {
-        return getGame(gameId).getSessionIds().stream()
-            .map((sessionId) -> getSession(sessionId).getUsername())
-            .collect(Collectors.toList());
+    public List<Game> getGames() {
+        return ((Set<String>)((Map)C.get.invoke(state, "games")).keySet()).stream()
+                .map((gameId) -> getGame(gameId)).collect(Collectors.toList());
     }
 
     public List<Map> getAvailableGames(String sessionId) {
-        List<Map> availableGames = new ArrayList<>();
-        for (Map gameData : (Collection<Map>)((Map)C.get.invoke(state, "games")).values()) {
-            Game game = new Game(gameData, null);
-            if (game.isAvailable(getUserBySessionId(sessionId))) {
-                availableGames.add(getClientGameModel(game.getGameId()));
-            }
-        }
-        return availableGames;
-    }
-
-    public Map getClientGameModel(String gameId) {
-        return (Map)C.hashMap.invoke(
-                "gameId", gameId,
-                "started", getGame(gameId).started(),
-                "players", getPlayerNames(gameId));
+        return getGames().stream()
+            .filter((game) -> game.isAvailable(getUserBySessionId(sessionId)))
+            .map((game) -> game.getAvailableModel(this))
+            .collect(Collectors.toList());
     }
 
     // OTHER
@@ -186,13 +174,13 @@ public class Model {
         if (gameId == null) {
             availableGames = getAvailableGames(sessionId);
         } else {
-            currentGame = getClientGameModel(gameId);
+            currentGame = getGame(gameId).getCurrentModel(sessionId, this);
         }
 
         return (Map)C.hashMap.invoke(
                 "sessionId", sessionId,
-                "currentGame", currentGame,
-                "availableGames", availableGames);
+                "availableGames", availableGames,
+                "currentGame", currentGame);
     }
 
     public void authenticate(String username, String password) {

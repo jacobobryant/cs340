@@ -5,6 +5,7 @@ import clojure.lang.IFn;
 
 public class C {
     public static final IFn assocIn = Clojure.var("clojure.core", "assoc-in");
+    public static final IFn assoc = Clojure.var("clojure.core", "assoc");
     public static final IFn getIn = Clojure.var("clojure.core", "get-in");
     public static final IFn get = Clojure.var("clojure.core", "get");
     public static final IFn hashMap = Clojure.var("clojure.core", "hash-map");
@@ -20,6 +21,7 @@ public class C {
     public static final IFn last = Clojure.var("clojure.core", "last");
     public static final IFn vec = Clojure.var("clojure.core", "vec");
     public static final IFn shuffle = Clojure.var("clojure.core", "shuffle");
+    public static final IFn selectKeys = Clojure.var("clojure.core", "select-keys");
 
     public static final IFn swapperToFn = (IFn)eval.invoke(readString.invoke(
                 "(fn [old-state swapper] (.swap swapper old-state))"));

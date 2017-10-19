@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class Route extends BaseModel {
+public class Route {
     public static final List<Route> ROUTES;
     static {
         List<Route> routes = new ArrayList<>();
@@ -112,27 +112,15 @@ public class Route extends BaseModel {
         routes.add(new Route(City.Seattle, City.Vancouver, TrainType.any, 1));
         ROUTES = (List)C.vec.invoke(routes);
     }
+    public final City city1;
+    public final City city2;
+    public final TrainType type;
+    public final int length;
 
     public Route(City city1, City city2, TrainType type, int length) {
-        super(new Object[] {"city1", city1,
-                            "city2", city2,
-                            "type", type,
-                            "length", length}, null);
-    }
-
-    public City getCity1() {
-        return (City)data.get("city1");
-    }
-
-    public City getCity2() {
-        return (City)data.get("city2");
-    }
-
-    public TrainType getType() {
-        return (TrainType)data.get("type");
-    }
-
-    public int getLength() {
-        return (int)data.get("length");
+        this.city1 = city1;
+        this.city2 = city2;
+        this.type = type;
+        this.length = length;
     }
 }

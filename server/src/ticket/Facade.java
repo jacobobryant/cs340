@@ -25,18 +25,12 @@ public class Facade {
     }
 
     private static Map success(Model m, String sessionId) {
-        Map clientModel = m.getClientModel(sessionId);
-        ClientProxy cp = new ClientProxy();
-        cp.setClientModel(clientModel);
-        return cp.getResponse();
+        return m.getClientModel(sessionId);
     }
 
     private static Map error(E.BaseException e) {
-        ClientProxy cp = new ClientProxy();
-        cp.showError(e);
-        return cp.getResponse();
+        return Server.error(e.getCode(), e.getMessage());
     }
-
 
     public static Map register(String username, String password) {
         return run((state) -> {
