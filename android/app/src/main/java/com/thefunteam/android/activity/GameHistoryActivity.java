@@ -33,9 +33,6 @@ public class GameHistoryActivity extends ObservingActivity {
     private RecyclerView.Adapter adapter;
     private Button backToGameButton;
 
-    //do we have to make this as a part of the Game object?
-    private InGame CurinGame;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -61,12 +58,19 @@ public class GameHistoryActivity extends ObservingActivity {
 
         //curinGame should be updated how can I do that?
 
-        if(CurinGame.getGameHistory() == null){
+        if (model.getInGameObject() == null) {
+            return;
+        }
+        List<String> newLog = model.getInGameObject().getGameHistory();
+        gameLog.clear();
+
+        if(newLog == null){
             gameLog.add("no history");
         }
-        if(CurinGame.getGameHistory() != null){
-            gameLog.addAll(CurinGame.getGameHistory());
+        if(newLog != null){
+            gameLog.addAll(newLog);
         }
+
         adapter.notifyDataSetChanged();
     }
 
