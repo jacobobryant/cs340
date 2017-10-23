@@ -16,11 +16,15 @@ public class InGame {
     //number of cards in face down destination deck - route
     private int destDeck;
 
-    public InGame(List<Player> players, int trainDeck, List<TrainType> faceUpDeck, int destDeck) {
+    //game history
+    private List<String> gameHistory;
+
+    public InGame(List<Player> players, int trainDeck, List<TrainType> faceUpDeck, int destDeck, List<String> gameHistory) {
         this.players = players;
         this.trainDeck = trainDeck;
         this.faceUpDeck = faceUpDeck;
         this.destDeck = destDeck;
+        this.gameHistory = gameHistory;
     }
 
     public List<Player> getPlayers() {
@@ -38,4 +42,6 @@ public class InGame {
     public int getDestDeck() {
         return destDeck;
     }
+
+    public List<String> getGameHistory() { return gameHistory;  }
 }
