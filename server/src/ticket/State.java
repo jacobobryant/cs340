@@ -1,5 +1,8 @@
 package ticket;
 
+import client.AvailableGame;
+import client.ClientModel;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -159,7 +162,7 @@ public class State {
                 .map((gameId) -> getGame(gameId)).collect(Collectors.toList());
     }
 
-    public List<Map> getAvailableGames(String sessionId) {
+    public List<AvailableGame> getAvailableGames(String sessionId) {
         return getGames().stream()
             .filter((game) -> game.isAvailable(getUserBySessionId(sessionId)))
             .map((game) -> game.getAvailableModel(this))
@@ -167,20 +170,21 @@ public class State {
     }
 
     // OTHER
-    public Map getClientModel(String sessionId) {
+    public ClientModel getClientModel(String sessionId) {
         String gameId = getSession(sessionId).getGameId();
-        List<Map> availableGames = null;
-        Map currentGame = null;
+        List<AvailableGame> availableGames = null;
+        client.Game currentGame = null;
         if (gameId == null) {
             availableGames = getAvailableGames(sessionId);
         } else {
             currentGame = getGame(gameId).getCurrentModel(sessionId, this);
         }
 
-        return (Map)C.hashMap.invoke(
-                "sessionId", sessionId,
-                "availableGames", availableGames,
-                "currentGame", currentGame);
+        return new ClientModel(sessionId, availableGames, currentGame);
+        //return (Map)C.hashMap.invoke(
+        //        "sessionId", sessionId,
+        //        "availableGames", availableGames,
+        //        "currentGame", currentGame);
     }
 
     public void authenticate(String username, String password) {

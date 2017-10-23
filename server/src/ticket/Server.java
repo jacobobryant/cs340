@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class Server extends NanoHTTPD {
     private interface FacadeMethod {
-        Map run();
+        Object run();
     }
 
     public Server() throws IOException {
@@ -30,7 +30,7 @@ public class Server extends NanoHTTPD {
     @Override
     public Response serve(IHTTPSession session) {
         try {
-            Map response = serveHelper(session);
+            Object response = serveHelper(session);
             //System.out.println(State.getState());
             //State.getState().pprint();
             //System.out.println();
@@ -49,7 +49,7 @@ public class Server extends NanoHTTPD {
         }
     }
 
-    private Map serveHelper(IHTTPSession session) {
+    private Object serveHelper(IHTTPSession session) {
         String endpoint = session.getUri();
         System.out.println(session.getMethod() + ": " + endpoint);
 

@@ -1,5 +1,8 @@
 package ticket;
 
+import client.AvailableGame;
+import client.Player;
+
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -23,13 +26,13 @@ public class Game extends BaseModel {
                             "destDiscard", C.vector.invoke(),
                             "openRoutes", Route.ROUTES,
                             "messages", C.vector.invoke(),
-                            "gameHistory", C.vector.invoke(),
+                            "history", C.vector.invoke(),
                             "longestRouteHolder", null},
                 path);
     }
 
-    public Map getCurrentModel(String curSession, State state) {
-        List<Map> players = getSessionIds().stream()
+    public client.Game getCurrentModel(String curSession, State state) {
+        List<Player> players = getSessionIds().stream()
             .map((sessionId) -> state.getSession(sessionId)
                         .getClientModel(sessionId.equals(curSession)))
             .collect(Collectors.toList());
@@ -38,26 +41,47 @@ public class Game extends BaseModel {
         String username = (holder == null) ? null
                     : state.getSession(holder).getUsername();
 
-        Map ret = (Map)C.selectKeys.invoke(data, new String[] {
-                    "faceUpDeck", "openRoutes", "messages", "gameHistory"});
-        return (Map)C.assoc.invoke(ret,
-                "players", players,
-                "trainDeck", getTrainDeck().size(),
-                "destDeck", getDestDeck().size(),
-                "longestRouteHolder", username);
+        return new client.Game(players, getTrainDeck().size(),
+                getFaceUpDeck(), getDestDeck().size(), 
+                getOpenRoutes(), getMessages(), getHistory(),
+                username);
+        //Map ret = (Map)C.selectKeys.invoke(data, new String[] {
+        //            "faceUpDeck", "openRoutes", "messages", "gameHistory"});
+        //return (Map)C.assoc.invoke(ret,
+        //        "players", players,
+        //        "trainDeck", getTrainDeck().size(),
+        //        "destDeck", getDestDeck().size(),
+        //        "longestRouteHolder", username);
     }
 
-    public Map getAvailableModel(State state) {
+    public AvailableGame getAvailableModel(State state) {
         List<String> players = getSessionIds().stream()
             .map((sessionId) -> state.getSession(sessionId).getUsername())
             .collect(Collectors.toList());
-        return (Map)C.hashMap.invoke(
-            "gameId", getGameId(),
-            "players", players);
+        return new AvailableGame(getGameId(), players);
+        //return (Map)C.hashMap.invoke(
+        //    "gameId", getGameId(),
+        //    "players", players);
     }
 
     public String getLongestRouteHolder() {
         return (String)data.get("longestRouteHolder");
+    }
+
+    public List<String> getHistory() {
+        return (List)data.get("history");
+    }
+
+    public List<String> getMessages() {
+        return (List)data.get("messages");
+    }
+
+    public List<Route> getOpenRoutes() {
+        return (List)data.get("openRoutes");
+    }
+
+    public List<TrainType> getFaceUpDeck() {
+        return (List)data.get("faceUpDeck");
     }
 
     public List<TrainType> getTrainDeck() {

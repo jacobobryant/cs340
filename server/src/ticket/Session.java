@@ -1,5 +1,8 @@
 package ticket;
 
+import client.Player;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -20,17 +23,30 @@ public class Session extends BaseModel {
               path);
     }
 
-    public Map getClientModel(boolean isCurrentPlayer) {
-        Map ret = (Map)C.selectKeys.invoke(data, new String[] {"username",
-            "routes", "trainsLeft", "destCards", "trainCards", "score"});
-
-        if (!isCurrentPlayer) {
-            ret = (Map)C.assoc.invoke(ret,
-                    "trainCards", new Object[getTrainCards().size()],
-                    "destCards", new Object[getDestCards().size()]);
+    public Player getClientModel(boolean isCurrentPlayer) {
+        List<TrainType> trainCards;
+        List<DestinationCard> destCards;
+        if (isCurrentPlayer) {
+            trainCards = getTrainCards();
+            destCards = getDestCards();
+        } else {
+            trainCards = Arrays.asList(new TrainType[getTrainCards().size()]);
+            destCards = Arrays.asList(new DestinationCard[getDestCards().size()]);
         }
+        return new Player(getUsername(), getRoutes(), trainCards,
+                destCards, getScore(), getTrainsLeft());
+    }
 
-        return ret;
+    public List<Route> getRoutes() {
+        return (List)data.get("routes");
+    }
+
+    public int getScore() {
+        return (int)data.get("score");
+    }
+
+    public int getTrainsLeft() {
+        return (int)data.get("trainsLeft");
     }
 
     public Session giveTrain(TrainType train) {
