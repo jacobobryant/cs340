@@ -99,6 +99,9 @@ public class Server extends NanoHTTPD {
             } else if (endpoint.equals("/state")) {
                 String sessionId = (String)get(body, "sessionId");
                 method = () -> Facade.state(sessionId);
+            } else if (endpoint.equals("/return-state")) {
+                String sessionId = (String)get(body, "sessionId");
+                method = () -> Facade.state(sessionId);
             } else if (endpoint.equals("/clear")) {
                 method = () -> Facade.clear();
             } else {

@@ -1,8 +1,4 @@
-package client;
-
-import ticket.DestinationCard;
-import ticket.Route;
-import ticket.TrainType;
+package shared;
 
 import java.util.List;
 

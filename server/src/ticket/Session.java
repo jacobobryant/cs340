@@ -1,6 +1,9 @@
 package ticket;
 
-import client.Player;
+import shared.DestinationCard;
+import shared.Player;
+import shared.Route;
+import shared.TrainType;
 
 import java.util.Arrays;
 import java.util.List;

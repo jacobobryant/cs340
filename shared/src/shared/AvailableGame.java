@@ -1,4 +1,4 @@
-package client;
+package shared;
 
 import java.util.Collections;
 import java.util.List;

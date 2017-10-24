@@ -1,6 +1,7 @@
-package ticket;
+package shared;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public enum TrainType {
@@ -13,7 +14,7 @@ public enum TrainType {
                 tdeck.add(type);
             }
         }
-        DECK = (List)C.vec.invoke(tdeck);
+        DECK = Collections.unmodifiableList(tdeck);
     }
 
     public int numInDeck() {

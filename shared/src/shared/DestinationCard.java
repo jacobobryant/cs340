@@ -1,8 +1,8 @@
-package ticket;
+package shared;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class DestinationCard {
     public static final List<DestinationCard> DECK;
@@ -38,7 +38,7 @@ public class DestinationCard {
         ddeck.add(new DestinationCard(City.LosAngeles, City.Miami, 20));
         ddeck.add(new DestinationCard(City.LosAngeles, City.NewYork, 21));
         ddeck.add(new DestinationCard(City.Seattle, City.NewYork, 22));
-        DECK = (List)C.vec.invoke(ddeck);
+        DECK = Collections.unmodifiableList(ddeck);
     }
     public final City city1;
     public final City city2;

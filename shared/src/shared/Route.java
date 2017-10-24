@@ -1,8 +1,8 @@
-package ticket;
+package shared;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 public class Route {
     public static final List<Route> ROUTES;
@@ -110,7 +110,7 @@ public class Route {
         routes.add(new Route(City.SaultStMarie, City.Toronto, TrainType.any, 2));
         routes.add(new Route(City.Seattle, City.Vancouver, TrainType.any, 1));
         routes.add(new Route(City.Seattle, City.Vancouver, TrainType.any, 1));
-        ROUTES = (List)C.vec.invoke(routes);
+        ROUTES = Collections.unmodifiableList(routes);
     }
     public final City city1;
     public final City city2;

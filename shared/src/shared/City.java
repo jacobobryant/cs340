@@ -1,4 +1,4 @@
-package ticket;
+package shared;
 
 public enum City {
     Atlanta,

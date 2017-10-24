@@ -1,7 +1,10 @@
 package ticket;
 
-import client.AvailableGame;
-import client.Player;
+import shared.AvailableGame;
+import shared.DestinationCard;
+import shared.Player;
+import shared.Route;
+import shared.TrainType;
 
 import java.util.List;
 import java.util.Map;
@@ -31,7 +34,7 @@ public class Game extends BaseModel {
                 path);
     }
 
-    public client.Game getCurrentModel(String curSession, State state) {
+    public shared.Game getCurrentModel(String curSession, State state) {
         List<Player> players = getSessionIds().stream()
             .map((sessionId) -> state.getSession(sessionId)
                         .getClientModel(sessionId.equals(curSession)))
@@ -41,27 +44,17 @@ public class Game extends BaseModel {
         String username = (holder == null) ? null
                     : state.getSession(holder).getUsername();
 
-        return new client.Game(players, getTrainDeck().size(),
+        return new shared.Game(players, getTrainDeck().size(),
                 getFaceUpDeck(), getDestDeck().size(), 
                 getOpenRoutes(), getMessages(), getHistory(),
-                username);
-        //Map ret = (Map)C.selectKeys.invoke(data, new String[] {
-        //            "faceUpDeck", "openRoutes", "messages", "gameHistory"});
-        //return (Map)C.assoc.invoke(ret,
-        //        "players", players,
-        //        "trainDeck", getTrainDeck().size(),
-        //        "destDeck", getDestDeck().size(),
-        //        "longestRouteHolder", username);
+                username, started());
     }
 
-    public AvailableGame getAvailableModel(State state) {
+    public shared.AvailableGame getAvailableModel(State state) {
         List<String> players = getSessionIds().stream()
             .map((sessionId) -> state.getSession(sessionId).getUsername())
             .collect(Collectors.toList());
         return new AvailableGame(getGameId(), players);
-        //return (Map)C.hashMap.invoke(
-        //    "gameId", getGameId(),
-        //    "players", players);
     }
 
     public String getLongestRouteHolder() {

@@ -1,6 +1,6 @@
 package ticket;
 
-import client.ClientModel;
+import shared.ClientModel;
 
 import java.util.HashMap;
 import java.util.Map;

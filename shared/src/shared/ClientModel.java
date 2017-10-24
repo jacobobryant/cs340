@@ -1,12 +1,12 @@
-package client;
+package shared;
 
 import java.util.Collections;
 import java.util.List;
 
 public class ClientModel {
     public final String sessionId;
-    public final List<AvailableGame> availableGames;
-    public final Game currentGame;
+    public final List<AvailableGame> availableGames;  // nullable
+    public final Game currentGame;  // nullable
 
     public ClientModel(String sessionId,
             List<AvailableGame> availableGames, Game currentGame) {

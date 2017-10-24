@@ -1,7 +1,7 @@
 package ticket;
 
-import client.AvailableGame;
-import client.ClientModel;
+import shared.AvailableGame;
+import shared.ClientModel;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -173,7 +173,7 @@ public class State {
     public ClientModel getClientModel(String sessionId) {
         String gameId = getSession(sessionId).getGameId();
         List<AvailableGame> availableGames = null;
-        client.Game currentGame = null;
+        shared.Game currentGame = null;
         if (gameId == null) {
             availableGames = getAvailableGames(sessionId);
         } else {
@@ -181,10 +181,6 @@ public class State {
         }
 
         return new ClientModel(sessionId, availableGames, currentGame);
-        //return (Map)C.hashMap.invoke(
-        //        "sessionId", sessionId,
-        //        "availableGames", availableGames,
-        //        "currentGame", currentGame);
     }
 
     public void authenticate(String username, String password) {
