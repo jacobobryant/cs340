@@ -36,6 +36,8 @@
         </activity>
         <activity android:name=".activity.GameHistoryActivity">
         </activity>
+        <activity android:name=".activity.MessageActivity">
+        </activity>
     </application>
 
 </manifest>

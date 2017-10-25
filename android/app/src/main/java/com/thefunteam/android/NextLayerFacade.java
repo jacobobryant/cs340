@@ -3,6 +3,7 @@ package com.thefunteam.android;
 import com.google.gson.Gson;
 import com.thefunteam.android.model.Atom;
 import com.thefunteam.android.model.GameCommand;
+import com.thefunteam.android.model.InGameModel.MessageCommand;
 import com.thefunteam.android.model.LoginCommand;
 import com.thefunteam.android.model.UserCommand;
 
@@ -62,6 +63,16 @@ public class NextLayerFacade {
         ClientCommunicator.getInstance().post(
                 "/leave",
                 gson.toJson(new UserCommand(sessionId))
+        );
+    }
+
+    //added
+    public void sendMessage(String message){
+        String sessionId = Atom.getInstance().getModel().getSessionId();
+        Gson gson = new Gson();
+        ClientCommunicator.getInstance().post(
+                "/chat",
+                gson.toJson(new MessageCommand(sessionId, message));
         );
     }
 }
