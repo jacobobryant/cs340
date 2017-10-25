@@ -37,7 +37,7 @@ public class Session extends BaseModel {
             destCards = Arrays.asList(new DestinationCard[getDestCards().size()]);
         }
         return new Player(getUsername(), getRoutes(), trainCards,
-                destCards, getScore(), getTrainsLeft());
+                destCards, getScore(), getTrainsLeft(), isCurrentPlayer);
     }
 
     public List<Route> getRoutes() {
