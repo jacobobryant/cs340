@@ -1,15 +1,17 @@
 package com.thefunteam.android.model;
 
 import java.util.List;
+import com.thefunteam.android.model.shared.Game;
+import com.thefunteam.android.model.shared.AvailableGame;
 
 public class Model {
 
     private String sessionId;
-    private List<Game> availableGames;
+    private List<AvailableGame> availableGames;
     private Game currentGame;
     private String errorMessage;
 
-    public Model(String sessionId, List<Game> availableGames, Game currentGame, String errorMessage) {
+    public Model(String sessionId, List<AvailableGame> availableGames, Game currentGame, String errorMessage) {
         this.sessionId = sessionId;
         this.availableGames = availableGames;
         this.currentGame = currentGame;
@@ -23,7 +25,7 @@ public class Model {
         return sessionId;
     }
 
-    public List<Game> getAvailableGames() {
+    public List<AvailableGame> getAvailableGames() {
 
         return availableGames;
     }
