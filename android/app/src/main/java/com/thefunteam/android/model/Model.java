@@ -1,5 +1,7 @@
 package com.thefunteam.android.model;
 
+import com.thefunteam.android.model.InGameModel.InGame;
+
 import java.util.List;
 import com.thefunteam.android.model.shared.Game;
 import com.thefunteam.android.model.shared.AvailableGame;
@@ -18,15 +20,11 @@ public class Model {
         this.errorMessage = errorMessage;
     }
 
-    public Model() {
-    }
-
     public String getSessionId() {
         return sessionId;
     }
 
     public List<AvailableGame> getAvailableGames() {
-
         return availableGames;
     }
 
