@@ -4,10 +4,17 @@ import json
 from random import randint
 
 def hit(endpoint, data):
-    if endpoint not in ('/register', '/login', '/join', '/clear'):
+    if endpoint == '/return-dest':
+        data = {'sessionId': data['sessionId'],
+                'dest': data['dest']}
+    elif endpoint not in ('/register', '/login', '/join', '/clear'):
         data = {'sessionId': data['sessionId']}
 
     response = json.loads(requests.post('http://localhost:8080' + endpoint, data=json.dumps(data)).text)
+    try:
+        response["currentGame"]["openRoutes"] = "[removed by test.py]"
+    except (KeyError, TypeError) as e:
+        pass
     print(endpoint)
     print_json(data)
     print_json(response)
@@ -51,5 +58,17 @@ hit('/join', {'sessionId': model2['sessionId'],
 hit('/start', model2)
 
 # test state
-hit('/state', model1)
+client_model = hit('/state', model1)
+
+cards = client_model["currentGame"]["players"][0]["destCards"]
+model1['dest'] = cards[0]
+hit('/return-dest', model1)
+
+model1['dest'] = cards[1]
+try:
+    hit('/return-dest', model1)
+except AssertionError:
+    pass
+
+
 

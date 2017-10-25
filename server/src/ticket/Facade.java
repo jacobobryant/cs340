@@ -1,6 +1,7 @@
 package ticket;
 
 import shared.ClientModel;
+import shared.DestinationCard;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -76,6 +77,14 @@ public class Facade {
         return run((state) -> {
             state.authenticate(sessionId);
             return state.startGame(sessionId);
+        }, sessionId);
+    }
+
+    public static Object returnDest(String sessionId,
+            DestinationCard card) {
+        return run((state) -> {
+            state.authenticate(sessionId);
+            return state.returnDest(sessionId, card);
         }, sessionId);
     }
 

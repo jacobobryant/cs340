@@ -127,6 +127,10 @@ public class Game extends BaseModel {
         return new Game(update(deck, C.subvec, 1), path);
     }
 
+    public Game discard(DestinationCard card) {
+        return new Game(update("destDiscard", C.conj, card), path);
+    }
+
     public List<String> getSessionIds() {
         return (List<String>)data.get("sessionIds");
     }

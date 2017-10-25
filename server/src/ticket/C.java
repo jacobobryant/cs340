@@ -23,6 +23,7 @@ public class C {
     public static final IFn subvec = Clojure.var("clojure.core", "subvec");
     public static final IFn shuffle = Clojure.var("clojure.core", "shuffle");
     public static final IFn selectKeys = Clojure.var("clojure.core", "select-keys");
+    public static final IFn println = Clojure.var("clojure.core", "println");
 
     public static final IFn swapperToFn = (IFn)eval.invoke(readString.invoke(
                 "(fn [old-state swapper] (.swap swapper old-state))"));
