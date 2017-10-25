@@ -23,4 +23,5 @@ public enum TrainType {
         }
         return 12;
     }
+    public static final int size = 9;
 }

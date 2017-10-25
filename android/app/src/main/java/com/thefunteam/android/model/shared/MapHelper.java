@@ -166,18 +166,35 @@ public class MapHelper {
 
     public static int getPlayerColor(int number) {
         switch (number) {
-            case 1:
+            case 0:
                 return Color.BLUE; // blue
-            case 2:
+            case 1:
                 return Color.GREEN;
-            case 3:
+            case 2:
                 return Color.YELLOW;
-            case 4:
+            case 3:
                 return Color.RED;
-            case 5:
+            case 4:
                 return Color.BLACK;
             default:
                 return 0;
+        }
+    }
+
+    public static String getPlayerColorName(int number) {
+        switch (number) {
+            case 1:
+                return "blue";
+            case 2:
+                return "green";
+            case 3:
+                return "yellow";
+            case 4:
+                return "red";
+            case 5:
+                return "black";
+            default:
+                return "";
         }
     }
 
