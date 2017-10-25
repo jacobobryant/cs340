@@ -23,4 +23,11 @@
             app:layout_constraintLeft_toLeftOf="parent"
             tools:layout_editor_absoluteY="0dp"
             tools:layout_editor_absoluteX="0dp"/>
+    <Button
+            android:text="Chat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/chatbutton"
+            app:layout_constraintBottom_toBottomOf="parent" android:layout_marginBottom="8dp"
+            android:layout_marginLeft="8dp" app:layout_constraintLeft_toLeftOf="parent"/>
 </android.support.constraint.ConstraintLayout>

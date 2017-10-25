@@ -1,10 +1,12 @@
 package com.thefunteam.android.activity;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.*;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.thefunteam.android.R;
@@ -24,6 +26,7 @@ public class GameActivity extends ObservingActivity {
     GamePresenter gamePresenter = new GamePresenter(this);
     Map map;
     private GestureDetector mDetector;
+    private Button chatButton;
     private RecyclerView playerInfoView;
     private ListAdapter adapter;
 
@@ -54,6 +57,13 @@ public class GameActivity extends ObservingActivity {
         playerInfoView.setLayoutManager(new LinearLayoutManager(this));
         playerInfoView.setAdapter(adapter);
         playerInfoView.setBackgroundColor(Color.RED);
+
+
+        //chat button
+        chatButton = (Button) findViewById(R.id.chatbutton);
+        chatButton.setOnClickListener(v -> {
+            startActivity(new Intent(GameActivity.this, MessageActivity.class));
+        });
     }
 
     View.OnTouchListener touchListener = new View.OnTouchListener() {

@@ -13,6 +13,8 @@ public class Model {
     private Game currentGame;
     private String errorMessage;
 
+    public Model() {}
+
     public Model(String sessionId, List<AvailableGame> availableGames, Game currentGame, String errorMessage) {
         this.sessionId = sessionId;
         this.availableGames = availableGames;

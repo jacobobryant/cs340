@@ -1,7 +1,5 @@
 package com.thefunteam.android.activity;
 
-import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -64,11 +62,8 @@ public class MessageActivity extends ObservingActivity {
                 if(!messageTosend.equals("")){
                     //send some command to server
                     msgPresenter.sendMessage(messageTosend.toString());
+                    messageTosend.setText("");
                 }
-                else{
-                    Toast.makeText(this, "type something", LENGTH_SHORT).show();
-                }
-
             }
         });
 
@@ -79,13 +74,13 @@ public class MessageActivity extends ObservingActivity {
 
         //curinGame should be updated how can I do that?
 
-        if (model.getInGameObject() == null) {
+        if (model.getCurrentGame() == null) {
             return;
         }
-        List<String> newLog = model.getInGameObject().getMessage();
+        List<String> newLog = model.getCurrentGame().getMessages();
         messageLog.clear();
 
-        if(newLog == null){
+        if(newLog == null || newLog.size() == 0){
             messageLog.add("no message");
         }
         if(newLog != null){

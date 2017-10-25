@@ -72,7 +72,7 @@ public class NextLayerFacade {
         Gson gson = new Gson();
         ClientCommunicator.getInstance().post(
                 "/chat",
-                gson.toJson(new MessageCommand(sessionId, message));
+                gson.toJson(new MessageCommand(sessionId, message))
         );
     }
 }

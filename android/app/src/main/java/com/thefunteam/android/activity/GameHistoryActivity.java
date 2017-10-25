@@ -12,7 +12,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.thefunteam.android.R;
 import com.thefunteam.android.model.Atom;
-import com.thefunteam.android.model.InGameModel.InGame;
 import com.thefunteam.android.model.Model;
 import com.thefunteam.android.presenter.GameHistoryPresenter;
 
@@ -58,10 +57,10 @@ public class GameHistoryActivity extends ObservingActivity {
 
         //curinGame should be updated how can I do that?
 
-        if (model.getInGameObject() == null) {
+        if (model.getCurrentGame() == null) {
             return;
         }
-        List<String> newLog = model.getInGameObject().getGameHistory();
+        List<String> newLog = model.getCurrentGame().getHistory();
         gameLog.clear();
 
         if(newLog == null){
