@@ -1,7 +1,9 @@
 package ticket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import fi.iki.elonen.NanoHTTPD;
+import shared.DestinationCard;
 
 import java.io.IOException;
 import java.security.InvalidParameterException;
@@ -99,9 +101,19 @@ public class Server extends NanoHTTPD {
             } else if (endpoint.equals("/state")) {
                 String sessionId = (String)get(body, "sessionId");
                 method = () -> Facade.state(sessionId);
-            } else if (endpoint.equals("/return-state")) {
+            } else if (endpoint.equals("/return-dest")) {
                 String sessionId = (String)get(body, "sessionId");
-                method = () -> Facade.state(sessionId);
+                Map arg = (Map)body.get("dest");
+                final DestinationCard card;
+                
+                if (arg != null) {
+                    Gson gson = new Gson();
+                    card = gson.fromJson(gson.toJsonTree(arg), DestinationCard.class);
+                } else {
+                    card = null;
+                }
+                //System.out.println(card.city1 + " " + card.city2 + " " + card.points);
+                method = () -> Facade.returnDest(sessionId, card);
             } else if (endpoint.equals("/clear")) {
                 method = () -> Facade.clear();
             } else {
@@ -110,6 +122,7 @@ public class Server extends NanoHTTPD {
         } catch (InvalidParameterException e) {
             return error(E.CLIENT_CODE, "request body doesn't contain required parameters");
         } catch (ClassCastException e) {
+            e.printStackTrace();
             return error(E.CLIENT_CODE, "request body contains arguments with invalid type");
         }
         return method.run();

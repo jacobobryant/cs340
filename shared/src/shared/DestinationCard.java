@@ -49,4 +49,33 @@ public class DestinationCard {
         this.city2 = city2;
         this.points = points;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DestinationCard that = (DestinationCard) o;
+
+        if (points != that.points) return false;
+        if (city1 != that.city1) return false;
+        return city2 == that.city2;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = city1 != null ? city1.hashCode() : 0;
+        result = 31 * result + (city2 != null ? city2.hashCode() : 0);
+        result = 31 * result + points;
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "DestinationCard{" +
+                "city1=" + city1 +
+                ", city2=" + city2 +
+                ", points=" + points +
+                '}';
+    }
 }

@@ -2,6 +2,7 @@ package ticket;
 
 import shared.AvailableGame;
 import shared.ClientModel;
+import shared.DestinationCard;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -167,6 +168,21 @@ public class State {
             .filter((game) -> game.isAvailable(getUserBySessionId(sessionId)))
             .map((game) -> game.getAvailableModel(this))
             .collect(Collectors.toList());
+    }
+
+    public State returnDest(String sessionId, DestinationCard card) {
+        Session ses = getSession(sessionId);
+        String gameId = ses.getGameId();
+        if (ses.getDestCards().size() < 3) {
+            throw new E.ClientException("Already returned card");
+        } else if (!ses.getDestCards().contains(card)) {
+            throw new E.ClientException("Player doesn't have that card");
+        } else if (gameId == null || !getGame(gameId).started()) {
+            throw new E.ClientException("Game hasn't started");
+        }
+
+        return commit(ses.returnCard(card))
+              .commit(getGame(ses.getGameId()).discard(card));
     }
 
     // OTHER

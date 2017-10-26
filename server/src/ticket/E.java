@@ -23,6 +23,24 @@ public class E {
         }
     }
 
+    public static class ClientException extends BaseException {
+        private String message;
+
+        public ClientException(String message) {
+            this.message = message;
+        }
+
+        @Override
+        public String getMessage() {
+            return message;
+        }
+
+        public int getCode() {
+            return E.CLIENT_CODE;
+        }
+
+    }
+
     public static class UserExistsException extends BaseException {
         @Override
         public String getMessage() {

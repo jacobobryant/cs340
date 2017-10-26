@@ -37,7 +37,7 @@ public class Session extends BaseModel {
             destCards = Arrays.asList(new DestinationCard[getDestCards().size()]);
         }
         return new Player(getUsername(), getRoutes(), trainCards,
-                destCards, getScore(), getTrainsLeft());
+                destCards, getScore(), getTrainsLeft(), isCurrentPlayer);
     }
 
     public List<Route> getRoutes() {
@@ -58,6 +58,14 @@ public class Session extends BaseModel {
 
     public Session giveDest(DestinationCard dest) {
         return new Session(update("destCards", C.conj, dest), path);
+    }
+
+    public Session returnCard(DestinationCard card) {
+        C.println.invoke(card);
+        System.out.println(getDestCards());
+        Session s = new Session(remove("destCards", card), path);
+        System.out.println(s.getDestCards());
+        return s;
     }
 
     public List<TrainType> getTrainCards() {

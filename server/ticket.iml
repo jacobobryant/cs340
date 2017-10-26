@@ -11,5 +11,6 @@
     <orderEntry type="library" name="org.nanohttpd:nanohttpd:2.2.0" level="project" />
     <orderEntry type="library" name="com.fasterxml.jackson.core:jackson-databind:2.0.5" level="project" />
     <orderEntry type="library" name="shared" level="project" />
+    <orderEntry type="library" name="com.google.code.gson:gson:2.2.2" level="project" />
   </component>
 </module>
