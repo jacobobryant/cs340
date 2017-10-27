@@ -109,12 +109,11 @@ public class GameActivity extends ObservingActivity {
         public void onBindViewHolder(ViewHolder holder, int position) {
             if(Atom.getInstance().getModel().getCurrentGame() == null || Atom.getInstance().getModel().getCurrentGame().getPlayers() == null) { return; }
             List<Player> players = Atom.getInstance().getModel().getCurrentGame().getPlayers();
-            String username = "roy";
             Player player = players.get(0);
             if(position == 0) {
                 int color = 0;
                 for(int i = 0; i < players.size(); i++) {
-                    if(players.get(i).getUsername().equals(username)) {
+                    if(players.get(i).isCurrentPlayer()) {
                         player = players.get(i);
                         color = i; break;
                     }
@@ -151,15 +150,15 @@ public class GameActivity extends ObservingActivity {
             } else {
                 boolean skip = false;
                 for(int i = 0; i < position; i++) {
-                    if(!players.get(i).getUsername().equals(username)) {
+                    if(players.get(i).isCurrentPlayer()) {
                         skip = true;
                     }
                 }
                 int color;
                 if(skip) {
-                    color = position + 1;
-                } else {
                     color = position;
+                } else {
+                    color = position - 1;
                 }
                 player = players.get(color);
 

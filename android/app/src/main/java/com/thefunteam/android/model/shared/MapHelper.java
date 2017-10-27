@@ -183,15 +183,15 @@ public class MapHelper {
 
     public static String getPlayerColorName(int number) {
         switch (number) {
-            case 1:
+            case 0:
                 return "blue";
-            case 2:
+            case 1:
                 return "green";
-            case 3:
+            case 2:
                 return "yellow";
-            case 4:
+            case 3:
                 return "red";
-            case 5:
+            case 4:
                 return "black";
             default:
                 return "";

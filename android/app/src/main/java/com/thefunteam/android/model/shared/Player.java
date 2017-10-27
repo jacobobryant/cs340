@@ -9,15 +9,18 @@ public class Player {
     public final List<DestinationCard> destCards;
     public final int score;
     public final int trainsLeft;
+    public final boolean currentPlayer;
 
     public Player(String username, List<Route> routes, List<TrainType> trainCards,
-                  List<DestinationCard> destCards, int score, int trainsLeft) {
+                  List<DestinationCard> destCards, int score, int trainsLeft,
+                  boolean currentPlayer) {
         this.username = username;
         this.routes = routes;
         this.trainCards = trainCards;
         this.destCards = destCards;
         this.score = score;
         this.trainsLeft = trainsLeft;
+        this.currentPlayer = currentPlayer;
     }
 
     public String getUsername() {
@@ -42,5 +45,9 @@ public class Player {
 
     public int getTrainsLeft() {
         return trainsLeft;
+    }
+
+    public boolean isCurrentPlayer() {
+        return currentPlayer;
     }
 }

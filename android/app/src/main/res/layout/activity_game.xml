@@ -124,7 +124,7 @@
         android:layout_width="100dp"
         android:layout_height="30dp" android:id="@+id/addPointsButton"
         android:textSize="10dp"
-        app:layout_constraintTo_toTopOf="parent" android:layout_marginTop="8dp"
+        app:layout_constraintTop_toTopOf="parent" android:layout_marginTop="8dp"
         android:layout_marginRight="10dp" app:layout_constraintRight_toRightOf="parent"
         android:background="#ff0000" android:layout_marginEnd="10dp"/>
     <Button
