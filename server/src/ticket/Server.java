@@ -108,6 +108,7 @@ public class Server extends NanoHTTPD {
             } else if (endpoint.equals("/return-dest")) {
                 String sessionId = (String)get(body, "sessionId");
                 Map arg = (Map)body.get("dest");
+                // TODO throw error if "dest" not in body?
                 final DestinationCard card;
                 
                 if (arg != null) {
@@ -116,7 +117,6 @@ public class Server extends NanoHTTPD {
                 } else {
                     card = null;
                 }
-                //System.out.println(card.city1 + " " + card.city2 + " " + card.points);
                 method = () -> Facade.returnDest(sessionId, card);
             } else if (endpoint.equals("/clear")) {
                 method = () -> Facade.clear();

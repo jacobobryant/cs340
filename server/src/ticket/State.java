@@ -213,7 +213,12 @@ public class State {
             .collect(Collectors.toList());
     }
 
+    // TODO make it so after the user returns a null card, we don't let them hit
+    // the endpoint again
     public State returnDest(String sessionId, DestinationCard card) {
+        if (card == null) {
+            return this;
+        }
         Session ses = getSession(sessionId);
         String gameId = ses.getGameId();
         if (ses.getDestCards().size() < 3) {
