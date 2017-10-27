@@ -101,6 +101,10 @@ public class Server extends NanoHTTPD {
             } else if (endpoint.equals("/state")) {
                 String sessionId = (String)get(body, "sessionId");
                 method = () -> Facade.state(sessionId);
+            } else if (endpoint.equals("/chat")){
+                String sessionId = (String)get(body, "sessionId");
+                String message = (String)get(body, "message");
+                method = () -> Facade.chat(sessionId, message);
             } else if (endpoint.equals("/return-dest")) {
                 String sessionId = (String)get(body, "sessionId");
                 Map arg = (Map)body.get("dest");
