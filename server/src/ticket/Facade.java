@@ -92,7 +92,7 @@ public class Facade {
             sb.append(": ");
             sb.append(message);
 
-            return state.chat(sb.toString());
+            return state.chat(sessionId, sb.toString());
         }, sessionId);
     }
 
