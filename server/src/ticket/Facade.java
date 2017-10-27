@@ -80,6 +80,22 @@ public class Facade {
         }, sessionId);
     }
 
+    public static Object chat(String sessionId, String message){
+
+        return run((state) -> {
+            state.authenticate(sessionId);
+
+            // append the username to the message
+            User u = state.getUserBySessionId(sessionId);
+            StringBuilder sb = new StringBuilder();
+            sb.append(u.data.get("name"));
+            sb.append(": ");
+            sb.append(message);
+
+            return state.chat(sb.toString());
+        }, sessionId);
+    }
+
     public static Object returnDest(String sessionId,
             DestinationCard card) {
         return run((state) -> {

@@ -149,6 +149,14 @@ public class State {
         return game.start(this);
     }
 
+    public State chat(String sessionId, String message){
+        if (!exists("sessions", sessionId, "gameId")) {
+            throw new E.NoCurrentGameException();
+        }
+        Game game = getGameBySession(sessionId);
+        return commit(game.sendMessage(message));
+    }
+
     public Game getGameBySession(String sessionId) {
         return getGame(getSession(sessionId).getGameId());
     }
