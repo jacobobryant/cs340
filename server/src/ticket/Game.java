@@ -131,6 +131,8 @@ public class Game extends BaseModel {
         return new Game(update("destDiscard", C.conj, card), path);
     }
 
+    public Game sendMessage(String message){return new Game(update("messages", C.conj, message), path);}
+
     public List<String> getSessionIds() {
         return (List<String>)data.get("sessionIds");
     }
