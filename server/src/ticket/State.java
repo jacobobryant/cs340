@@ -102,7 +102,15 @@ public class State {
         }
         String gameId = UUID.randomUUID().toString();
         Object[] path = {"games", gameId};
-        return commit(new Game(gameId, sessionId, false, path))
+        Game g = new Game(gameId, sessionId, false, path);
+
+        // create game history
+        StringBuilder sb = new StringBuilder();
+        User u = this.getUserBySessionId(sessionId);
+        sb.append(u.data.get("name"));
+        sb.append(" created the game");
+
+        return commit(g.addHistory(sb.toString()))
               .commit(getSession(sessionId).setGameId(gameId));
     }
 
@@ -116,7 +124,14 @@ public class State {
         if (!game.isAvailable(getUserBySessionId(sessionId))) {
             throw new E.GameUnavailableException();
         }
-        return commit(game.addSessionId(sessionId))
+
+        // create game history
+        StringBuilder sb = new StringBuilder();
+        User u = this.getUserBySessionId(sessionId);
+        sb.append(u.data.get("name"));
+        sb.append(" joined the game");
+
+        return commit(game.addSessionId(sessionId).addHistory(sb.toString()))
               .commit(getSession(sessionId).setGameId(gameId));
     }
 
@@ -134,7 +149,13 @@ public class State {
         if (game.getSessionIds().size() == 1) {
             return m.delete(game);
         } else {
-            return m.commit(game.removeSessionId(sessionId));
+            // create game history
+            StringBuilder sb = new StringBuilder();
+            User u = this.getUserBySessionId(sessionId);
+            sb.append(u.data.get("name"));
+            sb.append(" left the game");
+
+            return m.commit(game.removeSessionId(sessionId).addHistory(sb.toString()));
         }
     }
 
@@ -146,7 +167,14 @@ public class State {
         if (game.getSessionIds().size() < 2) {
             throw new E.NotEnoughUsersException();
         }
-        return game.start(this);
+
+        // create game history
+        StringBuilder sb = new StringBuilder();
+        User u = this.getUserBySessionId(sessionId);
+        sb.append(u.data.get("name"));
+        sb.append(" started the game");
+
+        return game.addHistory(sb.toString()).start(this);
     }
 
     public State chat(String sessionId, String message){
@@ -154,7 +182,14 @@ public class State {
             throw new E.NoCurrentGameException();
         }
         Game game = getGameBySession(sessionId);
-        return commit(game.sendMessage(message));
+
+        // create game history
+        StringBuilder sb = new StringBuilder();
+        User u = this.getUserBySessionId(sessionId);
+        sb.append(u.data.get("name"));
+        sb.append(" sent a message");
+
+        return commit(game.sendMessage(message).addHistory(sb.toString()));
     }
 
     public Game getGameBySession(String sessionId) {
@@ -189,8 +224,14 @@ public class State {
             throw new E.ClientException("Game hasn't started");
         }
 
+        // create game history
+        StringBuilder sb = new StringBuilder();
+        User u = this.getUserBySessionId(sessionId);
+        sb.append(u.data.get("name"));
+        sb.append(" returned a destination card");
+
         return commit(ses.returnCard(card))
-              .commit(getGame(ses.getGameId()).discard(card));
+              .commit(getGame(ses.getGameId()).discard(card).addHistory(sb.toString()));
     }
 
     // OTHER

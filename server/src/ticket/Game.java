@@ -133,6 +133,8 @@ public class Game extends BaseModel {
 
     public Game sendMessage(String message){return new Game(update("messages", C.conj, message), path);}
 
+    public Game addHistory(String item){return new Game(update("history", C.conj, item), path);}
+
     public List<String> getSessionIds() {
         return (List<String>)data.get("sessionIds");
     }
