@@ -200,4 +200,21 @@ public class MapHelper {
 
 
     public static City[] allCities = {City.Atlanta,City.Boston,City.Calgary,City.Charleston,City.Chicago,City.Dallas,City.Denver,City.Duluth,City.ElPaso,City.Helena,City.Houston,City.KansasCity,City.LasVegas,City.LittleRock,City.LosAngeles,City.Miami,City.Montreal,City.Nashville,City.NewOrleans,City.NewYork,City.OklahomaCity,City.Omaha,City.Phoenix,City.Pittsburgh,City.Portland,City.Raleigh,City.SaintLouis,City.SaltLakeCity,City.SanFrancisco,City.SantaFe,City.SaultStMarie,City.Seattle,City.Toronto,City.Vancouver,City.Washington,City.Winnipeg};
+
+    public static void adjust(Cord cord1, Cord cord2, Route route) {
+        if(route.second == true) {
+            float dx = cord1.x - cord2.x;
+            float dy = cord1.y - cord2.y;
+            float odx = dy;
+            float ody = -dx;
+            float mag = (float) Math.sqrt(dx*dx + dy*dy);
+            float udx = odx / mag;
+            float udy = ody / mag;
+
+            cord1.x += udx * 15;
+            cord1.y += udy * 15;
+            cord2.x += udx * 15;
+            cord2.y += udy * 15;
+        }
+    }
 }

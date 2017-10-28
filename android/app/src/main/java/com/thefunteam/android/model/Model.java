@@ -5,6 +5,7 @@ import com.thefunteam.android.model.InGameModel.InGame;
 import java.util.List;
 import com.thefunteam.android.model.shared.Game;
 import com.thefunteam.android.model.shared.AvailableGame;
+import com.thefunteam.android.model.shared.Player;
 
 public class Model {
 
@@ -40,5 +41,16 @@ public class Model {
 
     void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+    }
+
+    public Player getCurrentPlayer() {
+        if( currentGame == null || currentGame.getPlayers() == null) { return null; }
+        for(int i = 0; i < currentGame.getPlayers().size(); i++) {
+            Player player = currentGame.getPlayers().get(i);
+            if(player.isCurrentPlayer()) {
+                return player;
+            }
+        }
+        return null;
     }
 }

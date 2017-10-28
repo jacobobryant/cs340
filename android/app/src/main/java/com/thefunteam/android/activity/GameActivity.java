@@ -6,16 +6,12 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.*;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.*;
+import com.thefunteam.android.Poller;
 import com.thefunteam.android.R;
 import com.thefunteam.android.model.Atom;
 import com.thefunteam.android.model.Model;
-import com.thefunteam.android.model.shared.DestinationCard;
-import com.thefunteam.android.model.shared.MapHelper;
-import com.thefunteam.android.model.shared.Player;
-import com.thefunteam.android.model.shared.TrainType;
+import com.thefunteam.android.model.shared.*;
 import com.thefunteam.android.presenter.GamePresenter;
 import com.thefunteam.android.view.Map;
 
@@ -29,6 +25,37 @@ public class GameActivity extends ObservingActivity {
     private Button chatButton;
     private RecyclerView playerInfoView;
     private ListAdapter adapter;
+
+    // destination card picker
+    private LinearLayout destinationPicker;
+    private CheckBox destChooser1;
+    private CheckBox destChooser2;
+    private CheckBox destChooser3;
+    private Button destSubmit;
+
+    // card buttons
+    private Button destDrawPile;
+    private Button trainDrawPile;
+    private Button faceUp0;
+    private Button faceUp1;
+    private Button faceUp2;
+    private Button faceUp3;
+    private Button faceUp4;
+
+
+    // useless buttons
+    private Button addPoints;
+    private Button addTrainCard;
+    private Button addDestCard;
+    private Button removeDestCard;
+    private Button addTrainCardOther;
+    private Button addDestCardOther;
+    private Button claimRoute;
+    private Button claimRouteOther;
+    private Button addGameHistory;
+    private Button drawFaceUpCard;
+
+
 
     public GameActivity() {
         super();
@@ -47,9 +74,6 @@ public class GameActivity extends ObservingActivity {
         mDetector = new GestureDetector(this, new MyGestureListener());
         map.setOnTouchListener(touchListener);
 
-        map.updateRoutes(Atom.getInstance().getModel());
-
-
         // Player info
         adapter = new ListAdapter();
         playerInfoView = (RecyclerView) findViewById(R.id.playerinfo);
@@ -64,6 +88,108 @@ public class GameActivity extends ObservingActivity {
         chatButton.setOnClickListener(v -> {
             startActivity(new Intent(GameActivity.this, MessageActivity.class));
         });
+
+        destinationPicker = (LinearLayout) findViewById(R.id.destinationcardpicker);
+        destinationPicker.setVisibility(View.GONE);
+        destChooser1 = (CheckBox) findViewById(R.id.checkBox0);
+        destChooser2 = (CheckBox) findViewById(R.id.checkBox1);
+        destChooser3 = (CheckBox) findViewById(R.id.checkBox2);
+        destSubmit = (Button) findViewById(R.id.submitDest);
+        destSubmit.setOnClickListener(v -> {
+            int total = 0;
+            int returnCard = -1;
+            if(destChooser1.isChecked()) { total++; } else { returnCard = 0; }
+            if(destChooser2.isChecked()) { total++; } else { returnCard = 1; }
+            if(destChooser3.isChecked()) { total++; } else { returnCard = 2; }
+
+            if(total >= 2) {
+                gamePresenter.returnDestCard(returnCard);
+            } else {
+                Toast.makeText(this,"You must select at least two destination cards.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // card buttons
+        destDrawPile = (Button) findViewById(R.id.destDeckButton);
+        trainDrawPile = (Button) findViewById(R.id.trainDeckButton);
+        faceUp0 = (Button) findViewById(R.id.faceUpTrain0);
+        faceUp1 = (Button) findViewById(R.id.faceUpTrain1);
+        faceUp2 = (Button) findViewById(R.id.faceUpTrain2);
+        faceUp3 = (Button) findViewById(R.id.faceUpTrain3);
+        faceUp4 = (Button) findViewById(R.id.faceUpTrain4);
+
+        addPoints = (Button) findViewById(R.id.addPointsButton);
+        addPoints.setOnClickListener(v -> gamePresenter.addPoints());
+
+        addTrainCard = (Button) findViewById(R.id.addTrainCard);
+        addTrainCard.setOnClickListener(v -> gamePresenter.addTrainCard());
+
+        addDestCard = (Button) findViewById(R.id.addDestCard);
+        addDestCard.setOnClickListener(v -> gamePresenter.addDestCard());
+
+        removeDestCard = (Button) findViewById(R.id.removeDestCard);
+        removeDestCard.setOnClickListener(v -> gamePresenter.removeDestCard());
+
+        addTrainCardOther = (Button) findViewById(R.id.addTrainCardOther);
+        addTrainCardOther.setOnClickListener(v -> gamePresenter.addTrainCardOther());
+
+        addDestCardOther = (Button) findViewById(R.id.addDestCardOther);
+        addDestCardOther.setOnClickListener(v -> gamePresenter.addDestCardOther());
+
+        claimRoute = (Button) findViewById(R.id.claimRoute);
+        claimRoute.setOnClickListener(v -> gamePresenter.claimRoute());
+
+        claimRouteOther = (Button) findViewById(R.id.claimRouteOther);
+        claimRouteOther.setOnClickListener(v -> gamePresenter.claimRouteOther());
+
+        addGameHistory = (Button) findViewById(R.id.addGameHistory);
+        addGameHistory.setOnClickListener(v -> gamePresenter.addGameHistory());
+
+        drawFaceUpCard = (Button) findViewById(R.id.drawFaceUpCard);
+        drawFaceUpCard.setOnClickListener(v -> gamePresenter.drawFaceUpCard());
+
+        update(Atom.getInstance().getModel());
+    }
+
+
+    public void update(Model model) {
+        Player currentPlayer = model.getCurrentPlayer();
+        Game game = model.getCurrentGame();
+        if(currentPlayer != null) {
+
+            // Update dest choosing
+            if(currentPlayer.getDestCards().size() == 3) {
+                List<DestinationCard> cards = currentPlayer.getDestCards();
+                destinationPicker.setVisibility(View.VISIBLE);
+                destChooser1.setText(cards.get(0).description());
+                destChooser2.setText(cards.get(1).description());
+                destChooser3.setText(cards.get(2).description());
+            } else {
+                destinationPicker.setVisibility(View.GONE);
+            }
+        }
+
+        // Update destination deck
+        int destCardCount = game.getDestDeck();
+        destDrawPile.setText("Destination Draw Deck\n" + Integer.toString(destCardCount) + " Cards Left");
+        int trainCardCount = game.getTrainDeck();
+        trainDrawPile.setText("Train Draw Deck\n" + Integer.toString(trainCardCount) + " Cards Left.");
+//        faceUp0.setBackgroundColor(MapHelper.getColor(game.getFaceUpDeck().get(0)));
+//        faceUp1.setBackgroundColor(MapHelper.getColor(game.getFaceUpDeck().get(1)));
+//        faceUp2.setBackgroundColor(MapHelper.getColor(game.getFaceUpDeck().get(2)));
+//        faceUp3.setBackgroundColor(MapHelper.getColor(game.getFaceUpDeck().get(3)));
+//        faceUp4.setBackgroundColor(MapHelper.getColor(game.getFaceUpDeck().get(4)));
+        faceUp0.setBackgroundColor(MapHelper.getColor(TrainType.red));
+        faceUp1.setBackgroundColor(MapHelper.getColor(TrainType.any));
+        faceUp2.setBackgroundColor(MapHelper.getColor(TrainType.blue));
+        faceUp3.setBackgroundColor(MapHelper.getColor(TrainType.purple));
+        faceUp4.setBackgroundColor(MapHelper.getColor(TrainType.green));
+
+        adapter.notifyDataSetChanged();
+
+        map.updateRoutes(model);
+
+        Poller.getInstance().stopPolling();
     }
 
     View.OnTouchListener touchListener = new View.OnTouchListener() {

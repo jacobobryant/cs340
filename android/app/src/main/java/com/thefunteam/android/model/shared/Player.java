@@ -7,9 +7,9 @@ public class Player {
     public final List<Route> routes;
     public final List<TrainType> trainCards;
     public final List<DestinationCard> destCards;
-    public final int score;
-    public final int trainsLeft;
-    public final boolean currentPlayer;
+    public int score;
+    public int trainsLeft;
+    public boolean currentPlayer;
 
     public Player(String username, List<Route> routes, List<TrainType> trainCards,
                   List<DestinationCard> destCards, int score, int trainsLeft,

@@ -1,11 +1,9 @@
 package com.thefunteam.android;
 
 import com.google.gson.Gson;
-import com.thefunteam.android.model.Atom;
-import com.thefunteam.android.model.GameCommand;
+import com.thefunteam.android.model.*;
 import com.thefunteam.android.model.InGameModel.MessageCommand;
-import com.thefunteam.android.model.LoginCommand;
-import com.thefunteam.android.model.UserCommand;
+import com.thefunteam.android.model.shared.DestinationCard;
 
 public class NextLayerFacade {
     private static NextLayerFacade ourInstance = new NextLayerFacade();
@@ -73,6 +71,15 @@ public class NextLayerFacade {
         ClientCommunicator.getInstance().post(
                 "/chat",
                 gson.toJson(new MessageCommand(sessionId, message))
+        );
+    }
+
+    public void returnCard(DestinationCard destinationCard) {
+        String sessionId = Atom.getInstance().getModel().getSessionId();
+        Gson gson = new Gson();
+        ClientCommunicator.getInstance().post(
+                "/return-dest",
+                gson.toJson(new ReturnDestCommand(sessionId, destinationCard))
         );
     }
 }

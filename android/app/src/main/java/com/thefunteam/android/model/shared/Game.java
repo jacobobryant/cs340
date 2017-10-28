@@ -4,9 +4,9 @@ import java.util.List;
 
 public class Game {
     public final List<Player> players;
-    public final int trainDeck;
+    public int trainDeck;
     public final List<TrainType> faceUpDeck;
-    public final int destDeck;
+    public int destDeck;
     public final List<Route> openRoutes;
     public final List<String> messages;
     public final List<String> history;

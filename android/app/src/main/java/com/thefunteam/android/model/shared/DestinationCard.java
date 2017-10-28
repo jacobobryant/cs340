@@ -94,4 +94,8 @@ public class DestinationCard {
                 ", points=" + points +
                 '}';
     }
+
+    public String description() {
+        return MapHelper.getName(city1) + " to " + MapHelper.getName(city2) + "(" + Integer.toString(getPoints()) + ")";
+    }
 }
