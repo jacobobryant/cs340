@@ -7,9 +7,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
+import com.google.gson.Gson;
+import com.thefunteam.android.ClientCommunicator;
+import com.thefunteam.android.Poller;
 import com.thefunteam.android.R;
 import com.thefunteam.android.model.Atom;
 import com.thefunteam.android.model.Model;
+import com.thefunteam.android.model.UserCommand;
 import com.thefunteam.android.presenter.MessagePresenter;
 
 import java.util.ArrayList;
@@ -61,19 +65,18 @@ public class MessageActivity extends ObservingActivity {
             public void onClick(View view) {
                 if(!messageTosend.equals("")){
                     //send some command to server
-                    msgPresenter.sendMessage(messageTosend.toString());
+                    msgPresenter.sendMessage(messageTosend.getText().toString());
                     messageTosend.setText("");
                 }
             }
         });
 
+        Poller.getInstance().startPolling();
+
         update(Atom.getInstance().getModel());
     }
 
     public void update(Model model){
-
-        //curinGame should be updated how can I do that?
-
         if (model.getCurrentGame() == null) {
             return;
         }
@@ -106,8 +109,7 @@ public class MessageActivity extends ObservingActivity {
 
         @Override
         public void onBindViewHolder(MessageActivity.ListAdapter.ViewHolder holder, int position) {
-            final String player = listItems.get(position);
-            holder.textDescription.setText(player);
+            holder.textDescription.setText(listItems.get(position));
         }
 
 
@@ -130,4 +132,9 @@ public class MessageActivity extends ObservingActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Poller.getInstance().stopPolling();
+    }
 }

@@ -152,10 +152,11 @@ public class GamePresenter extends Presenter {
     public void drawFaceUpCard() {
         List<TrainType> faceUp = Atom.getInstance().getModel().getCurrentGame().getFaceUpDeck();
         Player player = Atom.getInstance().getModel().getCurrentPlayer();
-        player.getTrainCards().add(faceUp.get(0));
-        faceUp.remove(0);
-        faceUp.add(TrainType.any);
-        gameActivity.update(Atom.getInstance().getModel());
-
+        if(faceUp.size() > 0) {
+            player.getTrainCards().add(faceUp.get(0));
+            faceUp.remove(0);
+            faceUp.add(TrainType.any);
+            gameActivity.update(Atom.getInstance().getModel());
+        }
     }
 }

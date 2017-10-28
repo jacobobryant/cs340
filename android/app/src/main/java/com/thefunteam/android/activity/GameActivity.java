@@ -23,6 +23,7 @@ public class GameActivity extends ObservingActivity {
     Map map;
     private GestureDetector mDetector;
     private Button chatButton;
+    private Button historyButton;
     private RecyclerView playerInfoView;
     private ListAdapter adapter;
 
@@ -54,7 +55,7 @@ public class GameActivity extends ObservingActivity {
     private Button claimRouteOther;
     private Button addGameHistory;
     private Button drawFaceUpCard;
-
+    private boolean showDestPicker = true;
 
 
     public GameActivity() {
@@ -85,9 +86,10 @@ public class GameActivity extends ObservingActivity {
 
         //chat button
         chatButton = (Button) findViewById(R.id.chatbutton);
-        chatButton.setOnClickListener(v -> {
-            startActivity(new Intent(GameActivity.this, MessageActivity.class));
-        });
+        chatButton.setOnClickListener(v -> startActivity(new Intent(GameActivity.this, MessageActivity.class)));
+
+        historyButton = (Button) findViewById(R.id.historybutton);
+        historyButton.setOnClickListener(v -> startActivity( new Intent(GameActivity.this, GameHistoryActivity.class)));
 
         destinationPicker = (LinearLayout) findViewById(R.id.destinationcardpicker);
         destinationPicker.setVisibility(View.GONE);
@@ -103,6 +105,7 @@ public class GameActivity extends ObservingActivity {
             if(destChooser3.isChecked()) { total++; } else { returnCard = 2; }
 
             if(total >= 2) {
+                showDestPicker = false;
                 gamePresenter.returnDestCard(returnCard);
             } else {
                 Toast.makeText(this,"You must select at least two destination cards.", Toast.LENGTH_SHORT).show();
@@ -158,7 +161,7 @@ public class GameActivity extends ObservingActivity {
         if(currentPlayer != null) {
 
             // Update dest choosing
-            if(currentPlayer.getDestCards().size() == 3) {
+            if(showDestPicker) {
                 List<DestinationCard> cards = currentPlayer.getDestCards();
                 destinationPicker.setVisibility(View.VISIBLE);
                 destChooser1.setText(cards.get(0).description());
@@ -174,16 +177,40 @@ public class GameActivity extends ObservingActivity {
         destDrawPile.setText("Destination Draw Deck\n" + Integer.toString(destCardCount) + " Cards Left");
         int trainCardCount = game.getTrainDeck();
         trainDrawPile.setText("Train Draw Deck\n" + Integer.toString(trainCardCount) + " Cards Left.");
-//        faceUp0.setBackgroundColor(MapHelper.getColor(game.getFaceUpDeck().get(0)));
-//        faceUp1.setBackgroundColor(MapHelper.getColor(game.getFaceUpDeck().get(1)));
-//        faceUp2.setBackgroundColor(MapHelper.getColor(game.getFaceUpDeck().get(2)));
-//        faceUp3.setBackgroundColor(MapHelper.getColor(game.getFaceUpDeck().get(3)));
-//        faceUp4.setBackgroundColor(MapHelper.getColor(game.getFaceUpDeck().get(4)));
-        faceUp0.setBackgroundColor(MapHelper.getColor(TrainType.red));
-        faceUp1.setBackgroundColor(MapHelper.getColor(TrainType.any));
-        faceUp2.setBackgroundColor(MapHelper.getColor(TrainType.blue));
-        faceUp3.setBackgroundColor(MapHelper.getColor(TrainType.purple));
-        faceUp4.setBackgroundColor(MapHelper.getColor(TrainType.green));
+
+        if(game.getFaceUpDeck().size() == 0) {
+            game.getFaceUpDeck().add(TrainType.yellow);
+            game.getFaceUpDeck().add(TrainType.black);
+            game.getFaceUpDeck().add(TrainType.purple);
+            game.getFaceUpDeck().add(TrainType.blue);
+            game.getFaceUpDeck().add(TrainType.green);
+        }
+
+        if(game.getFaceUpDeck().size() > 0) {
+            faceUp0.setBackgroundColor(MapHelper.getColor(game.getFaceUpDeck().get(0)));
+        } else {
+            faceUp0.setVisibility(View.INVISIBLE);
+        }
+        if(game.getFaceUpDeck().size() > 1) {
+            faceUp1.setBackgroundColor(MapHelper.getColor(game.getFaceUpDeck().get(1)));
+        } else {
+            faceUp1.setVisibility(View.INVISIBLE);
+        }
+        if(game.getFaceUpDeck().size() > 2) {
+            faceUp2.setBackgroundColor(MapHelper.getColor(game.getFaceUpDeck().get(2)));
+        } else {
+            faceUp2.setVisibility(View.INVISIBLE);
+        }
+        if(game.getFaceUpDeck().size() > 3) {
+            faceUp3.setBackgroundColor(MapHelper.getColor(game.getFaceUpDeck().get(3)));
+        } else {
+            faceUp3.setVisibility(View.INVISIBLE);
+        }
+        if(game.getFaceUpDeck().size() > 4) {
+            faceUp4.setBackgroundColor(MapHelper.getColor(game.getFaceUpDeck().get(4)));
+        } else {
+            faceUp4.setVisibility(View.INVISIBLE);
+        }
 
         adapter.notifyDataSetChanged();
 
