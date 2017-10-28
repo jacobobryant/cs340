@@ -1,7 +1,5 @@
 package com.thefunteam.android.model;
 
-import android.support.v7.app.AppCompatActivity;
-
 import java.util.Observable;
 
 public class Atom extends Observable {

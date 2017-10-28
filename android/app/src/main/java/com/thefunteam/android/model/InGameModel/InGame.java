@@ -19,12 +19,17 @@ public class InGame {
     //game history
     private List<String> gameHistory;
 
-    public InGame(List<Player> players, int trainDeck, List<TrainType> faceUpDeck, int destDeck, List<String> gameHistory) {
+    //message
+    private List<String> messages;
+
+    public InGame(List<Player> players, int trainDeck, List<TrainType> faceUpDeck, int destDeck,
+                  List<String> gameHistory, List<String> messages) {
         this.players = players;
         this.trainDeck = trainDeck;
         this.faceUpDeck = faceUpDeck;
         this.destDeck = destDeck;
         this.gameHistory = gameHistory;
+        this.messages = messages;
     }
 
     public List<Player> getPlayers() {
@@ -43,5 +48,12 @@ public class InGame {
         return destDeck;
     }
 
-    public List<String> getGameHistory() { return gameHistory;  }
+    public List<String> getGameHistory() {
+        return gameHistory;
+    }
+
+    public List<String> getMessages() {
+        return messages;
+    }
+
 }

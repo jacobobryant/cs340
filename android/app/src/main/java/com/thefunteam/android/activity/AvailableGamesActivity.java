@@ -15,7 +15,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.thefunteam.android.R;
 import com.thefunteam.android.model.Atom;
-import com.thefunteam.android.model.Game;
+import com.thefunteam.android.model.shared.AvailableGame;
+import com.thefunteam.android.model.shared.Game;
 import com.thefunteam.android.model.Model;
 import com.thefunteam.android.presenter.AvailableGamesPresenter;
 
@@ -26,7 +27,7 @@ public class AvailableGamesActivity extends ObservingActivity {
     AvailableGamesPresenter availableGamesPresenter = new AvailableGamesPresenter(this);
 
     private RecyclerView gameListView;
-    private List<Game> gameList;
+    private List<AvailableGame> gameList;
     private ListAdapter adapter;
     private Button createGameButton;
 
@@ -58,7 +59,7 @@ public class AvailableGamesActivity extends ObservingActivity {
         });
     }
 
-    private void askToJoinGame(View view, final Game game) {
+    private void askToJoinGame(View view, final AvailableGame game) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
         builder.setTitle("Join Game")
                 .setMessage("Do you want to join this game?")
@@ -77,7 +78,7 @@ public class AvailableGamesActivity extends ObservingActivity {
     }
 
     public void update(Model model) {
-        List<Game> games = model.getAvailableGames();
+        List<AvailableGame> games = model.getAvailableGames();
         gameList.clear();
         if (games != null) {
             gameList.addAll(games);
@@ -87,9 +88,9 @@ public class AvailableGamesActivity extends ObservingActivity {
 
     class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
 
-        public List<Game> listItems;
+        public List<AvailableGame> listItems;
 
-        ListAdapter(List<Game> listItems) {
+        ListAdapter(List<AvailableGame> listItems) {
             this.listItems = listItems;
         }
 
@@ -102,7 +103,7 @@ public class AvailableGamesActivity extends ObservingActivity {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            final Game game = listItems.get(position);
+            final AvailableGame game = listItems.get(position);
 
             String ownerName = game.getPlayers().get(0);
             holder.textDescription.setText(ownerName + "'s game (" + Integer.toString(game.getPlayers().size()) + " players)");

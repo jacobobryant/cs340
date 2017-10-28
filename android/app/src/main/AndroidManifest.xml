@@ -32,9 +32,11 @@
         <activity android:name=".activity.AvailableGamesActivity"/>
         <activity android:name=".activity.CurrentGameActivity">
         </activity>
-        <activity android:name=".activity.GameActivity">
+        <activity android:name=".activity.GameActivity"  android:screenOrientation="landscape">
         </activity>
         <activity android:name=".activity.GameHistoryActivity">
+        </activity>
+        <activity android:name=".activity.MessageActivity">
         </activity>
     </application>
 

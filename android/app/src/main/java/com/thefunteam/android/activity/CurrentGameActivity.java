@@ -1,7 +1,6 @@
 package com.thefunteam.android.activity;
 
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,12 +12,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.thefunteam.android.R;
 import com.thefunteam.android.model.Atom;
-import com.thefunteam.android.model.Game;
 import com.thefunteam.android.model.Model;
+import com.thefunteam.android.model.shared.Player;
 import com.thefunteam.android.presenter.CurrentGamePresenter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CurrentGameActivity extends ObservingActivity {
 
@@ -67,10 +67,11 @@ public class CurrentGameActivity extends ObservingActivity {
 
     public void update(Model model) {
         if(model.getCurrentGame() == null) { return; }
-        List<String> players = model.getCurrentGame().getPlayers();
+        List<Player> players = model.getCurrentGame().getPlayers();
         playerList.clear();
         if (players != null) {
-            playerList.addAll(players);
+            List<String> usernames = players.stream().map(Player::getUsername).collect(Collectors.toList());
+            playerList.addAll(usernames);
             startGameButton.setEnabled(playerList.size() > 1 && playerList.size() < 6);
         }
         adapter.notifyDataSetChanged();

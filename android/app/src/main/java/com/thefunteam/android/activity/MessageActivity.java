@@ -1,46 +1,49 @@
 package com.thefunteam.android.activity;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.*;
 import com.thefunteam.android.R;
 import com.thefunteam.android.model.Atom;
 import com.thefunteam.android.model.Model;
-import com.thefunteam.android.presenter.GameHistoryPresenter;
+import com.thefunteam.android.presenter.MessagePresenter;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class GameHistoryActivity extends ObservingActivity {
+import static android.widget.Toast.LENGTH_SHORT;
 
-    GameHistoryPresenter gameHistoryPresenter =  new GameHistoryPresenter(this);
+public class MessageActivity extends ObservingActivity {
 
-    public GameHistoryActivity(){
+    MessagePresenter msgPresenter = new MessagePresenter(this);
+
+    public MessageActivity(){
         super();
-        presenter = gameHistoryPresenter;
+        presenter = msgPresenter;
     }
 
-    private RecyclerView gameHistoryView;
-    private List<String> gameLog = new ArrayList<>();
+    private RecyclerView messageLogView;
+    private List<String> messageLog = new ArrayList<>();
     private RecyclerView.Adapter adapter;
     private Button backToGameButton;
+
+    private EditText messageTosend;
+    private Button sendMessageButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_game_history);
+        setContentView(R.layout.activity_message);
 
-        gameHistoryView = (RecyclerView) findViewById(R.id.gameLog);
-        gameHistoryView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new ListAdapter(gameLog);
-        gameHistoryView.setAdapter(adapter);
+        messageLogView = (RecyclerView) findViewById(R.id.messageLog);
+        messageLogView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new ListAdapter(messageLog);
+        messageLogView.setAdapter(adapter);
 
         backToGameButton = (Button) findViewById(R.id.Back_to_Game);
         backToGameButton.setOnClickListener(new View.OnClickListener() {
@@ -50,6 +53,20 @@ public class GameHistoryActivity extends ObservingActivity {
                 finish();
             }
         });
+
+        messageTosend = (EditText) findViewById(R.id.message);
+        sendMessageButton  = (Button) findViewById(R.id.sendMessage);
+        sendMessageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!messageTosend.equals("")){
+                    //send some command to server
+                    msgPresenter.sendMessage(messageTosend.toString());
+                    messageTosend.setText("");
+                }
+            }
+        });
+
         update(Atom.getInstance().getModel());
     }
 
@@ -60,20 +77,19 @@ public class GameHistoryActivity extends ObservingActivity {
         if (model.getCurrentGame() == null) {
             return;
         }
-        List<String> newLog = model.getCurrentGame().getHistory();
-        gameLog.clear();
+        List<String> newLog = model.getCurrentGame().getMessages();
+        messageLog.clear();
 
-        if(newLog == null){
-            gameLog.add("no history");
+        if(newLog == null || newLog.size() == 0){
+            messageLog.add("no message");
         }
         if(newLog != null){
-            gameLog.addAll(newLog);
+            messageLog.addAll(newLog);
         }
-
         adapter.notifyDataSetChanged();
     }
 
-    public class ListAdapter extends RecyclerView.Adapter<GameHistoryActivity.ListAdapter.ViewHolder>{
+    public class ListAdapter extends RecyclerView.Adapter<MessageActivity.ListAdapter.ViewHolder>{
 
         private List<String> listItems;
 
@@ -82,14 +98,14 @@ public class GameHistoryActivity extends ObservingActivity {
         }
 
         @Override
-        public GameHistoryActivity.ListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        public MessageActivity.ListAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View v = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.recycler_view, parent, false);
-            return new GameHistoryActivity.ListAdapter.ViewHolder(v);
+            return new MessageActivity.ListAdapter.ViewHolder(v);
         }
 
         @Override
-        public void onBindViewHolder(GameHistoryActivity.ListAdapter.ViewHolder holder, int position) {
+        public void onBindViewHolder(MessageActivity.ListAdapter.ViewHolder holder, int position) {
             final String player = listItems.get(position);
             holder.textDescription.setText(player);
         }
