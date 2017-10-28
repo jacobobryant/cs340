@@ -113,5 +113,10 @@ class TestServer(unittest.TestCase):
         self.raises(lambda: hit('/chat', self.user1))
         self.raises(lambda: hit('/chat', assoc(self.user2, "message", "foo")))
 
+    def test_faceup_init(self):
+        self.join_first(self.user2)
+        state = hit('/start', self.user1)
+        assert len(state['currentGame']['faceUpDeck']) == 5
+
 if __name__ == "__main__":
     unittest.main()

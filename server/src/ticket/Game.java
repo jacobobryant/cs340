@@ -106,7 +106,15 @@ public class Game extends BaseModel {
             }
             state = state.commit(ses);
         }
+        for (int i = 0; i < 5; i++) {
+            game = game.turnFaceUp();
+        }
         return state.commit(game);
+    }
+
+    private Game turnFaceUp() {
+        return new Game(update("faceUpDeck", C.conj, topTrain()), path)
+                    .drawCard("trainDeck");
     }
 
     private List<Session> getSessions(State state) {
