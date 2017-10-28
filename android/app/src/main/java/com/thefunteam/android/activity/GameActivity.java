@@ -178,13 +178,13 @@ public class GameActivity extends ObservingActivity {
         int trainCardCount = game.getTrainDeck();
         trainDrawPile.setText("Train Draw Deck\n" + Integer.toString(trainCardCount) + " Cards Left.");
 
-        if(game.getFaceUpDeck().size() == 0) {
-            game.getFaceUpDeck().add(TrainType.yellow);
-            game.getFaceUpDeck().add(TrainType.black);
-            game.getFaceUpDeck().add(TrainType.purple);
-            game.getFaceUpDeck().add(TrainType.blue);
-            game.getFaceUpDeck().add(TrainType.green);
-        }
+//        if(game.getFaceUpDeck().size() == 0) {
+//            game.getFaceUpDeck().add(TrainType.yellow);
+//            game.getFaceUpDeck().add(TrainType.black);
+//            game.getFaceUpDeck().add(TrainType.purple);
+//            game.getFaceUpDeck().add(TrainType.blue);
+//            game.getFaceUpDeck().add(TrainType.green);
+//        }
 
         if(game.getFaceUpDeck().size() > 0) {
             faceUp0.setBackgroundColor(MapHelper.getColor(game.getFaceUpDeck().get(0)));

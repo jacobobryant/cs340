@@ -148,9 +148,9 @@ public class MapHelper {
             case blue:
                 return Color.rgb(10, 20, 240);
             case yellow:
-                return Color.rgb(160, 230, 30);
+                return Color.rgb(249, 255, 91);
             case orange:
-                return Color.rgb( 230, 240, 12);
+                return Color.rgb(239, 156, 12);
             case black:
                 return Color.rgb(20, 20, 20);
             case red:
