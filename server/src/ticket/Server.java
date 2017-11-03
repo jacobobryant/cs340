@@ -43,7 +43,7 @@ public class Server extends NanoHTTPD {
             try {
                 return newFixedLengthResponse(
                         new ObjectMapper().writeValueAsString(
-                            error(E.SERVER, "internal server error")));
+                            BadJuju.map("internal server error")));
             } catch (IOException ioe) {
                 e.printStackTrace();
                 return newFixedLengthResponse("something has gone terribly, terribly wrong");
@@ -60,7 +60,7 @@ public class Server extends NanoHTTPD {
         try {
             session.parseBody(files);
         } catch (IOException | ResponseException e) {
-            return error(E.CLIENT_CODE, "couldn't parse request body");
+            return BadJuju.map("couldn't parse request body");
         }
         String json = (files.containsKey("postData"))
             ? files.get("postData") : session.getQueryParameterString();
@@ -71,7 +71,7 @@ public class Server extends NanoHTTPD {
             body = new ObjectMapper().readValue(json, HashMap.class);
         } catch (IOException | NullPointerException e) {
             System.out.println(json);
-            return error(E.CLIENT_CODE, "couldn't parse json from request body");
+            return BadJuju.map("couldn't parse json from request body");
         }
 
         // We use FacadeMethod so that invocation occurs outside the try/catch block.
@@ -121,13 +121,13 @@ public class Server extends NanoHTTPD {
             } else if (endpoint.equals("/clear")) {
                 method = () -> Facade.clear();
             } else {
-                return error(E.CLIENT_CODE, "endpoint " + endpoint + " doesn't exist");
+                return BadJuju.map("endpoint " + endpoint + " doesn't exist");
             }
         } catch (InvalidParameterException e) {
-            return error(E.CLIENT_CODE, "request body doesn't contain required parameters");
+            return BadJuju.map("request body doesn't contain required parameters");
         } catch (ClassCastException e) {
             e.printStackTrace();
-            return error(E.CLIENT_CODE, "request body contains arguments with invalid type");
+            return BadJuju.map("request body contains arguments with invalid type");
         }
         return method.run();
     }
@@ -138,9 +138,5 @@ public class Server extends NanoHTTPD {
             throw new InvalidParameterException();
         }
         return ret;
-    }
-
-    public static Map error(int code, String message) {
-        return (Map)C.hashMap.invoke("code", code, "message", message);
     }
 }

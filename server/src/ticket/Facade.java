@@ -4,15 +4,14 @@ import shared.ClientModel;
 import shared.DestinationCard;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public class Facade {
     private static Object run(State.Swapper swapper, String key, boolean getByUsername) {
         State m;
         try {
             m = State.swap(swapper);
-        } catch (E.BaseException e) {
-            return error(e);
+        } catch (BadJuju e) {
+            return e.toMap();
         }
         String sessionId;
         if (getByUsername) {
@@ -31,15 +30,9 @@ public class Facade {
         return m.getClientModel(sessionId);
     }
 
-    private static Map error(E.BaseException e) {
-        return Server.error(e.getCode(), e.getMessage());
-    }
-
     public static Object register(String username, String password) {
         return run((state) -> {
-            if (state.userExists(username)) {
-                throw new E.UserExistsException();
-            }
+            state.checkUsernameAvailable(username);
             return state.createUser(username, password)
                 .createSession(username);
         }, username, true);
@@ -55,6 +48,7 @@ public class Facade {
     public static Object create(String sessionId) {
         return run((state) -> {
             state.authenticate(sessionId);
+            state.checkNoGame(sessionId);
             return state.createGame(sessionId);
         }, sessionId);
     }
@@ -62,6 +56,8 @@ public class Facade {
     public static Object join(String sessionId, String gameId) {
         return run((state) -> {
             state.authenticate(sessionId);
+            state.checkNoGame(sessionId);
+            state.checkGameAvailable(sessionId, gameId);
             return state.joinGame(sessionId, gameId);
         }, sessionId);
     }
@@ -69,6 +65,8 @@ public class Facade {
     public static Object leave(String sessionId){
         return run((state) -> {
                 state.authenticate(sessionId);
+                state.checkHasGame(sessionId);
+                state.checkStarted(state.getGameBySession(sessionId), false);
                 return state.leaveGame(sessionId);
             }, sessionId);
     }
@@ -76,6 +74,10 @@ public class Facade {
     public static Object start(String sessionId){
         return run((state) -> {
             state.authenticate(sessionId);
+            state.checkHasGame(sessionId);
+            Game game = state.getGameBySession(sessionId);
+            state.checkStarted(game, false);
+            state.checkEnoughPlayers(game);
             return state.startGame(sessionId);
         }, sessionId);
     }
@@ -84,6 +86,7 @@ public class Facade {
 
         return run((state) -> {
             state.authenticate(sessionId);
+            state.checkHasGame(sessionId);
 
             // append the username to the message
             User u = state.getUserBySessionId(sessionId);
@@ -96,16 +99,26 @@ public class Facade {
         }, sessionId);
     }
 
-    public static Object returnDest(String sessionId,
-            DestinationCard card) {
+    public static Object returnDest(String sessionId, DestinationCard card) {
         return run((state) -> {
             state.authenticate(sessionId);
+            state.checkHasGame(sessionId);
+            Session s = state.getSession(sessionId);
+            state.checkStarted(state.getGameBySession(sessionId), true);
+            state.checkCanReturn(s);
+            state.checkHasCard(s, card);
             return state.returnDest(sessionId, card);
         }, sessionId);
     }
 
     public static Object state(String sessionId) {
-        return success(State.getState(), sessionId);
+        State s = State.getState();
+        try {
+            s.authenticate(sessionId);
+        } catch (BadJuju e) {
+            return e.toMap();
+        }
+        return success(s, sessionId);
     }
 
     public static Object clear() {

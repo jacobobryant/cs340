@@ -97,9 +97,6 @@ public class State {
 
     // GAME
     public State createGame(String sessionId) {
-        if (exists("sessions", sessionId, "gameId")) {
-            throw new E.HasGameException();
-        }
         String gameId = UUID.randomUUID().toString();
         Object[] path = {"games", gameId};
         Game g = new Game(gameId, sessionId, false, path);
@@ -115,15 +112,7 @@ public class State {
     }
 
     public State joinGame(String sessionId, String gameId) {
-        if (exists("sessions", sessionId, "gameId")){
-            throw new E.HasGameException();
-        } else if (!exists("games", gameId)) {
-            throw new E.GameUnavailableException();
-        }
         Game game = getGame(gameId);
-        if (!game.isAvailable(getUserBySessionId(sessionId))) {
-            throw new E.GameUnavailableException();
-        }
 
         // create game history
         StringBuilder sb = new StringBuilder();
@@ -137,14 +126,7 @@ public class State {
 
     public State leaveGame(String sessionId) {
         Session session = getSession(sessionId);
-        String gameId = session.getGameId();
-        if (gameId == null) {
-            throw new E.NoCurrentGameException();
-        }
-        Game game = getGame(gameId);
-        if (game.started()) {
-            throw new E.GameAlreadyStartedException();
-        }
+        Game game = getGameBySession(sessionId);
         State m = commit(session.setGameId(null));
         if (game.getSessionIds().size() == 1) {
             return m.delete(game);
@@ -155,18 +137,13 @@ public class State {
             sb.append(u.data.get("name"));
             sb.append(" left the game");
 
-            return m.commit(game.removeSessionId(sessionId).addHistory(sb.toString()));
+            return m.commit(game.removeSessionId(sessionId)
+                                .addHistory(sb.toString()));
         }
     }
 
     public State startGame(String sessionId){
-        if (!exists("sessions", sessionId, "gameId")) {
-            throw new E.NoCurrentGameException();
-        }
         Game game = getGameBySession(sessionId);
-        if (game.getSessionIds().size() < 2) {
-            throw new E.NotEnoughUsersException();
-        }
 
         // create game history
         StringBuilder sb = new StringBuilder();
@@ -178,9 +155,6 @@ public class State {
     }
 
     public State chat(String sessionId, String message){
-        if (!exists("sessions", sessionId, "gameId")) {
-            throw new E.NoCurrentGameException();
-        }
         Game game = getGameBySession(sessionId);
 
         // create game history
@@ -220,14 +194,6 @@ public class State {
             return this;
         }
         Session ses = getSession(sessionId);
-        String gameId = ses.getGameId();
-        if (ses.getDestCards().size() < 3) {
-            throw new E.ClientException("Already returned card");
-        } else if (!ses.getDestCards().contains(card)) {
-            throw new E.ClientException("Player doesn't have that card");
-        } else if (gameId == null || !getGame(gameId).started()) {
-            throw new E.ClientException("Game hasn't started");
-        }
 
         // create game history
         StringBuilder sb = new StringBuilder();
@@ -236,7 +202,8 @@ public class State {
         sb.append(" returned a destination card");
 
         return commit(ses.returnCard(card))
-              .commit(getGame(ses.getGameId()).discard(card).addHistory(sb.toString()));
+              .commit(getGame(ses.getGameId()).discard(card)
+                      .addHistory(sb.toString()));
     }
 
     // OTHER
@@ -253,15 +220,73 @@ public class State {
         return new ClientModel(sessionId, availableGames, currentGame);
     }
 
+    // PRECONDITION CHECKERS
+
     public void authenticate(String username, String password) {
         if (!userExists(username) || !getUser(username).getPassword().equals(password)) {
-            throw new E.LoginException();
+            throw new BadJuju("Invalid username/password combination");
         }
     }
 
     public void authenticate(String sessionId) {
         if (!exists("sessions", sessionId)) {
-            throw new E.SessionException();
+            throw new BadJuju("Invalid session ID");
+        }
+    }
+
+    public void checkUsernameAvailable(String username) {
+        if (userExists(username)) {
+            throw new BadJuju("That username has already been taken");
+        }
+    }
+
+    public void checkNoGame(String sessionId) {
+        if (exists("sessions", sessionId, "gameId")) {
+            throw new BadJuju("Session is already part of a game");
+        }
+    }
+
+    public void checkGameAvailable(String sessionId, String gameId) {
+        if (!exists("games", gameId)) {
+            throw new BadJuju("Game isn't available");
+        }
+        Game game = getGame(gameId);
+        if (!game.isAvailable(getUserBySessionId(sessionId))) {
+            throw new BadJuju("Game isn't available");
+        }
+    }
+
+    public void checkHasGame(String sessionId) {
+        Session session = getSession(sessionId);
+        String gameId = session.getGameId();
+        if (gameId == null) {
+            throw new BadJuju("Session isn't part of a game");
+        }
+    }
+
+    public void checkStarted(Game game, boolean shouldBeStarted) {
+        if (game.started() != shouldBeStarted) {
+            throw new BadJuju("Game " +
+                              ((shouldBeStarted) ? "not" : "already") +
+                              " started");
+        }
+    }
+
+    public void checkEnoughPlayers(Game game) {
+        if (game.getSessionIds().size() < 2) {
+            throw new BadJuju("Not enough players to start");
+        }
+    }
+
+    public void checkCanReturn(Session s) {
+        if (s.getDestCards().size() < 3) {
+            throw new BadJuju("Already returned card");
+        } 
+    }
+
+    public void checkHasCard(Session s, DestinationCard card) {
+        if (card != null && !s.getDestCards().contains(card)) {
+            throw new BadJuju("Player doesn't have that card");
         }
     }
 }

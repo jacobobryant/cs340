@@ -94,6 +94,7 @@ public class Game extends BaseModel {
     }
 
     public State start(State state) {
+        // TODO don't allow a game to be started twice or with less than two players.
         Game game = new Game(set("started", true), path);
         for (Session ses : getSessions(state)) {
             for (int i = 0; i < 4; i++) {

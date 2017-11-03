@@ -1,8 +1,2 @@
 Server.java: massive if-else block. Can we deserialize json more cleanly/more
-abstractly?
-
-errors. We have all these random errors and ad-hoc checking. I don't think we
-really need the error code. Can error checking be cleaner?
-
-interaction between facade and state. What stuff should facade handle?
-
+abstractly? should we use classes that client uses to serialize commands?
