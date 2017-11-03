@@ -93,46 +93,30 @@ public class Game extends BaseModel {
         return (boolean)data.get("started");
     }
 
-    public State start(State state) {
-        // TODO don't allow a game to be started twice or with less than two players.
-        Game game = new Game(set("started", true), path);
-        for (Session ses : getSessions(state)) {
-            for (int i = 0; i < 4; i++) {
-                ses = ses.giveTrain(game.topTrain());
-                game = game.drawCard("trainDeck");
-            }
-            for (int i = 0; i < 3; i++) {
-                ses = ses.giveDest(game.topDest());
-                game = game.drawCard("destDeck");
-            }
-            state = state.commit(ses);
-        }
-        for (int i = 0; i < 5; i++) {
-            game = game.turnFaceUp();
-        }
-        return state.commit(game);
+    public Game start() {
+        return new Game(set("started", true), path);
     }
 
-    private Game turnFaceUp() {
+    public Game turnFaceUp() {
         return new Game(update("faceUpDeck", C.conj, topTrain()), path)
                     .drawCard("trainDeck");
     }
 
-    private List<Session> getSessions(State state) {
+    public List<Session> getSessions(State state) {
         return getSessionIds().stream()
             .map((sessionId) -> state.getSession(sessionId))
             .collect(Collectors.toList());
     }
 
-    private TrainType topTrain() {
+    public TrainType topTrain() {
         return getTrainDeck().get(0);
     }
 
-    private DestinationCard topDest() {
+    public DestinationCard topDest() {
         return getDestDeck().get(0);
     }
 
-    private Game drawCard(String deck) {
+    public Game drawCard(String deck) {
         return new Game(update(deck, C.subvec, 1), path);
     }
 
@@ -143,6 +127,12 @@ public class Game extends BaseModel {
     public Game sendMessage(String message){return new Game(update("messages", C.conj, message), path);}
 
     public Game addHistory(String item){return new Game(update("history", C.conj, item), path);}
+
+    public Game addHistory(State s, String sessionId, String action) {
+        User u = s.getUserBySessionId(sessionId);
+        String message = u.getName() + " " + action;
+        return new Game(update("history", C.conj, message), path);
+    }
 
     public List<String> getSessionIds() {
         return (List<String>)data.get("sessionIds");
