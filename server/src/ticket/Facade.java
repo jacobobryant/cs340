@@ -88,6 +88,7 @@ public class Facade {
             state.authenticate(sessionId);
             state.checkHasGame(sessionId);
 
+
             // append the username to the message
             User u = state.getUserBySessionId(sessionId);
             StringBuilder sb = new StringBuilder();

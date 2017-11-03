@@ -109,8 +109,8 @@ class TestServer(unittest.TestCase):
     def test_chat(self):
         message = "hello there"
         state = hit('/chat', assoc(self.user1, "message", message))
+        hit('/chat', assoc(self.user1, "message", 1))
         assert message in state['currentGame']['messages'][0]
-        self.raises(lambda: hit('/chat', self.user1))
         self.raises(lambda: hit('/chat', assoc(self.user2, "message", "foo")))
 
     def test_faceup_init(self):

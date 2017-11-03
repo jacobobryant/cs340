@@ -1,2 +1,0 @@
-Server.java: massive if-else block. Can we deserialize json more cleanly/more
-abstractly? should we use classes that client uses to serialize commands?
