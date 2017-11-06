@@ -1,4 +1,4 @@
-package com.thefunteam.android.model.InGameModel;
+package com.thefunteam.android.model;
 
 public class MessageCommand {
     private String sessionId;

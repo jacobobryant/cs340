@@ -43,20 +43,7 @@ public class GameActivity extends ObservingActivity {
     private Button faceUp3;
     private Button faceUp4;
 
-
-    // useless buttons
-    private Button addPoints;
-    private Button addTrainCard;
-    private Button addDestCard;
-    private Button removeDestCard;
-    private Button addTrainCardOther;
-    private Button addDestCardOther;
-    private Button claimRoute;
-    private Button claimRouteOther;
-    private Button addGameHistory;
-    private Button drawFaceUpCard;
     private boolean showDestPicker = true;
-
 
     public GameActivity() {
         super();
@@ -121,36 +108,6 @@ public class GameActivity extends ObservingActivity {
         faceUp3 = (Button) findViewById(R.id.faceUpTrain3);
         faceUp4 = (Button) findViewById(R.id.faceUpTrain4);
 
-        addPoints = (Button) findViewById(R.id.addPointsButton);
-        addPoints.setOnClickListener(v -> gamePresenter.addPoints());
-
-        addTrainCard = (Button) findViewById(R.id.addTrainCard);
-        addTrainCard.setOnClickListener(v -> gamePresenter.addTrainCard());
-
-        addDestCard = (Button) findViewById(R.id.addDestCard);
-        addDestCard.setOnClickListener(v -> gamePresenter.addDestCard());
-
-        removeDestCard = (Button) findViewById(R.id.removeDestCard);
-        removeDestCard.setOnClickListener(v -> gamePresenter.removeDestCard());
-
-        addTrainCardOther = (Button) findViewById(R.id.addTrainCardOther);
-        addTrainCardOther.setOnClickListener(v -> gamePresenter.addTrainCardOther());
-
-        addDestCardOther = (Button) findViewById(R.id.addDestCardOther);
-        addDestCardOther.setOnClickListener(v -> gamePresenter.addDestCardOther());
-
-        claimRoute = (Button) findViewById(R.id.claimRoute);
-        claimRoute.setOnClickListener(v -> gamePresenter.claimRoute());
-
-        claimRouteOther = (Button) findViewById(R.id.claimRouteOther);
-        claimRouteOther.setOnClickListener(v -> gamePresenter.claimRouteOther());
-
-        addGameHistory = (Button) findViewById(R.id.addGameHistory);
-        addGameHistory.setOnClickListener(v -> gamePresenter.addGameHistory());
-
-        drawFaceUpCard = (Button) findViewById(R.id.drawFaceUpCard);
-        drawFaceUpCard.setOnClickListener(v -> gamePresenter.drawFaceUpCard());
-
         update(Atom.getInstance().getModel());
     }
 
@@ -169,6 +126,9 @@ public class GameActivity extends ObservingActivity {
                 destChooser3.setText(cards.get(2).description());
             } else {
                 destinationPicker.setVisibility(View.GONE);
+                destChooser1.setChecked(false);
+                destChooser2.setChecked(false);
+                destChooser3.setChecked(false);
             }
         }
 
@@ -177,14 +137,6 @@ public class GameActivity extends ObservingActivity {
         destDrawPile.setText("Destination Draw Deck\n" + Integer.toString(destCardCount) + " Cards Left");
         int trainCardCount = game.getTrainDeck();
         trainDrawPile.setText("Train Draw Deck\n" + Integer.toString(trainCardCount) + " Cards Left.");
-
-//        if(game.getFaceUpDeck().size() == 0) {
-//            game.getFaceUpDeck().add(TrainType.yellow);
-//            game.getFaceUpDeck().add(TrainType.black);
-//            game.getFaceUpDeck().add(TrainType.purple);
-//            game.getFaceUpDeck().add(TrainType.blue);
-//            game.getFaceUpDeck().add(TrainType.green);
-//        }
 
         if(game.getFaceUpDeck().size() > 0) {
             faceUp0.setBackgroundColor(MapHelper.getColor(game.getFaceUpDeck().get(0)));
@@ -225,6 +177,10 @@ public class GameActivity extends ObservingActivity {
             return mDetector.onTouchEvent(event);
         }
     };
+
+    public void makeToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
 
     class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
 
