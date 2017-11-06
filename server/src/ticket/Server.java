@@ -3,7 +3,7 @@ package ticket;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import fi.iki.elonen.NanoHTTPD;
-import shared.DestinationCard;
+import shared.command.*;
 
 import java.io.IOException;
 import java.security.InvalidParameterException;
@@ -33,9 +33,6 @@ public class Server extends NanoHTTPD {
     public Response serve(IHTTPSession session) {
         try {
             Object response = serveHelper(session);
-            //System.out.println(State.getState());
-            //State.getState().pprint();
-            //System.out.println();
             return newFixedLengthResponse(
                     new ObjectMapper().writeValueAsString(response));
         } catch (Exception e) {
@@ -43,7 +40,7 @@ public class Server extends NanoHTTPD {
             try {
                 return newFixedLengthResponse(
                         new ObjectMapper().writeValueAsString(
-                            error(E.SERVER, "internal server error")));
+                            BadJuju.map("internal server error")));
             } catch (IOException ioe) {
                 e.printStackTrace();
                 return newFixedLengthResponse("something has gone terribly, terribly wrong");
@@ -60,87 +57,43 @@ public class Server extends NanoHTTPD {
         try {
             session.parseBody(files);
         } catch (IOException | ResponseException e) {
-            return error(E.CLIENT_CODE, "couldn't parse request body");
+            return BadJuju.map("couldn't parse request body");
         }
         String json = (files.containsKey("postData"))
             ? files.get("postData") : session.getQueryParameterString();
 
-        // parse json
-        Map body;
-        try {
-            body = new ObjectMapper().readValue(json, HashMap.class);
-        } catch (IOException | NullPointerException e) {
-            System.out.println(json);
-            return error(E.CLIENT_CODE, "couldn't parse json from request body");
+        Gson gson = new Gson();
+        if (endpoint.equals("/register")) {
+            LoginCommand cmd = gson.fromJson(json, LoginCommand.class);
+            return Facade.register(cmd.username, cmd.password);
+        } else if (endpoint.equals("/login")) {
+            LoginCommand cmd = gson.fromJson(json, LoginCommand.class);
+            return Facade.login(cmd.username, cmd.password);
+        } else if (endpoint.equals("/create")) {
+            UserCommand cmd = gson.fromJson(json, UserCommand.class);
+            return Facade.create(cmd.sessionId);
+        } else if (endpoint.equals("/join")) {
+            GameCommand cmd = gson.fromJson(json, GameCommand.class);
+            return Facade.join(cmd.sessionId, cmd.gameId);
+        } else if (endpoint.equals("/leave")){
+            UserCommand cmd = gson.fromJson(json, UserCommand.class);
+            return Facade.leave(cmd.sessionId);
+        } else if (endpoint.equals("/start")) {
+            UserCommand cmd = gson.fromJson(json, UserCommand.class);
+            return Facade.start(cmd.sessionId);
+        } else if (endpoint.equals("/state")) {
+            UserCommand cmd = gson.fromJson(json, UserCommand.class);
+            return Facade.state(cmd.sessionId);
+        } else if (endpoint.equals("/chat")){
+            MessageCommand cmd = gson.fromJson(json, MessageCommand.class);
+            return Facade.chat(cmd.sessionId, cmd.message);
+        } else if (endpoint.equals("/return-dest")) {
+            ReturnDestCommand cmd = gson.fromJson(json, ReturnDestCommand.class);
+            return Facade.returnDest(cmd.sessionId, cmd.dest);
+        } else if (endpoint.equals("/clear")) {
+            return Facade.clear();
+        } else {
+            return BadJuju.map("endpoint " + endpoint + " doesn't exist");
         }
-
-        // We use FacadeMethod so that invocation occurs outside the try/catch block.
-        FacadeMethod method;
-        try {
-            if (endpoint.equals("/register")) {
-                String username = (String)get(body, "username");
-                String password = (String)get(body, "password");
-                method = () -> Facade.register(username, password);
-            } else if (endpoint.equals("/login")) {
-                String username = (String)get(body, "username");
-                String password = (String)get(body, "password");
-                method = () -> Facade.login(username, password);
-            } else if (endpoint.equals("/create")) {
-                String sessionId = (String)get(body, "sessionId");
-                method = () -> Facade.create(sessionId);
-            } else if (endpoint.equals("/join")) {
-                String sessionId = (String)get(body, "sessionId");
-                String gameId = (String)get(body, "gameId");
-                method = () -> Facade.join(sessionId, gameId);
-            } else if (endpoint.equals("/leave")){
-                String sessionId = (String)get(body, "sessionId");
-                method = () -> Facade.leave(sessionId);
-            } else if (endpoint.equals("/start")) {
-                String sessionId = (String)get(body, "sessionId");
-                method = () -> Facade.start(sessionId);
-            } else if (endpoint.equals("/state")) {
-                String sessionId = (String)get(body, "sessionId");
-                method = () -> Facade.state(sessionId);
-            } else if (endpoint.equals("/chat")){
-                String sessionId = (String)get(body, "sessionId");
-                String message = (String)get(body, "message");
-                method = () -> Facade.chat(sessionId, message);
-            } else if (endpoint.equals("/return-dest")) {
-                String sessionId = (String)get(body, "sessionId");
-                Map arg = (Map)body.get("dest");
-                // TODO throw error if "dest" not in body?
-                final DestinationCard card;
-                
-                if (arg != null) {
-                    Gson gson = new Gson();
-                    card = gson.fromJson(gson.toJsonTree(arg), DestinationCard.class);
-                } else {
-                    card = null;
-                }
-                method = () -> Facade.returnDest(sessionId, card);
-            } else if (endpoint.equals("/clear")) {
-                method = () -> Facade.clear();
-            } else {
-                return error(E.CLIENT_CODE, "endpoint " + endpoint + " doesn't exist");
-            }
-        } catch (InvalidParameterException e) {
-            return error(E.CLIENT_CODE, "request body doesn't contain required parameters");
-        } catch (ClassCastException e) {
-            e.printStackTrace();
-            return error(E.CLIENT_CODE, "request body contains arguments with invalid type");
-        }
-        return method.run();
-    }
-
-    private Object get(Map m, Object key) {
-        Object ret = m.get(key);
-        if (ret == null) {
-            throw new InvalidParameterException();
-        }
-        return ret;
-    }
-
-    public static Map error(int code, String message) {
-        return (Map)C.hashMap.invoke("code", code, "message", message);
     }
 }

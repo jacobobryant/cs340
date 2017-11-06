@@ -13,6 +13,10 @@ public class User extends BaseModel {
                             "sessionIds", C.vector.invoke()}, path);
     }
 
+    public String getName() {
+        return (String)data.get("name");
+    }
+
     public String getPassword() {
         return (String)data.get("password");
     }
