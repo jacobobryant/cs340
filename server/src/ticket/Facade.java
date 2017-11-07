@@ -2,9 +2,12 @@ package ticket;
 
 import shared.ClientModel;
 import shared.DestinationCard;
+import shared.TurnState;
 
 import java.util.HashMap;
 import java.util.UUID;
+
+import static shared.TurnState.*;
 
 public class Facade {
     private static Object run(State.Swapper swapper, String key, boolean getByUsername) {
@@ -113,9 +116,10 @@ public class Facade {
                     game = game.drawCard("trainDeck");
                 }
                 for (int i = 0; i < 3; i++) {
-                    ses = ses.giveDest(game.topDest());
+                    ses = ses.givePendingDest(game.topDest());
                     game = game.drawCard("destDeck");
                 }
+                ses = ses.setTurnState(init);
                 state = state.commit(ses);
             }
             for (int i = 0; i < 5; i++) {
@@ -139,22 +143,43 @@ public class Facade {
         }, sessionId);
     }
 
-    public static Object returnDest(String sessionId, DestinationCard card) {
+    public static Object drawDest(String sessionId) {
+        return run((state) -> {
+            state.checkTurnState(sessionId, beginning);
+            Session ses = state.getSession(sessionId);
+            Game game = state.getGame(ses.getGameId());
+            state.checkDestDeckNotEmpty(game);
+
+            int nCards = Math.min(3, game.getDestDeck().size());
+            for (int i = 0; i < nCards; i++) {
+                ses = ses.givePendingDest(game.topDest());
+                game = game.drawCard("destDeck");
+            }
+            ses = ses.setTurnState(returnDest);
+            return state.commit(ses).commit(game);
+        }, sessionId);
+    }
+
+    public static Object returnDest(String sessionId, DestinationCard[] cards) {
         return run((state) -> {
             state.authenticate(sessionId);
             state.checkHasGame(sessionId);
             Session ses = state.getSession(sessionId);
-            state.checkStarted(state.getGameBySession(sessionId), true);
-            state.checkCanReturn(ses);
-            if (card == null) {
-                return state;
+            state.checkTurnState(sessionId, init, returnDest);
+            state.checkHasPending(ses, cards);
+            int max = ses.getTurnState().maxReturnCards();
+            if (cards.length > max) {
+                throw new BadJuju("You may return at most " + max + " card(s)");
             }
-            state.checkHasCard(ses, card);
 
-            Game g = state.getGame(ses.getGameId())
-                    .discard(card)
-                    .addHistory(state, sessionId, "returned a destination card");
-            return state.commit(ses.returnCard(card)).commit(g);
+            ses = ses.returnCards(cards);
+            Game game = state.getGame(ses.getGameId())
+                       .discard(cards)
+                       .addHistory(state, sessionId, "returned " + cards.length +
+                               " destination card(s)");
+            state = state.commit(ses).commit(game);
+            return endTurn(state, sessionId);
+
         }, sessionId);
     }
 
@@ -180,5 +205,10 @@ public class Facade {
         Object[] path = {"sessions", id};
         return s.commit(new Session(id, username, path))
                 .commit(s.getUser(username).addSessionId(id));
+    }
+
+    public static State endTurn(State s, String sessionId) {
+        // todo set next turn
+        return s.commit(s.getSession(sessionId).setTurnState(waiting));
     }
 }

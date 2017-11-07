@@ -3,6 +3,9 @@ package ticket;
 import clojure.java.api.Clojure;
 import clojure.lang.IFn;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 public class C {
     public static final IFn assocIn = Clojure.var("clojure.core", "assoc-in");
     public static final IFn assoc = Clojure.var("clojure.core", "assoc");
@@ -24,6 +27,10 @@ public class C {
     public static final IFn shuffle = Clojure.var("clojure.core", "shuffle");
     public static final IFn selectKeys = Clojure.var("clojure.core", "select-keys");
     public static final IFn println = Clojure.var("clojure.core", "println");
+    public static final IFn partial = Clojure.var("clojure.core", "partial");
+    public static final IFn reduce = Clojure.var("clojure.core", "reduce");
+    public static final IFn vconcat = (IFn)C.partial.invoke(C.reduce, C.conj);
+
 
     public static final IFn swapperToFn = (IFn)eval.invoke(readString.invoke(
                 "(fn [old-state swapper] (.swap swapper old-state))"));
@@ -41,4 +48,15 @@ public class C {
 
     public static final IFn pprint = Clojure.var("clojure.pprint", "pprint");
     //public static final IFn withOutStr = Clojure.var("clojure.core", "with-out-str");
+    //
+
+    public static Collection removeAll(Collection a, Collection b) {
+        ArrayList list = new ArrayList(a);
+        for (Object item : b) {
+            if (!list.remove(item)) {
+                throw new RuntimeException("couldn't remove all values");
+            }
+        }
+        return (Collection)C.vec.invoke(list);
+    }
 }

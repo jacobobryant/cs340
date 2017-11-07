@@ -4,10 +4,10 @@ import shared.DestinationCard;
 
 public class ReturnDestCommand {
     public final String sessionId;
-    public final DestinationCard dest;
+    public final DestinationCard[] cards;
 
-    public ReturnDestCommand(String sessionId, DestinationCard destinationCard) {
+    public ReturnDestCommand(String sessionId, DestinationCard[] cards) {
         this.sessionId = sessionId;
-        this.dest = destinationCard;
+        this.cards = cards;
     }
 }

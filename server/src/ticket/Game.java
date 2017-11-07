@@ -6,6 +6,7 @@ import shared.Player;
 import shared.Route;
 import shared.TrainType;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,10 +27,10 @@ public class Game extends BaseModel {
                             "faceUpDeck", C.vector.invoke(),
                             "trainDiscard", C.vector.invoke(),
                             "destDeck", C.shuffle.invoke(DestinationCard.DECK),
-                            "destDiscard", C.vector.invoke(),
                             "openRoutes", Route.ROUTES,
                             "messages", C.vector.invoke(),
                             "history", C.vector.invoke(),
+                            "turn", -1,
                             "longestRouteHolder", null},
                 path);
     }
@@ -120,8 +121,12 @@ public class Game extends BaseModel {
         return new Game(update(deck, C.subvec, 1), path);
     }
 
-    public Game discard(DestinationCard card) {
-        return new Game(update("destDiscard", C.conj, card), path);
+    public Game discard(DestinationCard[] cards) {
+        List lcards = Arrays.asList(cards);
+        C.println.invoke("lcards");
+        C.pprint.invoke(lcards);
+        System.out.println(lcards);
+        return new Game(update("destDeck", C.vconcat, lcards), path);
     }
 
     public Game sendMessage(String message){return new Game(update("messages", C.conj, message), path);}

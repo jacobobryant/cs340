@@ -21,7 +21,12 @@ def hit(endpoint, data):
     print_json(data)
     print_json(response)
     print()
-    assert "code" not in response
+
+    if "code" in response:
+        if response["message"] == "internal server error":
+            raise Exception("internal server error")
+        assert False
+
     return response
 
 def print_json(data):
@@ -55,6 +60,11 @@ class TestServer(unittest.TestCase):
         request['gameId'] = hit('/state', user)['availableGames'][0]['gameId']
         hit('/join', request)
 
+    def init_game(self):
+        self.join_first(self.user2)
+        hit('/start', self.user1)
+        self.pending = hit('/state', self.user1)["currentGame"]["players"][0]["pending"]
+
     def raises(self, fn, *args, **kwargs):
         self.assertRaises(AssertionError, fn, *args, **kwargs)
 
@@ -65,58 +75,64 @@ class TestServer(unittest.TestCase):
         self.user3 = self.new_user()
         hit('/create', self.user1)
 
-    def test_register(self):
-        u = users.__next__()
-        hit('/register', u)
-        self.raises(lambda: hit('/register', u))
+    #def test_register(self):
+    #    u = users.__next__()
+    #    hit('/register', u)
+    #    self.raises(lambda: hit('/register', u))
 
-    def test_login(self):
-        u = users.__next__()
-        hit('/register', u)
-        hit('/login', u)
-        hit('/login', u)
+    #def test_login(self):
+    #    u = users.__next__()
+    #    hit('/register', u)
+    #    hit('/login', u)
+    #    hit('/login', u)
 
-    def test_join_leave(self):
-        self.join_first(self.user2)
-        hit('/leave', self.user2)
+    #def test_join_leave(self):
+    #    self.join_first(self.user2)
+    #    hit('/leave', self.user2)
 
-    def test_start(self):
-        self.raises(lambda: hit('/start', self.user1))
-        self.join_first(self.user2)
-        hit('/start', self.user1)
+    #def test_start(self):
+    #    self.raises(lambda: hit('/start', self.user1))
+    #    self.join_first(self.user2)
+    #    hit('/start', self.user1)
 
     def test_return_dest(self):
-        self.join_first(self.user2)
-        hit('/start', self.user1)
+        self.init_game()
 
-        cards = hit('/state', self.user1)["currentGame"]["players"][0]["destCards"]
         request = deepcopy(self.user1)
-        request['dest'] = cards[0]
+        request['cards'] = self.pending[:1]
 
-        hit('/return-dest', self.user1)
+        request['cards'][0]['points'] += 1
+        self.raises(lambda: hit('/return-dest', request))
+        request['cards'][0]['points'] -= 1
 
-        request['dest']['points'] += 1
+        request['cards'] = self.pending[:2]
         self.raises(lambda: hit('/return-dest', request))
 
-        request['dest']['points'] -= 1
+        request['cards'] = self.pending[:1]
         hit('/return-dest', request)
 
-        request['dest'] = cards[1]
+        request['cards'] = self.pending[1:2]
         self.raises(lambda: hit('/return-dest', request))
 
-        hit('/return-dest', self.user2)
+        request = deepcopy(self.user2)
+        request['cards'] = []
+        hit('/return-dest', request)
 
-    def test_chat(self):
-        message = "hello there"
-        state = hit('/chat', assoc(self.user1, "message", message))
-        hit('/chat', assoc(self.user1, "message", 1))
-        assert message in state['currentGame']['messages'][0]
-        self.raises(lambda: hit('/chat', assoc(self.user2, "message", "foo")))
+    #def test_chat(self):
+    #    message = "hello there"
+    #    state = hit('/chat', assoc(self.user1, "message", message))
+    #    hit('/chat', assoc(self.user1, "message", 1))
+    #    assert message in state['currentGame']['messages'][0]
+    #    self.raises(lambda: hit('/chat', assoc(self.user2, "message", "foo")))
 
-    def test_faceup_init(self):
-        self.join_first(self.user2)
-        state = hit('/start', self.user1)
-        assert len(state['currentGame']['faceUpDeck']) == 5
+    #def test_faceup_init(self):
+    #    self.join_first(self.user2)
+    #    state = hit('/start', self.user1)
+    #    assert len(state['currentGame']['faceUpDeck']) == 5
+
+    #def test_draw_dest(self):
+    #    self.init_game()
+    #    hit('/draw-dest', self.user1)
 
 if __name__ == "__main__":
     unittest.main()

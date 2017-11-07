@@ -89,7 +89,10 @@ public class Server extends NanoHTTPD {
             return Facade.chat(cmd.sessionId, cmd.message);
         } else if (endpoint.equals("/return-dest")) {
             ReturnDestCommand cmd = gson.fromJson(json, ReturnDestCommand.class);
-            return Facade.returnDest(cmd.sessionId, cmd.dest);
+            return Facade.returnDest(cmd.sessionId, cmd.cards);
+        } else if (endpoint.equals("/draw-dest")) {
+            UserCommand cmd = gson.fromJson(json, UserCommand.class);
+            return Facade.drawDest(cmd.sessionId);
         } else if (endpoint.equals("/clear")) {
             return Facade.clear();
         } else {

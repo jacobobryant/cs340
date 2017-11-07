@@ -3,6 +3,7 @@ package ticket;
 import shared.AvailableGame;
 import shared.ClientModel;
 import shared.DestinationCard;
+import shared.TurnState;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -179,5 +180,34 @@ public class State {
         if (!s.getDestCards().contains(card)) {
             throw new BadJuju("Player doesn't have that card");
         }
+    }
+
+    public void checkTurnState(String sessionId, TurnState... states) {
+        authenticate(sessionId);
+        TurnState ts = getSession(sessionId).getTurnState();
+        if (!Arrays.asList(states).contains(ts)) { 
+            throw new BadJuju("Wrong turn state");
+        }
+    }
+
+    public void checkDestDeckNotEmpty(Game game) {
+        if (game.getDestDeck().size() == 0) {
+            throw new BadJuju("Destination card deck is empty");
+        }
+    }
+
+    public void checkHasPending(Session ses, DestinationCard[] cards) {
+        List<DestinationCard> list = new ArrayList<>(ses.getPendingDestCards());
+        if (cards == null) {
+            throw new BadJuju("cards can't be null");
+        }
+
+        for (DestinationCard card : cards) {
+            if (!list.remove(card)) {
+                C.println.invoke("doesn't have pending");
+                throw new BadJuju("returned cards aren't pending");
+            }
+        }
+        C.println.invoke("has pending");
     }
 }

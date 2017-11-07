@@ -32,6 +32,8 @@ public class BaseModel {
     }
 
     protected Map update(Object key, IFn fn, Object... fnargs) {
+        C.println.invoke("fnargs");
+        C.pprint.invoke(fnargs);
         return (Map)C.apply.invoke(C.update, this.data, key, fn, fnargs);
     }
 

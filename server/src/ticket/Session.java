@@ -1,9 +1,6 @@
 package ticket;
 
-import shared.DestinationCard;
-import shared.Player;
-import shared.Route;
-import shared.TrainType;
+import shared.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,24 +17,38 @@ public class Session extends BaseModel {
                             "gameId", null,
                             "routes", C.vector.invoke(),
                             "trainsLeft", 45,
+                            "pending", C.vector.invoke(),
                             "destCards", C.vector.invoke(),
                             "trainCards", C.vector.invoke(),
-                            "score", 0},
+                            "score", 0,
+                            "turnState", TurnState.lobby},
               path);
     }
 
     public Player getClientModel(boolean isCurrentPlayer) {
         List<TrainType> trainCards;
         List<DestinationCard> destCards;
+        List<DestinationCard> pending;
         if (isCurrentPlayer) {
             trainCards = getTrainCards();
             destCards = getDestCards();
+            pending = getPendingDestCards();
         } else {
             trainCards = Arrays.asList(new TrainType[getTrainCards().size()]);
             destCards = Arrays.asList(new DestinationCard[getDestCards().size()]);
+            pending = Arrays.asList(new DestinationCard[getPendingDestCards().size()]);
         }
         return new Player(getUsername(), getRoutes(), trainCards,
-                destCards, getScore(), getTrainsLeft(), isCurrentPlayer);
+                destCards, pending, getScore(), getTrainsLeft(), isCurrentPlayer,
+                getTurnState());
+    }
+
+    public TurnState getTurnState() {
+        return (TurnState)data.get("turnState");
+    }
+
+    public Session setTurnState(TurnState ts) {
+        return new Session(set("turnState", ts), path);
     }
 
     public List<Route> getRoutes() {
@@ -56,16 +67,34 @@ public class Session extends BaseModel {
         return new Session(update("trainCards", C.conj, train), path);
     }
 
+    public Session givePendingDest(DestinationCard dest) {
+        return new Session(update("pending", C.conj, dest), path);
+    }
+
     public Session giveDest(DestinationCard dest) {
         return new Session(update("destCards", C.conj, dest), path);
     }
 
-    public Session returnCard(DestinationCard card) {
-        C.println.invoke(card);
-        System.out.println(getDestCards());
-        Session s = new Session(remove("destCards", card), path);
-        System.out.println(s.getDestCards());
-        return s;
+    public Session setDestCards(List<DestinationCard> cards) {
+        return new Session(set("destCards", cards), path);
+    }
+
+    public List<DestinationCard> getPendingDestCards() {
+        return (List)data.get("pending");
+    }
+
+    public Session returnCards(DestinationCard[] cards) {
+        List<DestinationCard> pending = getPendingDestCards();
+        pending = (List<DestinationCard>)C.removeAll(pending, Arrays.asList(cards));
+        C.println.invoke("pending");
+        C.pprint.invoke(pending);
+        System.out.println(pending);
+        return new Session(update("destCards", C.vconcat, pending), path)
+                .clearPending();
+    }
+
+    private Session clearPending() {
+        return new Session(set("pending", C.vector.invoke()), path);
     }
 
     public List<TrainType> getTrainCards() {
