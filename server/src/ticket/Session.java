@@ -28,25 +28,30 @@ public class Session extends BaseModel {
               path);
     }
 
-    public Player getClientModel(boolean isCurrentPlayer) {
+    public Player getClientModel(boolean isCurrentPlayer, boolean gameOver) {
         List<TrainType> trainCards;
         List<DestinationCard> destCards;
         List<DestinationCard> pending;
-        int destPoints;
-        int destPenalty;
         if (isCurrentPlayer) {
             trainCards = getTrainCards();
             destCards = getDestCards();
             pending = getPendingDestCards();
-            destPoints = getDestPoints();
-            destPenalty = getDestPenalty();
         } else {
             trainCards = Arrays.asList(new TrainType[getTrainCards().size()]);
             destCards = Arrays.asList(new DestinationCard[getDestCards().size()]);
             pending = Arrays.asList(new DestinationCard[getPendingDestCards().size()]);
+        }
+
+        int destPoints;
+        int destPenalty;
+        if (isCurrentPlayer || gameOver) {
+            destPoints = getDestPoints();
+            destPenalty = getDestPenalty();
+        } else {
             destPoints = 0;
             destPenalty = 0;
         }
+
         return new Player(getUsername(), getRoutes(), trainCards,
                 destCards, pending, 
                 
