@@ -2,9 +2,9 @@ package ticket;
 
 import shared.*;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Session extends BaseModel {
     public Session(Map data, Object[] path) {
@@ -20,7 +20,10 @@ public class Session extends BaseModel {
                             "pending", C.vector.invoke(),
                             "destCards", C.vector.invoke(),
                             "trainCards", C.vector.invoke(),
-                            "score", 0,
+                            "routePoints", 0,
+                            "destPoints", 0,
+                            "longestRoutePoints", 0,
+                            "destPenalty", 0,
                             "turnState", TurnState.lobby},
               path);
     }
@@ -29,17 +32,28 @@ public class Session extends BaseModel {
         List<TrainType> trainCards;
         List<DestinationCard> destCards;
         List<DestinationCard> pending;
+        int destPoints;
+        int destPenalty;
         if (isCurrentPlayer) {
             trainCards = getTrainCards();
             destCards = getDestCards();
             pending = getPendingDestCards();
+            destPoints = getDestPoints();
+            destPenalty = getDestPenalty();
         } else {
             trainCards = Arrays.asList(new TrainType[getTrainCards().size()]);
             destCards = Arrays.asList(new DestinationCard[getDestCards().size()]);
             pending = Arrays.asList(new DestinationCard[getPendingDestCards().size()]);
+            destPoints = 0;
+            destPenalty = 0;
         }
         return new Player(getUsername(), getRoutes(), trainCards,
-                destCards, pending, getScore(), getTrainsLeft(), isCurrentPlayer,
+                destCards, pending, 
+                
+                getRoutePoints(), getLongestRoutePoints(),
+                destPoints, destPenalty,
+                
+                getTrainsLeft(), isCurrentPlayer,
                 getTurnState());
     }
 
@@ -55,16 +69,24 @@ public class Session extends BaseModel {
         return (List)data.get("routes");
     }
 
-    public int getScore() {
-        return (int)data.get("score");
+    public int getRoutePoints() {
+        return C.castInt(data.get("routePoints"));
+    }
+
+    public int getLongestRoutePoints() {
+        return C.castInt(data.get("longestRoutePoints"));
+    }
+
+    public int getDestPoints() {
+        return C.castInt(data.get("destPoints"));
+    }
+
+    public int getDestPenalty() {
+        return C.castInt(data.get("destPenalty"));
     }
 
     public int getTrainsLeft() {
-        try {
-            return (int)data.get("trainsLeft");
-        } catch (ClassCastException e) {
-            return (int)(long)data.get("trainsLeft");
-        }
+        return C.castInt(data.get("trainsLeft"));
     }
 
     public Session giveTrain(TrainType train) {
@@ -127,8 +149,61 @@ public class Session extends BaseModel {
         return new Session(set("gameId", gameId), path);
     }
 
-    public int countTrainCards(TrainType color) {
-        return (int)(getTrainCards().stream()
-                    .filter((card) -> card.equals(color)).count());
+    private List<City> getChildrenCities(Set<City> visited, City parent) {
+        return getRoutes().stream().filter((r) -> r.match(parent) &&
+                !visited.contains(r.other(parent))).map((r) ->
+                r.other(parent)).collect(Collectors.toList());
+    }
+
+    private boolean pathExists(Set<City> visited, City a, City b) {
+        if (getRoutes().stream().anyMatch((r) -> r.match(a, b))) {
+            return true;
+        }
+        visited.add(a);
+        return getChildrenCities(visited, a).stream().anyMatch((child) ->
+                pathExists(visited, child, b));
+    }
+
+    private boolean completed(DestinationCard c) {
+        return pathExists(new HashSet<>(), c.city1, c.city2);
+    }
+
+    private int longestPath(List<Route> routes, City current) {
+        return routes.stream().filter((r) -> r.match(current)).mapToInt((r) ->
+                r.length + longestPath((List) C.vecrm.invoke(routes, r),
+                        r.other(current))).max().orElse(0);
+    }
+
+    public int getLongestRouteLength() {
+        return Stream.of(City.values()).mapToInt((city) ->
+                longestPath(getRoutes(), city)).max().orElse(0);
+    }
+
+    private Session updateRoutePoints() {
+        return new Session(set("routePoints",
+                    getRoutes().stream().mapToInt((r) -> r.points()).sum()), path);
+    }
+
+    private Session updateDestPoints() {
+        int destPoints = getDestCards().stream().mapToInt((c) ->
+                (completed(c)) ? c.points : 0).sum();
+        int destPenalty = getDestCards().stream().mapToInt((c) ->
+                (completed(c)) ? 0 : -c.points).sum();
+        return new Session((Map)C.assoc.invoke(data, "destPoints", destPoints,
+                    "destPenalty", destPenalty), path);
+    }
+
+    public Session updatePoints(boolean newRoute, boolean newDestCard,
+            int longestRouteLength) {
+        Session s = this;
+        if (newRoute) {
+            s = s.updateRoutePoints();
+        } else if (newDestCard) {
+            s = s.updateDestPoints();
+        }
+        int longestRoutePoints = (s.getLongestRouteLength() == longestRouteLength
+                && longestRouteLength > 0) ? 10 : 0;
+        System.out.println("longestRoutePoints: " + longestRoutePoints);
+        return new Session(s.set("longestRoutePoints", longestRoutePoints), s.path);
     }
 }

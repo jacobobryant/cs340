@@ -30,6 +30,7 @@ public class Game extends BaseModel {
                             "destDeck", C.shuffle.invoke(DestinationCard.DECK),
                             "openRoutes", Route.ROUTES,
                             "messages", C.vector.invoke(),
+                            "turnsLeft", 666,
                             "history", C.vector.invoke()},
                 path);
     }
@@ -40,14 +41,10 @@ public class Game extends BaseModel {
                         .getClientModel(sessionId.equals(curSession)))
             .collect(Collectors.toList());
 
-        String holder = getLongestRouteHolder();
-        String username = (holder == null) ? null
-                    : state.getSession(holder).getUsername();
-
         return new shared.Game(players, getTrainDeck().size(),
                 getFaceUpDeck(), getDestDeck().size(), 
                 getOpenRoutes(), getMessages(), getHistory(),
-                username, started());
+                started(), getTurnsLeft());
     }
 
     public shared.AvailableGame getAvailableModel(State state) {
@@ -57,8 +54,8 @@ public class Game extends BaseModel {
         return new AvailableGame(getGameId(), players);
     }
 
-    public String getLongestRouteHolder() {
-        return (String)data.get("longestRouteHolder");
+    public int getTurnsLeft() {
+        return C.castInt(data.get("turnsLeft"));
     }
 
     public List<String> getHistory() {
@@ -210,5 +207,13 @@ public class Game extends BaseModel {
         return (!started() && ids.size() < 5 &&
                 ids.stream().filter(u.getSessionIds()::contains)
                 .collect(toList()).size() == 0);
+    }
+
+    public Game decrementTurnsLeft() {
+        return new Game(update("turnsLeft", C.dec), path);
+    }
+
+    public Game setLastRound() {
+        return new Game(set("turnsLeft", getSessionIds().size() + 1), path);
     }
 }

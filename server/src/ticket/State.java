@@ -240,7 +240,8 @@ public class State {
                                              card.match(r.type))
                 || !C.containsAll(s.getTrainCards(), cards)
                 || cards.size() != r.length
-                || s.getTrainsLeft() < r.length) {
+                || s.getTrainsLeft() < r.length
+                || s.getRoutes().contains(r.fooDouble())) {
             throw new BadJuju("You can't claim that route with those cards");
         }
     }

@@ -165,5 +165,10 @@ class TestServer(unittest.TestCase):
         self.raises(lambda: hit('/build', assoc(self.user2, "route", 
             assoc(route, "second", False), "cards", cards[:1])))
 
+    def test_update_score(self):
+        self.init_game(True)
+        cards = hit('/state', self.user1)['currentGame']['players'][0]['trainCards']
+        hit('/build', assoc(self.user1, "route", route, "cards", cards[:1]))
+
 if __name__ == "__main__":
     unittest.main()

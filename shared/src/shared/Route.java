@@ -1,8 +1,11 @@
 package shared;
 
+import ticket.C;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class Route {
     public static final List<Route> ROUTES;
@@ -112,6 +115,8 @@ public class Route {
         routes.add(new Route(City.Seattle, City.Vancouver, TrainType.any, 1, true));
         ROUTES = Collections.unmodifiableList(routes);
     }
+    public static final Map<Integer, Integer> POINTS = (Map) C.hashMap.invoke(
+            1, 1, 2, 2, 3, 4, 4, 7, 5, 10, 6, 15);
     public final City city1;
     public final City city2;
     public final TrainType type;
@@ -138,6 +143,22 @@ public class Route {
     // causes an infinite recursion.
     public Route fooDouble() {
         return new Route(city1, city2, type, length, !second);
+    }
+
+    public int points() {
+        return POINTS.get(length);
+    }
+
+    public boolean match(City a, City b) {
+        return ((city1 == a && city2 == b) || (city1 == b && city2 == a));
+    }
+
+    public boolean match(City a) {
+        return city1 == a || city2 == a;
+    }
+
+    public City other(City a) {
+        return ((a == city1) ? city2 : city1);
     }
 
     @Override

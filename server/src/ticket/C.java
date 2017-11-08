@@ -30,6 +30,7 @@ public class C {
     public static final IFn partial = Clojure.var("clojure.core", "partial");
     public static final IFn reduce = Clojure.var("clojure.core", "reduce");
     public static final IFn minus = Clojure.var("clojure.core", "-");
+    public static final IFn dec = Clojure.var("clojure.core", "dec");
 
     public static final IFn swapperToFn = (IFn)eval.invoke(readString.invoke(
             "(fn [old-state swapper] (.swap swapper old-state))"));
@@ -67,5 +68,13 @@ public class C {
             }
         }
         return true;
+    }
+
+    public static int castInt(Object o) {
+        try {
+            return (int)o;
+        } catch (ClassCastException e) {
+            return (int)(long)o;
+        }
     }
 }

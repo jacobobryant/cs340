@@ -177,6 +177,7 @@ public class Facade {
                        .addHistory(state, sessionId, "returned " + cards.length +
                                " destination card(s)");
             state = state.commit(ses, game);
+            state = updatePoints(state, game, sessionId, false);
             return endTurn(state, sessionId);
 
         }, sessionId);
@@ -241,8 +242,11 @@ public class Facade {
             game = game.claim(route, cards)
                        .addHistory(state, sessionId, "claimed a route");
             ses = ses.claim(route, cards);
+            if (game.getTurnsLeft() == 666 && ses.getTrainsLeft() < 3) {
+                game = game.setLastRound();
+            }
             state = state.commit(game, ses);
-            state = updatePoints(state, game);
+            state = updatePoints(state, game, sessionId, true);
             return endTurn(state, sessionId);
         }, sessionId);
     }
@@ -287,17 +291,33 @@ public class Facade {
                 s = s.commit(ses.setTurnState(beginning));
             }
         } else {
-            List<String> sids = game.getSessionIds();
-            int nextIndex = (sids.indexOf(sessionId) + 1) % sids.size();
-            Session next = s.getSession(sids.get(nextIndex))
-                            .setTurnState(beginning);
-            s = s.commit(next);
+            if (game.getTurnsLeft() != 666) {
+                game = game.decrementTurnsLeft();
+                s = s.commit(game);
+            }
+            if (game.getTurnsLeft() > 0) {
+                List<String> sids = game.getSessionIds();
+                int nextIndex = (sids.indexOf(sessionId) + 1) % sids.size();
+                Session next = s.getSession(sids.get(nextIndex))
+                                .setTurnState(beginning);
+                s = s.commit(next);
+            }
         }
         return s;
     }
 
-    private static State updatePoints(State s, Game g) {
-        // TODO
+    private static State updatePoints(State s, Game g, String sessionId,
+            boolean builtRoute) {
+        final State sf = s;
+        int longestRouteLength = g.getSessionIds().stream().mapToInt((sid) ->
+                sf.getSession(sid).getLongestRouteLength()).max().orElse(0);
+        for (String sid : g.getSessionIds()) {
+            boolean cur = sessionId.equals(sid);
+            s = s.commit(s.getSession(sid).updatePoints(
+                        builtRoute && cur,
+                        !builtRoute && cur,
+                        longestRouteLength));
+        }
         return s;
     }
 }
