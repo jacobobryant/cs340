@@ -12,6 +12,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
+import static shared.TrainType.any;
 
 public class Game extends BaseModel {
             
@@ -29,9 +30,7 @@ public class Game extends BaseModel {
                             "destDeck", C.shuffle.invoke(DestinationCard.DECK),
                             "openRoutes", Route.ROUTES,
                             "messages", C.vector.invoke(),
-                            "history", C.vector.invoke(),
-                            "turn", -1,
-                            "longestRouteHolder", null},
+                            "history", C.vector.invoke()},
                 path);
     }
 
@@ -86,6 +85,10 @@ public class Game extends BaseModel {
         return (List)data.get("destDeck");
     }
 
+    public List<TrainType> getDiscard() {
+        return (List)data.get("trainDiscard");
+    }
+
     public String getGameId() {
         return (String)data.get("gameId");
     }
@@ -98,9 +101,53 @@ public class Game extends BaseModel {
         return new Game(set("started", true), path);
     }
 
-    public Game turnFaceUp() {
+    public Game discardFaceUp(int index) {
+        return new Game(update("faceUpDeck", C.removeAt, index), path)
+                .shuffleDiscardIfNeeded()
+                .fillFaceUp();
+    }
+
+    public boolean canDrawAgain() {
+        int faceupNonLocomotives = (int)(getFaceUpDeck().stream()
+                    .filter((type) -> !type.equals(any)).count());
+        return (getTrainDeck().size() + faceupNonLocomotives > 0);
+    }
+
+    public Game fillFaceUp() {
+        Game g = this;
+        while (g.getFaceUpDeck().size() < 5 && g.getTrainDeck().size() > 0) {
+            g = g.turnFaceUp();
+
+            int nLocomotives = (int)(g.getFaceUpDeck().stream()
+                    .filter((type) -> type.equals(any)).count());
+            int nTotalNonLocomotives = (int)(((List)C.vconcat.invoke(
+                    g.getFaceUpDeck(), g.getTrainDeck(), g.getDiscard()))
+                    .stream().filter((type) -> !type.equals(any)).count());
+            if (nLocomotives >= 3 && nTotalNonLocomotives > 2) {
+                Object data = C.update.invoke(g.data, "trainDiscard",
+                        C.vconcat, g.getFaceUpDeck());
+                data = C.assoc.invoke(data, "faceUpDeck", C.vector.invoke());
+                g = new Game((Map)data, g.path);
+            }
+            g = g.shuffleDiscardIfNeeded();
+        }
+        return g;
+    }
+
+    private Game turnFaceUp() {
         return new Game(update("faceUpDeck", C.conj, topTrain()), path)
-                    .drawCard("trainDeck");
+                    .drawTrainCard();
+    }
+
+    private Game shuffleDiscardIfNeeded() {
+        if (getTrainDeck().size() == 0 && getFaceUpDeck().size() > 0) {
+            List<TrainType> newTrainDeck = (List)C.vconcat.invoke(
+                    getTrainDeck(), C.shuffle.invoke(getDiscard()));
+            Object data = C.assoc.invoke(this.data, "trainDeck", newTrainDeck);
+            data = C.assoc.invoke(data, "trainDiscard", C.vector.invoke());
+            return new Game((Map)data, path);
+        }
+        return this;
     }
 
     public List<Session> getSessions(State state) {
@@ -117,16 +164,23 @@ public class Game extends BaseModel {
         return getDestDeck().get(0);
     }
 
+    public Game drawTrainCard() {
+        return drawCard("trainDeck").shuffleDiscardIfNeeded();
+    }
+
     public Game drawCard(String deck) {
         return new Game(update(deck, C.subvec, 1), path);
     }
 
     public Game discard(DestinationCard[] cards) {
-        List lcards = Arrays.asList(cards);
-        C.println.invoke("lcards");
-        C.pprint.invoke(lcards);
-        System.out.println(lcards);
-        return new Game(update("destDeck", C.vconcat, lcards), path);
+        return new Game(update("destDeck", C.vconcat, Arrays.asList(cards)), path);
+    }
+
+    public Game claim(Route r, List<TrainType> cards) {
+        Object data = this.data;
+        data = C.update.invoke(data, "trainDiscard", C.vconcat, cards);
+        data = C.update.invoke(data, "openRoutes", C.vecrm, r);
+        return new Game((Map)data, path).shuffleDiscardIfNeeded();
     }
 
     public Game sendMessage(String message){return new Game(update("messages", C.conj, message), path);}

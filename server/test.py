@@ -44,6 +44,12 @@ def gen_user():
         n += 1
 users = gen_user()
 
+route = {"city1": "Seattle",
+         "city2": "Vancouver",
+         "type": "any",
+         "length": 1,
+         "second": True}
+
 class TestServer(unittest.TestCase):
 
     def run(self, result=None):
@@ -60,10 +66,14 @@ class TestServer(unittest.TestCase):
         request['gameId'] = hit('/state', user)['availableGames'][0]['gameId']
         hit('/join', request)
 
-    def init_game(self):
+    def init_game(self, finish_init=False):
         self.join_first(self.user2)
         hit('/start', self.user1)
-        self.pending = hit('/state', self.user1)["currentGame"]["players"][0]["pending"]
+        if finish_init:
+            hit('/return-dest', assoc(self.user1, 'cards', []))
+            hit('/return-dest', assoc(self.user2, 'cards', []))
+        else:
+            self.pending = hit('/state', self.user1)["currentGame"]["players"][0]["pending"]
 
     def raises(self, fn, *args, **kwargs):
         self.assertRaises(AssertionError, fn, *args, **kwargs)
@@ -75,25 +85,25 @@ class TestServer(unittest.TestCase):
         self.user3 = self.new_user()
         hit('/create', self.user1)
 
-    #def test_register(self):
-    #    u = users.__next__()
-    #    hit('/register', u)
-    #    self.raises(lambda: hit('/register', u))
+    def test_register(self):
+        u = users.__next__()
+        hit('/register', u)
+        self.raises(lambda: hit('/register', u))
 
-    #def test_login(self):
-    #    u = users.__next__()
-    #    hit('/register', u)
-    #    hit('/login', u)
-    #    hit('/login', u)
+    def test_login(self):
+        u = users.__next__()
+        hit('/register', u)
+        hit('/login', u)
+        hit('/login', u)
 
-    #def test_join_leave(self):
-    #    self.join_first(self.user2)
-    #    hit('/leave', self.user2)
+    def test_join_leave(self):
+        self.join_first(self.user2)
+        hit('/leave', self.user2)
 
-    #def test_start(self):
-    #    self.raises(lambda: hit('/start', self.user1))
-    #    self.join_first(self.user2)
-    #    hit('/start', self.user1)
+    def test_start(self):
+        self.raises(lambda: hit('/start', self.user1))
+        self.join_first(self.user2)
+        hit('/start', self.user1)
 
     def test_return_dest(self):
         self.init_game()
@@ -118,21 +128,42 @@ class TestServer(unittest.TestCase):
         request['cards'] = []
         hit('/return-dest', request)
 
-    #def test_chat(self):
-    #    message = "hello there"
-    #    state = hit('/chat', assoc(self.user1, "message", message))
-    #    hit('/chat', assoc(self.user1, "message", 1))
-    #    assert message in state['currentGame']['messages'][0]
-    #    self.raises(lambda: hit('/chat', assoc(self.user2, "message", "foo")))
+    def test_chat(self):
+        message = "hello there"
+        state = hit('/chat', assoc(self.user1, "message", message))
+        hit('/chat', assoc(self.user1, "message", 1))
+        assert message in state['currentGame']['messages'][0]
+        self.raises(lambda: hit('/chat', assoc(self.user2, "message", "foo")))
 
-    #def test_faceup_init(self):
-    #    self.join_first(self.user2)
-    #    state = hit('/start', self.user1)
-    #    assert len(state['currentGame']['faceUpDeck']) == 5
+    def test_faceup_init(self):
+        self.join_first(self.user2)
+        state = hit('/start', self.user1)
+        assert len(state['currentGame']['faceUpDeck']) == 5
 
-    #def test_draw_dest(self):
-    #    self.init_game()
-    #    hit('/draw-dest', self.user1)
+    def test_draw_dest(self):
+        self.init_game(True)
+        hit('/draw-dest', self.user1)
+
+    def test_draw_train(self):
+        self.init_game(True)
+        hit('/draw-train', self.user1)
+        hit('/draw-train', self.user1)
+        hit('/draw-faceup-train', assoc(self.user2, "index", 0))
+        hit('/draw-faceup-train', assoc(self.user2, "index", 0))
+
+    def test_build_train(self):
+        self.init_game(True)
+        cards = hit('/state', self.user1)['currentGame']['players'][0]['trainCards']
+
+        self.raises(lambda: hit('/build', assoc(self.user1,
+                            "route", route, "cards", [])))
+        self.raises(lambda: hit('/build', assoc(self.user1,
+                            "route", route, "cards", cards)))
+        hit('/build', assoc(self.user1, "route", route, "cards", cards[:1]))
+
+        cards = hit('/state', self.user2)['currentGame']['players'][1]['trainCards']
+        self.raises(lambda: hit('/build', assoc(self.user2, "route", 
+            assoc(route, "second", False), "cards", cards[:1])))
 
 if __name__ == "__main__":
     unittest.main()

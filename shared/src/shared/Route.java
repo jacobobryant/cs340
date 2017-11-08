@@ -129,4 +129,38 @@ public class Route {
     public Route(City city1, City city2, TrainType type, int length) {
         this(city1, city2, type, length, false);
     }
+
+    public boolean hasDouble() {
+        return ROUTES.contains(fooDouble());
+    }
+
+    // if it's called getDouble, GSON tries to serialize it as a field which
+    // causes an infinite recursion.
+    public Route fooDouble() {
+        return new Route(city1, city2, type, length, !second);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Route route = (Route) o;
+
+        if (length != route.length) return false;
+        if (second != route.second) return false;
+        if (city1 != route.city1) return false;
+        if (city2 != route.city2) return false;
+        return type == route.type;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = city1.hashCode();
+        result = 31 * result + city2.hashCode();
+        result = 31 * result + type.hashCode();
+        result = 31 * result + length;
+        result = 31 * result + (second ? 1 : 0);
+        return result;
+    }
 }

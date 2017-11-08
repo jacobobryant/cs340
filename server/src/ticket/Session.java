@@ -60,7 +60,11 @@ public class Session extends BaseModel {
     }
 
     public int getTrainsLeft() {
-        return (int)data.get("trainsLeft");
+        try {
+            return (int)data.get("trainsLeft");
+        } catch (ClassCastException e) {
+            return (int)(long)data.get("trainsLeft");
+        }
     }
 
     public Session giveTrain(TrainType train) {
@@ -86,15 +90,21 @@ public class Session extends BaseModel {
     public Session returnCards(DestinationCard[] cards) {
         List<DestinationCard> pending = getPendingDestCards();
         pending = (List<DestinationCard>)C.removeAll(pending, Arrays.asList(cards));
-        C.println.invoke("pending");
-        C.pprint.invoke(pending);
-        System.out.println(pending);
         return new Session(update("destCards", C.vconcat, pending), path)
                 .clearPending();
     }
 
     private Session clearPending() {
         return new Session(set("pending", C.vector.invoke()), path);
+    }
+
+    public Session claim(Route r, List<TrainType> cards) {
+        Object data = this.data;
+        data = C.assoc.invoke(data, "trainCards", 
+                C.removeAll(getTrainCards(), cards));
+        data = C.update.invoke(data, "routes", C.conj, r);
+        data = C.update.invoke(data, "trainsLeft", C.minus, r.length);
+        return new Session((Map)data, path);
     }
 
     public List<TrainType> getTrainCards() {
@@ -115,5 +125,10 @@ public class Session extends BaseModel {
 
     public Session setGameId(String gameId) {
         return new Session(set("gameId", gameId), path);
+    }
+
+    public int countTrainCards(TrainType color) {
+        return (int)(getTrainCards().stream()
+                    .filter((card) -> card.equals(color)).count());
     }
 }

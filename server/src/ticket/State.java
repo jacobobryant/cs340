@@ -1,12 +1,11 @@
 package ticket;
 
-import shared.AvailableGame;
-import shared.ClientModel;
-import shared.DestinationCard;
-import shared.TurnState;
+import shared.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static shared.TrainType.any;
 
 /**
  * Holds the global state. Includes methods that provide interaction between individually
@@ -28,8 +27,12 @@ public class State {
         this.state = state;
     }
 
-    public State commit(BaseModel model) {
-        return new State(C.assocIn.invoke(this.state, model.path, model.data));
+    public State commit(BaseModel... models) {
+        Object data = this.state;
+        for (BaseModel m : models) {
+            data = C.assocIn.invoke(data, m.path, m.data);
+        }
+        return new State(data);
     }
 
     public String toString() {
@@ -204,10 +207,41 @@ public class State {
 
         for (DestinationCard card : cards) {
             if (!list.remove(card)) {
-                C.println.invoke("doesn't have pending");
                 throw new BadJuju("returned cards aren't pending");
             }
         }
-        C.println.invoke("has pending");
+    }
+
+    public void checkTrainDeckNotEmpty(Game game) {
+        if (game.getTrainDeck().size() == 0) {
+            throw new BadJuju("Train card deck is empty");
+        }
+
+    }
+
+    public void checkValidFaceupIndex(Game game, int index) {
+        if (index < 0 || index >= game.getFaceUpDeck().size()) {
+            throw new BadJuju("invalid faceup card index");
+        }
+    }
+
+    public void checkClaimable(Game g, Route r) {
+        if (!g.getOpenRoutes().contains(r) ||
+                (g.getSessionIds().size() < 4 && r.hasDouble() &&
+                 !g.getOpenRoutes().contains(r.fooDouble()))) {
+            throw new BadJuju("that route is unclaimable");
+        }
+    }
+
+    public void checkCanClaim(Session s, Route r, List<TrainType> cards) {
+        final List<TrainType> nonlocos = cards.stream().filter((card) ->
+                !card.equals(any)).collect(Collectors.toList());
+        if (!nonlocos.stream().allMatch((card) -> card.match(nonlocos.get(0)) &&
+                                             card.match(r.type))
+                || !C.containsAll(s.getTrainCards(), cards)
+                || cards.size() != r.length
+                || s.getTrainsLeft() < r.length) {
+            throw new BadJuju("You can't claim that route with those cards");
+        }
     }
 }

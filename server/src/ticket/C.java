@@ -29,26 +29,25 @@ public class C {
     public static final IFn println = Clojure.var("clojure.core", "println");
     public static final IFn partial = Clojure.var("clojure.core", "partial");
     public static final IFn reduce = Clojure.var("clojure.core", "reduce");
-    public static final IFn vconcat = (IFn)C.partial.invoke(C.reduce, C.conj);
-
+    public static final IFn minus = Clojure.var("clojure.core", "-");
 
     public static final IFn swapperToFn = (IFn)eval.invoke(readString.invoke(
-                "(fn [old-state swapper] (.swap swapper old-state))"));
+            "(fn [old-state swapper] (.swap swapper old-state))"));
     public static final IFn vecrm = (IFn)eval.invoke(readString.invoke(
-                "(fn [v item] (vec (remove #(= item %) v)))"));
+            "(fn [v item] (vec (remove #(= item %) v)))"));
     public static final IFn dissocIn = (IFn)eval.invoke(readString.invoke(
-                "(fn [m path] (update-in m (butlast path) dissoc (last path)))"));
-    //public static final IFn prettify = (IFn)eval.invoke(readString.invoke(
-                //"(fn [o] (with-out-str (pprint o)))"));
-
+            "(fn [m path] (update-in m (butlast path) dissoc (last path)))"));
+    public static final IFn vconcat = (IFn)eval.invoke(readString.invoke(
+            "(fn [& args] (vec (apply concat args)))"));
+    public static final IFn removeAt = (IFn)eval.invoke(readString.invoke(
+            "(fn [v i] (reduce conj (subvec v 0 i) (subvec v (inc i))))"));
+        
     static {
         IFn require = Clojure.var("clojure.core", "require");
         require.invoke(Clojure.read("clojure.pprint"));
     }
 
     public static final IFn pprint = Clojure.var("clojure.pprint", "pprint");
-    //public static final IFn withOutStr = Clojure.var("clojure.core", "with-out-str");
-    //
 
     public static Collection removeAll(Collection a, Collection b) {
         ArrayList list = new ArrayList(a);
@@ -58,5 +57,15 @@ public class C {
             }
         }
         return (Collection)C.vec.invoke(list);
+    }
+
+    public static boolean containsAll(Collection a, Collection b) {
+        ArrayList list = new ArrayList(a);
+        for (Object item : b) {
+            if (!list.remove(item)) {
+                return false;
+            }
+        }
+        return true;
     }
 }

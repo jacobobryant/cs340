@@ -28,12 +28,10 @@ public class BaseModel {
     }
 
     protected Map set(Object key, Object value) {
-        return (Map)C.assocIn.invoke(this.data, new Object[] {key}, value);
+        return (Map)C.assoc.invoke(this.data, key, value);
     }
 
     protected Map update(Object key, IFn fn, Object... fnargs) {
-        C.println.invoke("fnargs");
-        C.pprint.invoke(fnargs);
         return (Map)C.apply.invoke(C.update, this.data, key, fn, fnargs);
     }
 

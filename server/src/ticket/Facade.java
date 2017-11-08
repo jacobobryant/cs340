@@ -1,12 +1,12 @@
 package ticket;
 
-import shared.ClientModel;
-import shared.DestinationCard;
-import shared.TurnState;
+import shared.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 
+import static shared.TrainType.any;
 import static shared.TurnState.*;
 
 public class Facade {
@@ -61,8 +61,8 @@ public class Facade {
             Object[] path = {"games", gameId};
             Game g = new Game(gameId, sessionId, false, path)
                     .addHistory(state, sessionId, "created the game");
-            return state.commit(g).commit(
-                    state.getSession(sessionId).setGameId(gameId));
+            Session s = state.getSession(sessionId).setGameId(gameId);
+            return state.commit(g, s);
         }, sessionId);
     }
 
@@ -76,8 +76,8 @@ public class Facade {
                         .addSessionId(sessionId)
                         .addHistory(state, sessionId, "joined the game");
 
-            return state.commit(game).commit(
-                    state.getSession(sessionId).setGameId(gameId));
+            Session ses = state.getSession(sessionId).setGameId(gameId);
+            return state.commit(game, ses);
         }, sessionId);
     }
 
@@ -122,9 +122,7 @@ public class Facade {
                 ses = ses.setTurnState(init);
                 state = state.commit(ses);
             }
-            for (int i = 0; i < 5; i++) {
-                game = game.turnFaceUp();
-            }
+            game = game.fillFaceUp();
             return state.commit(game);
         }, sessionId);
     }
@@ -156,16 +154,17 @@ public class Facade {
                 game = game.drawCard("destDeck");
             }
             ses = ses.setTurnState(returnDest);
-            return state.commit(ses).commit(game);
+            game = game.addHistory(state, sessionId,
+                    "drew destination cards");
+            return state.commit(game, ses);
         }, sessionId);
     }
 
     public static Object returnDest(String sessionId, DestinationCard[] cards) {
         return run((state) -> {
             state.authenticate(sessionId);
-            state.checkHasGame(sessionId);
-            Session ses = state.getSession(sessionId);
             state.checkTurnState(sessionId, init, returnDest);
+            Session ses = state.getSession(sessionId);
             state.checkHasPending(ses, cards);
             int max = ses.getTurnState().maxReturnCards();
             if (cards.length > max) {
@@ -177,9 +176,74 @@ public class Facade {
                        .discard(cards)
                        .addHistory(state, sessionId, "returned " + cards.length +
                                " destination card(s)");
-            state = state.commit(ses).commit(game);
+            state = state.commit(ses, game);
             return endTurn(state, sessionId);
 
+        }, sessionId);
+    }
+
+    public static Object drawTrain(String sessionId) {
+        return run((state) -> {
+            state.authenticate(sessionId);
+            state.checkTurnState(sessionId, beginning, drawTrain);
+            Session ses = state.getSession(sessionId);
+            Game game = state.getGame(ses.getGameId());
+            state.checkTrainDeckNotEmpty(game);
+
+            TrainType card = game.topTrain();
+            ses = ses.giveTrain(card);
+            game = game.drawTrainCard()
+                       .addHistory(state, sessionId, "drew a train card");
+            state = state.commit(ses, game);
+
+            if (ses.getTurnState().equals(beginning) && game.canDrawAgain()) {
+                return state.commit(ses.setTurnState(drawTrain));
+            }
+            return endTurn(state, sessionId);
+        }, sessionId);
+    }
+
+    public static Object drawFaceupTrain(String sessionId, int index) {
+        return run((state) -> {
+            state.authenticate(sessionId);
+            state.checkTurnState(sessionId, beginning, drawTrain);
+            Session ses = state.getSession(sessionId);
+            Game game = state.getGame(ses.getGameId());
+            state.checkValidFaceupIndex(game, index);
+            TrainType card = game.getFaceUpDeck().get(index);
+            if (ses.getTurnState().equals(drawTrain) && card.equals(any)) {
+                throw new BadJuju("Can't take locomotive on second draw");
+            }
+
+            game = game.discardFaceUp(index).addHistory(state, sessionId,
+                    "took a face up " + card.cardName() + " card");
+            ses = ses.giveTrain(card);
+            state = state.commit(game, ses);
+
+            if (ses.getTurnState().equals(beginning) && !card.equals(any)
+                    && game.canDrawAgain()) {
+                return state.commit(ses.setTurnState(drawTrain));
+            }
+            return endTurn(state, sessionId);
+        }, sessionId);
+    }
+
+    public static Object build(String sessionId, Route route,
+                               List<TrainType> cards) {
+        return run((state) -> {
+            state.authenticate(sessionId);
+            state.checkTurnState(sessionId, beginning);
+            Session ses = state.getSession(sessionId);
+            Game game = state.getGame(ses.getGameId());
+            state.checkClaimable(game, route);
+            state.checkCanClaim(ses, route, cards);
+
+            game = game.claim(route, cards)
+                       .addHistory(state, sessionId, "claimed a route");
+            ses = ses.claim(route, cards);
+            state = state.commit(game, ses);
+            state = updatePoints(state, game);
+            return endTurn(state, sessionId);
         }, sessionId);
     }
 
@@ -203,12 +267,37 @@ public class Facade {
     private static State createSession(State s, String username) {
         String id = UUID.randomUUID().toString();
         Object[] path = {"sessions", id};
-        return s.commit(new Session(id, username, path))
-                .commit(s.getUser(username).addSessionId(id));
+        return s.commit(new Session(id, username, path),
+                        s.getUser(username).addSessionId(id));
     }
 
-    public static State endTurn(State s, String sessionId) {
-        // todo set next turn
-        return s.commit(s.getSession(sessionId).setTurnState(waiting));
+    private static State endTurn(State s, String sessionId) {
+        Session ses = s.getSession(sessionId);
+        TurnState oldState = ses.getTurnState();
+
+        ses = ses.setTurnState(waiting);
+        s = s.commit(ses);
+        Game game = s.getGame(ses.getGameId());
+
+        if (oldState.equals(init)) {
+            final State sf = s;
+            if (game.getSessionIds().stream().allMatch(sid ->
+                    sf.getSession(sid).getTurnState().equals(waiting))) {
+                ses = s.getSession(game.getSessionIds().get(0));
+                s = s.commit(ses.setTurnState(beginning));
+            }
+        } else {
+            List<String> sids = game.getSessionIds();
+            int nextIndex = (sids.indexOf(sessionId) + 1) % sids.size();
+            Session next = s.getSession(sids.get(nextIndex))
+                            .setTurnState(beginning);
+            s = s.commit(next);
+        }
+        return s;
+    }
+
+    private static State updatePoints(State s, Game g) {
+        // TODO
+        return s;
     }
 }

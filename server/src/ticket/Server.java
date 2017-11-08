@@ -93,6 +93,15 @@ public class Server extends NanoHTTPD {
         } else if (endpoint.equals("/draw-dest")) {
             UserCommand cmd = gson.fromJson(json, UserCommand.class);
             return Facade.drawDest(cmd.sessionId);
+        } else if (endpoint.equals("/draw-train")) {
+            UserCommand cmd = gson.fromJson(json, UserCommand.class);
+            return Facade.drawTrain(cmd.sessionId);
+        } else if (endpoint.equals("/draw-faceup-train")) {
+            FaceupTrainCommand cmd = gson.fromJson(json, FaceupTrainCommand.class);
+            return Facade.drawFaceupTrain(cmd.sessionId, cmd.index);
+        } else if (endpoint.equals("/build")) {
+            BuildCommand cmd = gson.fromJson(json, BuildCommand.class);
+            return Facade.build(cmd.sessionId, cmd.route, cmd.cards);
         } else if (endpoint.equals("/clear")) {
             return Facade.clear();
         } else {
