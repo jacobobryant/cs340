@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.thefunteam.android.model.*;
 import com.thefunteam.android.model.MessageCommand;
 import com.thefunteam.android.model.shared.DestinationCard;
+import com.thefunteam.android.model.shared.ReturnDestCommand;
 
 /**
  * This class is used to do everything that the presenters need to do.
@@ -139,10 +140,11 @@ public class NextLayerFacade {
      */
     public void returnCard(DestinationCard destinationCard) {
         String sessionId = Atom.getInstance().getModel().getSessionId();
+        DestinationCard[] destinationCards = {destinationCard};
         Gson gson = new Gson();
         ClientCommunicator.getInstance().post(
                 "/return-dest",
-                gson.toJson(new ReturnDestCommand(sessionId, destinationCard))
+                gson.toJson(new ReturnDestCommand(sessionId, destinationCards))
         );
     }
 }
