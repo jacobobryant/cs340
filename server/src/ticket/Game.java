@@ -38,7 +38,8 @@ public class Game extends BaseModel {
     public shared.Game getCurrentModel(String curSession, State state) {
         List<Player> players = getSessionIds().stream()
             .map((sessionId) -> state.getSession(sessionId)
-                        .getClientModel(sessionId.equals(curSession)))
+                        .getClientModel(sessionId.equals(curSession),
+                            getTurnsLeft() <= 0))
             .collect(Collectors.toList());
 
         return new shared.Game(players, getTrainDeck().size(),
