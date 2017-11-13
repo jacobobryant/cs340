@@ -9,15 +9,21 @@ public class Player {
     public final List<DestinationCard> destCards;
     public final List<DestinationCard> pending;
 
+    //phase 3 models
     public final int routePoints;
     public final int longestRoutePoints;
     public final int destPoints;
     public final int destPenalty;
+
+    //summary methods
+    public String summary;
+
     public int trainsLeft;
     public boolean currentPlayer;
     public final TurnState turnState;
 
-    public Player(String username, List<Route> routes, List<TrainType> trainCards, List<DestinationCard> destCards, List<DestinationCard> pending, int routePoints, int longestRoutePoints, int destPoints, int destPenalty, int trainsLeft, boolean currentPlayer, TurnState turnState) {
+    public Player(String username, List<Route> routes, List<TrainType> trainCards, List<DestinationCard> destCards, List<DestinationCard> pending,
+                  int routePoints, int longestRoutePoints, int destPoints, int destPenalty, int trainsLeft, boolean currentPlayer, TurnState turnState) {
         this.username = username;
         this.routes = routes;
         this.trainCards = trainCards;
@@ -79,4 +85,20 @@ public class Player {
     public TurnState getTurnState() {
         return turnState;
     }
+
+    public String getScores(){
+        String scoresum = new String();
+        //show username
+        scoresum += "\n\n" + username + "\n\n";
+        //show claimed route points
+        scoresum += "Claimed Route Score: \n\t" + Integer.toString(routePoints) + "\n\n";
+        scoresum += "Longest Path Bonus: \n\t" + Integer.toString(longestRoutePoints) + "\n\n";
+        scoresum += "Reached Destination Score: \n\t" + Integer.toString(destPoints) + "\n\n";
+        scoresum += "Unreached Destination Panalty: \n\t" + "-" + Integer.toString(destPenalty) + "\n\n";
+        int total = routePoints + longestRoutePoints + destPoints - destPenalty;
+        scoresum += "total: \n\t" + Integer.toString(total);
+
+        return scoresum;
+    }
+
 }
