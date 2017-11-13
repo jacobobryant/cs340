@@ -1,20 +1,13 @@
 package ticket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.Gson;
 import fi.iki.elonen.NanoHTTPD;
-import shared.command.*;
 
 import java.io.IOException;
-import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class Server extends NanoHTTPD {
-    private interface FacadeMethod {
-        Object run();
-    }
-
     public Server() throws IOException {
         super(8080);
         start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
@@ -62,50 +55,6 @@ public class Server extends NanoHTTPD {
         String json = (files.containsKey("postData"))
             ? files.get("postData") : session.getQueryParameterString();
 
-        Gson gson = new Gson();
-        if (endpoint.equals("/register")) {
-            LoginCommand cmd = gson.fromJson(json, LoginCommand.class);
-            return Facade.register(cmd.username, cmd.password);
-        } else if (endpoint.equals("/login")) {
-            LoginCommand cmd = gson.fromJson(json, LoginCommand.class);
-            return Facade.login(cmd.username, cmd.password);
-        } else if (endpoint.equals("/create")) {
-            UserCommand cmd = gson.fromJson(json, UserCommand.class);
-            return Facade.create(cmd.sessionId);
-        } else if (endpoint.equals("/join")) {
-            GameCommand cmd = gson.fromJson(json, GameCommand.class);
-            return Facade.join(cmd.sessionId, cmd.gameId);
-        } else if (endpoint.equals("/leave")){
-            UserCommand cmd = gson.fromJson(json, UserCommand.class);
-            return Facade.leave(cmd.sessionId);
-        } else if (endpoint.equals("/start")) {
-            UserCommand cmd = gson.fromJson(json, UserCommand.class);
-            return Facade.start(cmd.sessionId);
-        } else if (endpoint.equals("/state")) {
-            UserCommand cmd = gson.fromJson(json, UserCommand.class);
-            return Facade.state(cmd.sessionId);
-        } else if (endpoint.equals("/chat")){
-            MessageCommand cmd = gson.fromJson(json, MessageCommand.class);
-            return Facade.chat(cmd.sessionId, cmd.message);
-        } else if (endpoint.equals("/return-dest")) {
-            ReturnDestCommand cmd = gson.fromJson(json, ReturnDestCommand.class);
-            return Facade.returnDest(cmd.sessionId, cmd.cards);
-        } else if (endpoint.equals("/draw-dest")) {
-            UserCommand cmd = gson.fromJson(json, UserCommand.class);
-            return Facade.drawDest(cmd.sessionId);
-        } else if (endpoint.equals("/draw-train")) {
-            UserCommand cmd = gson.fromJson(json, UserCommand.class);
-            return Facade.drawTrain(cmd.sessionId);
-        } else if (endpoint.equals("/draw-faceup-train")) {
-            FaceupTrainCommand cmd = gson.fromJson(json, FaceupTrainCommand.class);
-            return Facade.drawFaceupTrain(cmd.sessionId, cmd.index);
-        } else if (endpoint.equals("/build")) {
-            BuildCommand cmd = gson.fromJson(json, BuildCommand.class);
-            return Facade.build(cmd.sessionId, cmd.route, cmd.cards);
-        } else if (endpoint.equals("/clear")) {
-            return Facade.clear();
-        } else {
-            return BadJuju.map("endpoint " + endpoint + " doesn't exist");
-        }
+        return Facade.handle(endpoint, json);
     }
 }

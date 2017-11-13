@@ -1,10 +1,10 @@
 package ticket;
 
-import shared.AvailableGame;
-import shared.DestinationCard;
-import shared.Player;
-import shared.Route;
-import shared.TrainType;
+import shared.model.AvailableGame;
+import shared.model.DestinationCard;
+import shared.model.Player;
+import shared.model.Route;
+import shared.model.TrainType;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
-import static shared.TrainType.any;
+import static shared.model.TrainType.any;
 
 public class Game extends BaseModel {
             
@@ -35,20 +35,20 @@ public class Game extends BaseModel {
                 path);
     }
 
-    public shared.Game getCurrentModel(String curSession, State state) {
+    public shared.model.Game getCurrentModel(String curSession, State state) {
         List<Player> players = getSessionIds().stream()
             .map((sessionId) -> state.getSession(sessionId)
                         .getClientModel(sessionId.equals(curSession),
                             getTurnsLeft() <= 0))
             .collect(Collectors.toList());
 
-        return new shared.Game(players, getTrainDeck().size(),
+        return new shared.model.Game(players, getTrainDeck().size(),
                 getFaceUpDeck(), getDestDeck().size(), 
                 getOpenRoutes(), getMessages(), getHistory(),
                 started(), getTurnsLeft());
     }
 
-    public shared.AvailableGame getAvailableModel(State state) {
+    public AvailableGame getAvailableModel(State state) {
         List<String> players = getSessionIds().stream()
             .map((sessionId) -> state.getSession(sessionId).getUsername())
             .collect(Collectors.toList());
@@ -206,8 +206,7 @@ public class Game extends BaseModel {
     public boolean isAvailable(User u) {
         List<String> ids = getSessionIds();
         return (!started() && ids.size() < 5 &&
-                ids.stream().filter(u.getSessionIds()::contains)
-                .collect(toList()).size() == 0);
+                ids.stream().noneMatch(u.getSessionIds()::contains));
     }
 
     public Game decrementTurnsLeft() {

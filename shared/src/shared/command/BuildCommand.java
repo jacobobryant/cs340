@@ -1,7 +1,7 @@
 package shared.command;
 
-import shared.Route;
-import shared.TrainType;
+import shared.model.Route;
+import shared.model.TrainType;
 
 import java.util.List;
 

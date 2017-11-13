@@ -1,6 +1,6 @@
 package shared.command;
 
-import shared.DestinationCard;
+import shared.model.DestinationCard;
 
 public class ReturnDestCommand {
     public final String sessionId;

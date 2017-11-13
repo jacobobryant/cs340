@@ -92,7 +92,7 @@ class TestServer(unittest.TestCase):
 
     def test_login(self):
         u = users.__next__()
-        hit('/register', u)
+        assert "currentGame" in hit('/register', u)
         hit('/login', u)
         hit('/login', u)
 

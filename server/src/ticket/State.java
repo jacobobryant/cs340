@@ -1,11 +1,12 @@
 package ticket;
 
-import shared.*;
+import clojure.lang.IFn;
+import shared.model.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static shared.TrainType.any;
+import static shared.model.TrainType.any;
 
 /**
  * Holds the global state. Includes methods that provide interaction between individually
@@ -15,12 +16,12 @@ public class State {
     private static final Object globalState = C.atom.invoke(new State());
     private final Object state;
 
-    public interface Swapper {
-        State swap(State oldState);
+    public interface ISwapFN {
+        State swap(State oldState, String endpoint, String json);
     }
 
     public State() {
-        this(C.readString.invoke("{\"users\" {}, \"games\" {}, \"sessions\" {}}"));
+        this(C.readString.invoke("{\"users\" {}, \"games\" {}, \"sessions\" {}, \"eventId\" 0}"));
     }
 
     public State(Object state) {
@@ -43,12 +44,16 @@ public class State {
         C.pprint.invoke(state);
     }
 
-    public static State swap(Swapper swapper) {
-        return (State)C.swap.invoke(globalState, C.swapperToFn, swapper);
+    public static State swap(IFn swapfn, String endpoint, String json) {
+        return (State)C.swap.invoke(globalState, swapfn, endpoint, json);
     }
 
     public static State getState() {
         return (State)C.deref.invoke(globalState);
+    }
+
+    public State incrementEventId() {
+        return new State(C.update.invoke(state, "eventId", C.inc));
     }
 
     private boolean exists(Object... path) {
@@ -105,7 +110,7 @@ public class State {
     public ClientModel getClientModel(String sessionId) {
         String gameId = getSession(sessionId).getGameId();
         List<AvailableGame> availableGames = null;
-        shared.Game currentGame = null;
+        shared.model.Game currentGame = null;
         if (gameId == null) {
             availableGames = getAvailableGames(sessionId);
         } else {

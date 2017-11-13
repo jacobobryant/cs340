@@ -31,9 +31,10 @@ public class C {
     public static final IFn reduce = Clojure.var("clojure.core", "reduce");
     public static final IFn minus = Clojure.var("clojure.core", "-");
     public static final IFn dec = Clojure.var("clojure.core", "dec");
+    public static final IFn inc = Clojure.var("clojure.core", "inc");
 
     public static final IFn swapperToFn = (IFn)eval.invoke(readString.invoke(
-            "(fn [old-state swapper] (.swap swapper old-state))"));
+            "(fn [swapper] (fn [state endpoint json] (.swap swapper state endpoint json)))"));
     public static final IFn vecrm = (IFn)eval.invoke(readString.invoke(
             "(fn [v item] (vec (remove #(= item %) v)))"));
     public static final IFn dissocIn = (IFn)eval.invoke(readString.invoke(

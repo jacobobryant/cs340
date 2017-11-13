@@ -1,6 +1,6 @@
 package ticket;
 
-import shared.*;
+import shared.model.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -208,7 +208,6 @@ public class Session extends BaseModel {
         }
         int longestRoutePoints = (s.getLongestRouteLength() == longestRouteLength
                 && longestRouteLength > 0) ? 10 : 0;
-        System.out.println("longestRoutePoints: " + longestRoutePoints);
         return new Session(s.set("longestRoutePoints", longestRoutePoints), s.path);
     }
 }

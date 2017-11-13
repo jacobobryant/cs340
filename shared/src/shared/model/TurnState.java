@@ -1,4 +1,4 @@
-package shared;
+package shared.model;
 
 public enum TurnState {
     lobby, init, beginning, returnDest, drawTrain, waiting;
