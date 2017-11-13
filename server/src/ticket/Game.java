@@ -55,6 +55,17 @@ public class Game extends BaseModel {
         return new AvailableGame(getGameId(), players);
     }
 
+    public shared.RejoinableGame getRejoinableModel(State state, User u){
+        List<String> players = getSessionIds().stream()
+            .map((sessionId) -> state.getSession(sessionId).getUsername())
+            .collect(Collectors.toList());
+        List<String> ids = this.getSessionIds();
+        String id = ids.stream()
+            .filter((id) -> u.getSessionIds::contains)
+            .findFirst().get();
+        return new RejoinableGame(getGameId(), players, id);
+    }
+
     public int getTurnsLeft() {
         return C.castInt(data.get("turnsLeft"));
     }
@@ -208,6 +219,11 @@ public class Game extends BaseModel {
         return (!started() && ids.size() < 5 &&
                 ids.stream().filter(u.getSessionIds()::contains)
                 .collect(toList()).size() == 0);
+    }
+
+    public boolean isRejoinable(User u){
+        List<String> ids = getSessionIds();
+        return u.getSessionIds().stream().anyMatch(ids::contains);
     }
 
     public Game decrementTurnsLeft() {
