@@ -103,9 +103,10 @@ public class State {
     }
 
     public List<RejoinableGame> getRejoinableGames(String sessionId) {
+        User u = getUserBySessionId(sessionId);
         return getGames().stream()
-            .filter((game) -> game.isRejoinable(getUserBySessionId(sessionId)))
-            .map((game) -> game.getRejoinableModel(this))
+            .filter((game) -> game.isRejoinable(u))
+            .map((game) -> game.getRejoinableModel(this, u))
             .collect(Collectors.toList());
     }
 
