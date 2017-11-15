@@ -61,9 +61,9 @@ public class Game extends BaseModel {
             .collect(Collectors.toList());
         List<String> ids = this.getSessionIds();
         String id = ids.stream()
-            .filter((id) -> u.getSessionIds::contains)
+            .filter(u.getSessionIds()::contains)
             .findFirst().get();
-        return new RejoinableGame(getGameId(), players, id);
+        return new shared.RejoinableGame(getGameId(), players, id);
     }
 
     public int getTurnsLeft() {
