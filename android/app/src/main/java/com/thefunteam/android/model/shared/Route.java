@@ -3,6 +3,7 @@ package com.thefunteam.android.model.shared;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class Route {
     public static final List<Route> ROUTES;
@@ -112,6 +113,7 @@ public class Route {
         routes.add(new Route(City.Seattle, City.Vancouver, TrainType.any, 1, true));
         ROUTES = Collections.unmodifiableList(routes);
     }
+
     public final City city1;
     public final City city2;
     public final TrainType type;
@@ -152,5 +154,71 @@ public class Route {
 
     public boolean isSecond() {
         return second;
+    }
+
+
+    public boolean hasDouble() {
+        return ROUTES.contains(fooDouble());
+    }
+
+    // if it's called getDouble, GSON tries to serialize it as a field which
+    // causes an infinite recursion.
+    public Route fooDouble() {
+        return new Route(city1, city2, type, length, !second);
+    }
+
+    public int points() {
+        switch (length) {
+            case 1:
+                return 1;
+            case 2:
+                return 2;
+            case 3:
+                return 4;
+            case 4:
+                return 7;
+            case 5:
+                return 10;
+            case 6:
+                return 5;
+            default:
+                return 0;
+        }
+    }
+
+    public boolean match(City a, City b) {
+        return ((city1 == a && city2 == b) || (city1 == b && city2 == a));
+    }
+
+    public boolean match(City a) {
+        return city1 == a || city2 == a;
+    }
+
+    public City other(City a) {
+        return ((a == city1) ? city2 : city1);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Route route = (Route) o;
+
+        if (length != route.length) return false;
+        if (second != route.second) return false;
+        if (city1 != route.city1) return false;
+        if (city2 != route.city2) return false;
+        return type == route.type;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = city1.hashCode();
+        result = 31 * result + city2.hashCode();
+        result = 31 * result + type.hashCode();
+        result = 31 * result + length;
+        result = 31 * result + (second ? 1 : 0);
+        return result;
     }
 }

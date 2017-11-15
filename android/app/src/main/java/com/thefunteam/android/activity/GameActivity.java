@@ -229,7 +229,7 @@ public class GameActivity extends ObservingActivity {
                 }
                 holder.username.setText("You");
                 holder.color.setText("Color: " + MapHelper.getPlayerColorName(color));
-                holder.score.setText("Score: " + player.getScore());
+                holder.score.setText("Score: " + player.getRoutePoints());
 
                 StringBuilder destCardString = new StringBuilder("Destination Cards:\n");
                 for(int i = 0; i < player.getDestCards().size(); i++) {
@@ -273,7 +273,7 @@ public class GameActivity extends ObservingActivity {
 
                 holder.username.setText(player.getUsername());
                 holder.color.setText("Color: " + MapHelper.getPlayerColorName(color));
-                holder.score.setText("Score: " + player.getScore());
+                holder.score.setText("Score: " + player.getRoutePoints());
 
                 holder.destCards.setText("Destination Cards: " + player.getDestCards().size());
                 holder.trainCards.setText("Train Cards: " + player.getTrainCards().size());
