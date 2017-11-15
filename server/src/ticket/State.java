@@ -48,6 +48,18 @@ public class State {
         return (State)C.swap.invoke(globalState, swapfn, endpoint, json);
     }
 
+    public static void deserialize(Object blob) {
+        C.reset.invoke(globalState, new State(blob));
+    }
+
+    public Object serialize() {
+        return state;
+    }
+
+    public int getLatestEventId() {
+        return C.castInt(C.get.invoke(state, "eventId"));
+    }
+
     public static State getState() {
         return (State)C.deref.invoke(globalState);
     }

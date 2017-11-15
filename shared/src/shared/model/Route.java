@@ -1,14 +1,10 @@
 package shared.model;
 
-import ticket.C;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Route {
     public static final List<Route> ROUTES;
+    public static final Map<Integer, Integer> POINTS;
     static {
         List<Route> routes = new ArrayList<>();
         routes.add(new Route(City.Atlanta, City.Raleigh, TrainType.any, 2));
@@ -114,9 +110,15 @@ public class Route {
         routes.add(new Route(City.Seattle, City.Vancouver, TrainType.any, 1));
         routes.add(new Route(City.Seattle, City.Vancouver, TrainType.any, 1, true));
         ROUTES = Collections.unmodifiableList(routes);
+
+        POINTS = new HashMap<>();
+        POINTS.put(1, 1);
+        POINTS.put(2, 1);
+        POINTS.put(3, 4);
+        POINTS.put(4, 7);
+        POINTS.put(5, 10);
+        POINTS.put(6, 15);
     }
-    public static final Map<Integer, Integer> POINTS = (Map) C.hashMap.invoke(
-            1, 1, 2, 2, 3, 4, 4, 7, 5, 10, 6, 15);
     public final City city1;
     public final City city2;
     public final TrainType type;

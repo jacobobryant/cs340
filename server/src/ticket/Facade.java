@@ -3,6 +3,7 @@ package ticket;
 import clojure.lang.IFn;
 import com.google.gson.Gson;
 import shared.command.*;
+import shared.dao.Dao;
 import shared.model.*;
 
 import java.util.HashMap;
@@ -22,7 +23,7 @@ public class Facade {
             (State state, String endpoint, String json) ->
                 dispatch(state, endpoint, json).incrementEventId());
 
-    public static Object handle(String endpoint, String json) {
+    public static Object handle(Dao jones, int checkpoint, String endpoint, String json) {
         List<String> readOnlyEndpoints = (List)C.vector.invoke("/state");
         State s;
 
@@ -34,6 +35,14 @@ public class Facade {
             } catch (BadJuju e) {
                 return e.toMap();
             }
+
+            jones.startTransaction();
+            int eventId = s.getLatestEventId();
+            jones.saveEvent(eventId, endpoint, json);
+            if (eventId % checkpoint == 0) {
+                jones.saveState(s.serialize());
+            }
+            jones.endTransaction();
         }
 
         if (endpoint.equals("/clear")) {
