@@ -6,7 +6,7 @@ import java.util.List;
 public class ClientModel {
     public final String sessionId;
     public final List<AvailableGame> availableGames;  // nullable
-    public final List<RejoinableGame> rejoinableGames;
+    public final List<RejoinableGame> rejoinableGames; // nullable
     public final Game currentGame;  // nullable
 
     public ClientModel(String sessionId,
