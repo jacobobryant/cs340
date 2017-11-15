@@ -5,7 +5,21 @@ import java.util.Collections;
 import java.util.List;
 
 public enum TrainType {
-    purple, white, blue, yellow, orange, black, red, green, any;
+    any {
+        public int numInDeck() {
+            return 14;
+        }
+
+        public String cardName() {
+            return "locomotive";
+        }
+
+        public boolean match(TrainType other) {
+            return true;
+        }
+    },
+    purple, white, blue, yellow, orange, black, red, green;
+
     public static final List<TrainType> DECK;
     static {
         List<TrainType> tdeck = new ArrayList<>();
@@ -18,20 +32,15 @@ public enum TrainType {
     }
 
     public int numInDeck() {
-        if (this.equals(TrainType.any)) {
-            return 14;
-        }
         return 12;
     }
 
     public String cardName() {
-        if (this.equals(TrainType.any)) {
-            return "locomotive";
-        }
         return this.toString();
     }
 
     public boolean match(TrainType other) {
-        return (equals(any) || any.equals(other) || equals(other));
+        return (any.equals(other) || equals(other));
     }
+
 }

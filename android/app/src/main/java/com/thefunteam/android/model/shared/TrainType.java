@@ -24,4 +24,16 @@ public enum TrainType {
         return 12;
     }
     public static final int size = 9;
+
+
+    public String cardName() {
+        if (this.equals(TrainType.any)) {
+            return "locomotive";
+        }
+        return this.toString();
+    }
+
+    public boolean match(TrainType other) {
+        return (equals(any) || any.equals(other) || equals(other));
+    }
 }
