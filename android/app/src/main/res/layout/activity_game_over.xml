@@ -13,7 +13,7 @@
             tools:layout_editor_absoluteX="8dp">
 
         <Button
-                android:text="Back To Game List"
+                android:text="Back To Login"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/backtomenu"
