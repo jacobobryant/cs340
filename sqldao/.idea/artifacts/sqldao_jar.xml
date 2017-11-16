@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="sqldao:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/sqldao_jar</output-path>
+    <root id="archive" name="sqldao.jar">
+      <element id="module-output" name="sqldao" />
+    </root>
+  </artifact>
+</component>

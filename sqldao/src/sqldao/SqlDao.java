@@ -7,6 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SqlDao implements Dao {
+    public void init(boolean wipe) {
+        System.out.println("init");
+    }
+
     public void startTransaction() {
         System.out.println("starting transaction");
     }
@@ -19,7 +23,7 @@ public class SqlDao implements Dao {
         System.out.println("saving event");
     }
 
-    public void saveState(Object state) {
+    public void saveState(int eventId, Object state) {
         System.out.println("saving state");
     }
 

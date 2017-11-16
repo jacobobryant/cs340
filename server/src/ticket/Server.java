@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fi.iki.elonen.NanoHTTPD;
 import shared.dao.Dao;
 import shared.dao.Event;
+import shared.dao.GeneralPurposeToolBuildingFactoryFactoryFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,13 +30,17 @@ public class Server extends NanoHTTPD {
 
     public static void main(String[] args) {
         // parse cli args
-        String persister = "SqlDao";
+        String persister = "sql";
         int checkpoint = 10;
+        boolean wipe = false;
         if (args.length >= 1) {
             persister = args[0];
         }
         if (args.length >= 2) {
             checkpoint = Integer.parseInt(args[1]);
+        }
+        if (args.length >= 3 && args[2].equals("wipe")) {
+            wipe = true;
         }
 
         // add plugins to class path
@@ -53,27 +58,30 @@ public class Server extends NanoHTTPD {
             throw new RuntimeException(e);
         }
 
-        // load the select plugin
-        Dao jones = null;
-        ServiceLoader<Dao> loader = ServiceLoader.load(Dao.class);
-        for (Dao d : loader) {
-            if (d.getClass().getSimpleName().equals(persister)) {
-                jones = d;
+        // load the selected plugin
+        GeneralPurposeToolBuildingFactoryFactoryFactory factory = null;
+        ServiceLoader<GeneralPurposeToolBuildingFactoryFactoryFactory> loader =
+                ServiceLoader.load(GeneralPurposeToolBuildingFactoryFactoryFactory.class);
+        for (GeneralPurposeToolBuildingFactoryFactoryFactory f : loader) {
+            if (f.getName().equals(persister)) {
+                factory = f;
                 break;
             }
         }
-        if (jones == null) {
-            throw new RuntimeException("Couldn't load persistence provider \"" + persister + "\"");
+        if (factory == null) {
+            throw new RuntimeException("Couldn't find persistence provider \"" + persister + "\"");
         }
+        Dao jones = factory.makeDao();
+        jones.init(wipe);
 
         // restore state
         Object blob = jones.loadState();
         if (blob != null) {
             State.deserialize(blob);
         }
-        State s = State.getState();
-        for (Event e : jones.getEventsAfter(s.getLatestEventId())) {
-            Facade.handle(jones, checkpoint, e.endpoint, e.json);
+        int eventId = State.getState().getLatestEventId();
+        for (Event e : jones.getEventsAfter(eventId)) {
+            State.swap(Facade.swapfn, e.endpoint, e.json);
         }
 
         // start server

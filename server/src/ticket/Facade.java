@@ -36,11 +36,11 @@ public class Facade {
                 return e.toMap();
             }
 
-            jones.startTransaction();
             int eventId = s.getLatestEventId();
+            jones.startTransaction();
             jones.saveEvent(eventId, endpoint, json);
             if (eventId % checkpoint == 0) {
-                jones.saveState(s.serialize());
+                jones.saveState(eventId, s.serialize());
             }
             jones.endTransaction();
         }
