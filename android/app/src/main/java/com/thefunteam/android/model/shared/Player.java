@@ -94,8 +94,8 @@ public class Player {
         scoresum += "Claimed Route Score: \n\t" + Integer.toString(routePoints) + "\n\n";
         scoresum += "Longest Path Bonus: \n\t" + Integer.toString(longestRoutePoints) + "\n\n";
         scoresum += "Reached Destination Score: \n\t" + Integer.toString(destPoints) + "\n\n";
-        scoresum += "Unreached Destination Panalty: \n\t" + "-" + Integer.toString(destPenalty) + "\n\n";
-        int total = routePoints + longestRoutePoints + destPoints - destPenalty;
+        scoresum += "Unreached Destination Panalty: \n\t" + Integer.toString(destPenalty) + "\n\n";
+        int total = routePoints + longestRoutePoints + destPoints + destPenalty;
         scoresum += "total: \n\t" + Integer.toString(total);
 
         return scoresum;

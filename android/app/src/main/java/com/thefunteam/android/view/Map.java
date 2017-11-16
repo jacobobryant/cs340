@@ -14,6 +14,7 @@ import com.thefunteam.android.model.shared.MapHelper;
 import com.thefunteam.android.model.shared.Player;
 import com.thefunteam.android.model.shared.Route;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public class Map extends View {
@@ -185,6 +186,7 @@ public class Map extends View {
             paint.setColor(Color.rgb(255,100,100));
             canvas.drawText(name, cord.x, cord.y, paint);
         }
+
     }
 
     public void updateRoutes(Model model) {
@@ -193,4 +195,5 @@ public class Map extends View {
         players = model.getCurrentGame().getPlayers();
         this.invalidate();
     }
+
 }

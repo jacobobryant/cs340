@@ -1,8 +1,11 @@
 package com.thefunteam.android.activity;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.*;
@@ -10,12 +13,20 @@ import android.widget.*;
 import com.thefunteam.android.Poller;
 import com.thefunteam.android.R;
 import com.thefunteam.android.model.Atom;
+import com.thefunteam.android.model.Cord;
 import com.thefunteam.android.model.Model;
 import com.thefunteam.android.model.shared.*;
 import com.thefunteam.android.presenter.GamePresenter;
+import com.thefunteam.android.presenter.Presenter;
 import com.thefunteam.android.view.Map;
+import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+
+import static com.thefunteam.android.model.shared.TrainType.any;
 
 public class GameActivity extends ObservingActivity {
 
@@ -43,8 +54,6 @@ public class GameActivity extends ObservingActivity {
     private Button faceUp3;
     private Button faceUp4;
 
-    private boolean showDestPicker = true;
-
     public GameActivity() {
         super();
 
@@ -58,9 +67,6 @@ public class GameActivity extends ObservingActivity {
 
         map = (Map) findViewById(R.id.map);
         map.setBackgroundColor(Color.rgb(248,233,213));
-
-        mDetector = new GestureDetector(this, new MyGestureListener());
-        map.setOnTouchListener(touchListener);
 
         // Player info
         adapter = new ListAdapter();
@@ -85,28 +91,39 @@ public class GameActivity extends ObservingActivity {
         destChooser3 = (CheckBox) findViewById(R.id.checkBox2);
         destSubmit = (Button) findViewById(R.id.submitDest);
         destSubmit.setOnClickListener(v -> {
-            int total = 0;
-            int returnCard = -1;
-            if(destChooser1.isChecked()) { total++; } else { returnCard = 0; }
-            if(destChooser2.isChecked()) { total++; } else { returnCard = 1; }
-            if(destChooser3.isChecked()) { total++; } else { returnCard = 2; }
+            List<DestinationCard> pending = Atom.getInstance().getModel().getCurrentPlayer().getPending();
+            List<DestinationCard> returnCards = new LinkedList<>();
+            if(!destChooser1.isChecked() && pending.size() > 0) { returnCards.add(pending.get(0)); }
+            if(!destChooser2.isChecked() && pending.size() > 1) { returnCards.add(pending.get(1)); }
+            if(!destChooser3.isChecked() && pending.size() > 2) { returnCards.add(pending.get(2)); }
 
-            if(total >= 2) {
-                showDestPicker = false;
-                gamePresenter.returnDestCard(returnCard);
+            if(returnCards.size() <= gamePresenter.turnState.maxReturnCards()) {
+                gamePresenter.returnDestCard(returnCards.toArray(new DestinationCard[returnCards.size()]));
             } else {
-                Toast.makeText(this,"You must select at least two destination cards.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this,"You must select more destination cards.", Toast.LENGTH_SHORT).show();
             }
         });
 
         // card buttons
         destDrawPile = (Button) findViewById(R.id.destDeckButton);
+        destDrawPile.setOnClickListener(v -> gamePresenter.drawDestCard());
         trainDrawPile = (Button) findViewById(R.id.trainDeckButton);
+        trainDrawPile.setOnClickListener(v -> gamePresenter.drawTrainCard());
         faceUp0 = (Button) findViewById(R.id.faceUpTrain0);
         faceUp1 = (Button) findViewById(R.id.faceUpTrain1);
         faceUp2 = (Button) findViewById(R.id.faceUpTrain2);
         faceUp3 = (Button) findViewById(R.id.faceUpTrain3);
         faceUp4 = (Button) findViewById(R.id.faceUpTrain4);
+        Button[] faceUpButtons = {faceUp0, faceUp1, faceUp2, faceUp3, faceUp4};
+        for(int i = 0; i < faceUpButtons.length; i++) {
+            final int index = i;
+            faceUpButtons[i].setOnClickListener(v -> gamePresenter.drawFaceUpCard(index));
+        }
+
+
+        mDetector = new GestureDetector(this, new MyGestureListener(this));
+        map.setOnTouchListener(touchListener);
+
 
         update(Atom.getInstance().getModel());
     }
@@ -118,12 +135,27 @@ public class GameActivity extends ObservingActivity {
         if(currentPlayer != null) {
 
             // Update dest choosing
-            if(showDestPicker) {
-                List<DestinationCard> cards = currentPlayer.getDestCards();
+            if(gamePresenter.turnState == TurnState.init || gamePresenter.turnState == TurnState.returnDest) {
+                List<DestinationCard> cards = currentPlayer.getPending();
                 destinationPicker.setVisibility(View.VISIBLE);
-                destChooser1.setText(cards.get(0).description());
-                destChooser2.setText(cards.get(1).description());
-                destChooser3.setText(cards.get(2).description());
+                if(cards.size() > 0) {
+                    destChooser1.setVisibility(View.VISIBLE);
+                    destChooser1.setText(cards.get(0).description());
+                } else {
+                    destChooser1.setVisibility(View.GONE);
+                }
+                if(cards.size() > 1) {
+                    destChooser2.setVisibility(View.VISIBLE);
+                    destChooser2.setText(cards.get(1).description());
+                } else {
+                    destChooser2.setVisibility(View.GONE);
+                }
+                if(cards.size() > 2) {
+                    destChooser3.setVisibility(View.VISIBLE);
+                    destChooser3.setText(cards.get(2).description());
+                } else {
+                    destChooser3.setVisibility(View.GONE);
+                }
             } else {
                 destinationPicker.setVisibility(View.GONE);
                 destChooser1.setChecked(false);
@@ -165,10 +197,7 @@ public class GameActivity extends ObservingActivity {
         }
 
         adapter.notifyDataSetChanged();
-
         map.updateRoutes(model);
-
-        Poller.getInstance().stopPolling();
     }
 
     View.OnTouchListener touchListener = new View.OnTouchListener() {
@@ -182,7 +211,17 @@ public class GameActivity extends ObservingActivity {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
+    public void showGameOver() {
+        startActivity(new Intent(GameActivity.this, GameOverActivity.class));
+    }
+
     class MyGestureListener extends GestureDetector.SimpleOnGestureListener {
+        Context context;
+
+        MyGestureListener(Context context) {
+            super();
+            this.context = context;
+        }
 
         @Override
         public boolean onDown(MotionEvent event) {
@@ -190,6 +229,53 @@ public class GameActivity extends ObservingActivity {
         }
         @Override
         public boolean onSingleTapConfirmed(MotionEvent e) {
+            if(gamePresenter.turnState != TurnState.beginning) { return true; }
+            Cord touch = new Cord(e.getX(), e.getY(), false);
+
+            final Route route = MapHelper.getRoute(touch);
+            if(route == null) { return true; }
+
+            Model model = Atom.getInstance().getModel();
+            Game currentGame = model.getCurrentGame();
+            List<Player> players = currentGame.getPlayers();
+            for(Player player : players) {
+                if(player.getRoutes().contains(route.fooDouble()) && (player == model.getCurrentPlayer() || players.size() < 4)) {
+                    return true;
+                }
+            }
+
+            final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+            builder.setTitle("Build Route")
+                    .setMessage("Do you want to build from " + MapHelper.getName(route.getCity1()) + " to " + MapHelper.getName(route.getCity2()) + " with " + route.getType() + "?")
+                    .setIcon(android.R.drawable.ic_dialog_info)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                             if( route.type == any) {
+                                 final ArrayAdapter<String> adp = new ArrayAdapter<String>(context,
+                                         android.R.layout.simple_spinner_item, TrainType.strings);
+
+                                 final Spinner sp = new Spinner(context);
+                                 sp.setLayoutParams(new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+                                 sp.setAdapter(adp);
+                                 AlertDialog.Builder builder = new AlertDialog.Builder(context)
+                                         .setMessage("What train type would you like to use?")
+                                         .setView(sp)
+                                         .setPositiveButton("Confirm", new DialogInterface.OnClickListener() {
+                                             @Override
+                                             public void onClick(DialogInterface dialog, int which) {
+                                                 gamePresenter.claimRoute(route, TrainType.valueOf((String) sp.getSelectedItem()));
+                                             }
+                                         });
+                                 builder.create().show();
+                             } else {
+                                 gamePresenter.claimRoute(route, route.type);
+                             }
+                        }
+                    })
+                    .setNegativeButton("No", null)
+                    .show();
+
             return true;
         }
     }
@@ -250,7 +336,7 @@ public class GameActivity extends ObservingActivity {
                     trainCardString.append("\t");
                     trainCardString.append(trainType.name());
                     trainCardString.append(": ");
-                    trainCardString.append(Integer.toString(countCards(trainType, trainCards)));
+                    trainCardString.append(Integer.toString(TrainType.countCards(trainType, trainCards)));
                     trainCardString.append("\n");
                 }
                 holder.trainCards.setText(trainCardString.toString());
@@ -279,16 +365,6 @@ public class GameActivity extends ObservingActivity {
                 holder.trainCards.setText("Train Cards: " + player.getTrainCards().size());
                 holder.trainsLeft.setText("Trains left: " + player.getTrainsLeft());
             }
-        }
-
-        private int countCards(TrainType trainType, List<TrainType> cards) {
-            int count = 0;
-            for(TrainType card : cards) {
-                if(card == trainType) {
-                    count = count + 1;
-                }
-            }
-            return count;
         }
 
         @Override

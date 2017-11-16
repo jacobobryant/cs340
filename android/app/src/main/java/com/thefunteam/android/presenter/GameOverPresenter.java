@@ -6,18 +6,17 @@ import com.thefunteam.android.activity.GameOverActivity;
 import java.util.List;
 import java.util.Observable;
 
-public class GameOverPresenter {//extends Presenter{
+public class GameOverPresenter extends Presenter {
+
     private final GameOverActivity goActivity;
 
     public GameOverPresenter(GameOverActivity goActivity) {
+        super();
         this.goActivity = goActivity;
     }
 
-    public void goGameMenu(){
-        goActivity.goGameMenu();
-    }
+    @Override
+    public void update(Observable o, Object arg) {
 
-    public void showScores() {
-        goActivity.showScores();
     }
 }

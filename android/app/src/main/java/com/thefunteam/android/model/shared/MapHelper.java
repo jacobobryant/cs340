@@ -1,7 +1,11 @@
 package com.thefunteam.android.model.shared;
 
 import android.graphics.Color;
+import com.thefunteam.android.model.Atom;
 import com.thefunteam.android.model.Cord;
+
+import java.util.LinkedList;
+import java.util.List;
 
 public class MapHelper {
     public static Cord getLocation(City city) {
@@ -142,7 +146,7 @@ public class MapHelper {
     public static int getColor(TrainType trainType) {
         switch (trainType) {
             case purple:
-                return Color.rgb(234, 10, 290);
+                return Color.rgb(109, 46, 204);
             case white:
                 return Color.rgb(250, 250, 250);
             case blue:
@@ -207,7 +211,7 @@ public class MapHelper {
             float dy = cord1.y - cord2.y;
             float odx = dy;
             float ody = -dx;
-            float mag = (float) Math.sqrt(dx*dx + dy*dy);
+            float mag = (float) Math.sqrt(dx * dx + dy * dy);
             float udx = odx / mag;
             float udy = ody / mag;
 
@@ -216,5 +220,33 @@ public class MapHelper {
             cord2.x += udx * 15;
             cord2.y += udy * 15;
         }
+    }
+
+    public static Cord mid(Route route) {
+        Cord cord1 = MapHelper.getLocation(route.city1);
+        Cord cord2 = MapHelper.getLocation(route.city2);
+        if(cord2.y > cord1.y) {
+            Cord temp = cord2;
+            cord2 = cord1;
+            cord1 = temp;
+        }
+        adjust(cord1, cord2, route);
+        return Cord.middle(cord1, cord2);
+    }
+
+    public static Route getRoute(Cord touch) {
+        List<Route> routes = Atom.getInstance().getModel().getCurrentGame().getOpenRoutes();
+
+        double minDist = Float.POSITIVE_INFINITY;
+        Route closestRoute = null;
+        for(Route route : routes) {
+            Cord mid = mid(route);
+            double dist = Cord.dist(touch, mid);
+            if(dist < minDist || closestRoute == null) {
+                minDist = dist;
+                closestRoute = route;
+            }
+        }
+        return closestRoute;
     }
 }

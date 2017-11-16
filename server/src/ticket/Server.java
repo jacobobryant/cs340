@@ -6,7 +6,6 @@ import fi.iki.elonen.NanoHTTPD;
 import shared.command.*;
 
 import java.io.IOException;
-import java.security.InvalidParameterException;
 import java.util.HashMap;
 import java.util.Map;
 
