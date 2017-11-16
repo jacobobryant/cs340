@@ -12,6 +12,7 @@ public class Player {
     public final int longestRoutePoints;
     public final int destPoints;
     public final int destPenalty;
+    public final int completedDest;
     public final int trainsLeft;
     public final boolean currentPlayer;
     public final TurnState turnState;
@@ -19,7 +20,7 @@ public class Player {
     public Player(String username, List<Route> routes, List<TrainType>
             trainCards, List<DestinationCard> destCards, List<DestinationCard>
             pending, int routePoints, int longestRoutePoints, int destPoints,
-            int destPenalty, int trainsLeft, boolean currentPlayer, TurnState
+            int destPenalty, int completedDest, int trainsLeft, boolean currentPlayer, TurnState
             turnState) {
         this.username = username;
         this.routes = routes;
@@ -30,6 +31,7 @@ public class Player {
         this.longestRoutePoints = longestRoutePoints;
         this.destPoints = destPoints;
         this.destPenalty = destPenalty;
+        this.completedDest = completedDest;
         this.trainsLeft = trainsLeft;
         this.currentPlayer = currentPlayer;
         this.turnState = turnState;

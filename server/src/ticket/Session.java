@@ -24,6 +24,7 @@ public class Session extends BaseModel {
                             "destPoints", 0,
                             "longestRoutePoints", 0,
                             "destPenalty", 0,
+                            "completedDest", 0,
                             "turnState", TurnState.lobby},
               path);
     }
@@ -44,19 +45,22 @@ public class Session extends BaseModel {
 
         int destPoints;
         int destPenalty;
+        int completedDest;
         if (isCurrentPlayer || gameOver) {
             destPoints = getDestPoints();
             destPenalty = getDestPenalty();
+            completedDest = getCompletedDest();
         } else {
             destPoints = 0;
             destPenalty = 0;
+            completedDest = 0;
         }
 
         return new Player(getUsername(), getRoutes(), trainCards,
                 destCards, pending, 
                 
                 getRoutePoints(), getLongestRoutePoints(),
-                destPoints, destPenalty,
+                destPoints, destPenalty, completedDest,
                 
                 getTrainsLeft(), isCurrentPlayer,
                 getTurnState());
@@ -88,6 +92,10 @@ public class Session extends BaseModel {
 
     public int getDestPenalty() {
         return C.castInt(data.get("destPenalty"));
+    }
+
+    public int getCompletedDest() {
+        return C.castInt(data.get("completedDest"));
     }
 
     public int getTrainsLeft() {
@@ -194,21 +202,21 @@ public class Session extends BaseModel {
                 (completed(c)) ? c.points : 0).sum();
         int destPenalty = getDestCards().stream().mapToInt((c) ->
                 (completed(c)) ? 0 : -c.points).sum();
-        return new Session((Map)C.assoc.invoke(data, "destPoints", destPoints,
-                    "destPenalty", destPenalty), path);
+        int completedDest = (int)getDestCards().stream().filter(this::completed).count();
+        return new Session((Map)C.assoc.invoke(data,
+                    "destPoints", destPoints,
+                    "destPenalty", destPenalty,
+                    "completedDest", completedDest), path);
     }
 
-    public Session updatePoints(boolean newRoute, boolean newDestCard,
-            int longestRouteLength) {
-        Session s = this;
-        if (newRoute) {
-            s = s.updateRoutePoints();
-        } else if (newDestCard) {
-            s = s.updateDestPoints();
-        }
-        int longestRoutePoints = (s.getLongestRouteLength() == longestRouteLength
+    public Session updatePoints(boolean currentPlayer, int longestRouteLength) {
+        int longestRoutePoints = (getLongestRouteLength() == longestRouteLength
                 && longestRouteLength > 0) ? 10 : 0;
-        System.out.println("longestRoutePoints: " + longestRoutePoints);
-        return new Session(s.set("longestRoutePoints", longestRoutePoints), s.path);
+        Session s = new Session(set("longestRoutePoints", longestRoutePoints), path);
+        if (currentPlayer) {
+            s = s.updateDestPoints()
+                 .updateRoutePoints();
+        }
+        return s;
     }
 }

@@ -159,7 +159,7 @@ class TestServer(unittest.TestCase):
                             "route", route, "cards", [])))
         self.raises(lambda: hit('/build', assoc(self.user1,
                             "route", route, "cards", cards)))
-        hit('/build', assoc(self.user1, "route", route, "cards", cards[:1]))
+        result = hit('/build', assoc(self.user1, "route", route, "cards", cards[:1]))
 
         cards = hit('/state', self.user2)['currentGame']['players'][1]['trainCards']
         self.raises(lambda: hit('/build', assoc(self.user2, "route", 
