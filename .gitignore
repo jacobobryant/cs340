@@ -31,3 +31,4 @@ tasks.xml
 out/
 *.apk
 uiDesigner.xml
+*.db
