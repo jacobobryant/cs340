@@ -27,22 +27,22 @@ public class Facade {
         List<String> readOnlyEndpoints = (List)C.vector.invoke("/state");
         State s;
 
-        if (readOnlyEndpoints.contains(endpoint)) {
-            s = dispatch(State.getState(), endpoint, json);
-        } else {
-            try {
+        try {
+            if (readOnlyEndpoints.contains(endpoint)) {
+                s = dispatch(State.getState(), endpoint, json);
+            } else {
                 s = State.swap(swapfn, endpoint, json);
-            } catch (BadJuju e) {
-                return e.toMap();
-            }
 
-            int eventId = s.getLatestEventId();
-            jones.startTransaction();
-            jones.saveEvent(eventId, endpoint, json);
-            if (eventId % checkpoint == 0) {
-                jones.saveState(eventId, s.serialize());
+                int eventId = s.getLatestEventId();
+                jones.startTransaction();
+                jones.saveEvent(eventId, endpoint, json);
+                if (eventId % checkpoint == 0) {
+                    jones.saveState(eventId, s.serialize());
+                }
+                jones.endTransaction();
             }
-            jones.endTransaction();
+        } catch (BadJuju e) {
+            return e.toMap();
         }
 
         if (endpoint.equals("/clear")) {
@@ -98,6 +98,8 @@ public class Facade {
         } else if (endpoint.equals("/clear")) {
             return new State();
         } else if (endpoint.equals("/state")) {
+            UserCommand cmd = gson.fromJson(json, UserCommand.class);
+            state.authenticate(cmd.sessionId);
             return state;
         } else {
             throw new BadJuju("endpoint " + endpoint + " doesn't exist");

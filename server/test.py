@@ -170,5 +170,9 @@ class TestServer(unittest.TestCase):
         cards = hit('/state', self.user1)['currentGame']['players'][0]['trainCards']
         hit('/build', assoc(self.user1, "route", route, "cards", cards[:1]))
 
+    def test_persistence(self):
+        input("restart server, then press Enter")
+        hit('/state', self.user1)
+
 if __name__ == "__main__":
     unittest.main()
