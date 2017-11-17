@@ -222,6 +222,11 @@ public class Game extends BaseModel {
                 .collect(toList()).size() == 0);
     }
 
+    public boolean isRejoinable(User u){		
+        List<String> ids = getSessionIds();		
+        return u.getSessionIds().stream().anyMatch(ids::contains);		
+    }
+
     public Game decrementTurnsLeft() {
         return new Game(update("turnsLeft", C.dec), path);
     }
