@@ -16,7 +16,7 @@ public class Session extends BaseModel {
                             "username", username,
                             "gameId", null,
                             "routes", C.vector.invoke(),
-                            "trainsLeft", 45,
+                            "trainsLeft", 10,
                             "pending", C.vector.invoke(),
                             "destCards", C.vector.invoke(),
                             "trainCards", C.vector.invoke(),

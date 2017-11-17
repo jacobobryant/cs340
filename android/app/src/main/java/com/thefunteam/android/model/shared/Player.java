@@ -1,5 +1,9 @@
 package com.thefunteam.android.model.shared;
 
+import com.thefunteam.android.activity.GameOverActivity;
+import com.thefunteam.android.model.Atom;
+
+import java.util.Comparator;
 import java.util.List;
 
 public class Player {
@@ -14,6 +18,7 @@ public class Player {
     public final int longestRoutePoints;
     public final int destPoints;
     public final int destPenalty;
+    public final int completedDest;
 
     //summary methods
     public String summary;
@@ -23,7 +28,7 @@ public class Player {
     public final TurnState turnState;
 
     public Player(String username, List<Route> routes, List<TrainType> trainCards, List<DestinationCard> destCards, List<DestinationCard> pending,
-                  int routePoints, int longestRoutePoints, int destPoints, int destPenalty, int trainsLeft, boolean currentPlayer, TurnState turnState) {
+                  int routePoints, int longestRoutePoints, int destPoints, int destPenalty, int completedDest, int trainsLeft, boolean currentPlayer, TurnState turnState) {
         this.username = username;
         this.routes = routes;
         this.trainCards = trainCards;
@@ -33,6 +38,7 @@ public class Player {
         this.longestRoutePoints = longestRoutePoints;
         this.destPoints = destPoints;
         this.destPenalty = destPenalty;
+        this.completedDest = completedDest;
         this.trainsLeft = trainsLeft;
         this.currentPlayer = currentPlayer;
         this.turnState = turnState;
@@ -86,6 +92,10 @@ public class Player {
         return turnState;
     }
 
+    public int totalScore() {
+        return routePoints + longestRoutePoints + destPoints + destPenalty;
+    }
+
     public String getScores(){
         String scoresum = new String();
         //show username
@@ -97,6 +107,9 @@ public class Player {
         scoresum += "Unreached Destination Panalty: \n\t" + Integer.toString(destPenalty) + "\n\n";
         int total = routePoints + longestRoutePoints + destPoints + destPenalty;
         scoresum += "total: \n\t" + Integer.toString(total);
+
+        List<Player> players = Atom.getInstance().getModel().getCurrentGame().getPlayers();
+        players.stream().max(Comparator.comparing(Player::totalScore));
 
         return scoresum;
     }

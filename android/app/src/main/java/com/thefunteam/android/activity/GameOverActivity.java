@@ -20,6 +20,7 @@ public class GameOverActivity extends ObservingActivity {
     private GameOverPresenter goPresentner = new GameOverPresenter(this);
     Button back_to_available_game;
     ArrayList<TextView> playerscores = new ArrayList<>();
+    TextView winnerText;
 
     public GameOverActivity() {
         super();
@@ -45,13 +46,13 @@ public class GameOverActivity extends ObservingActivity {
         playerscores.add((TextView) findViewById(R.id.textView3));
         playerscores.add((TextView) findViewById(R.id.textView4));
         playerscores.add((TextView) findViewById(R.id.textView5));
+        winnerText = (TextView) findViewById(R.id.winnerText);
         
         showScores();
     }
 
     public void goGameMenu(){
         Atom.reset();
-        Poller.getInstance().stopPolling();
         Intent intent = new Intent(GameOverActivity.this, LoginActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
@@ -66,5 +67,7 @@ public class GameOverActivity extends ObservingActivity {
         for (int i = 0; i < scoreDetails.size(); i++){
             playerscores.get(i).setText(scoreDetails.get(i));
         }
+
+        winnerText.setText("\t\t" + Atom.getInstance().getModel().getWinningPlayer() + " wins!!!");
     }
 }
