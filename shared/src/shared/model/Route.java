@@ -1,8 +1,9 @@
 package shared.model;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Route {
+public class Route implements Serializable {
     public static final List<Route> ROUTES;
     public static final Map<Integer, Integer> POINTS;
     static {

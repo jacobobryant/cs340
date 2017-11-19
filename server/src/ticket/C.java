@@ -24,7 +24,6 @@ public class C {
     public static final IFn last = Clojure.var("clojure.core", "last");
     public static final IFn vec = Clojure.var("clojure.core", "vec");
     public static final IFn subvec = Clojure.var("clojure.core", "subvec");
-    public static final IFn shuffle = Clojure.var("clojure.core", "shuffle");
     public static final IFn selectKeys = Clojure.var("clojure.core", "select-keys");
     public static final IFn println = Clojure.var("clojure.core", "println");
     public static final IFn partial = Clojure.var("clojure.core", "partial");
@@ -44,6 +43,12 @@ public class C {
             "(fn [& args] (vec (apply concat args)))"));
     public static final IFn removeAt = (IFn)eval.invoke(readString.invoke(
             "(fn [v i] (reduce conj (subvec v 0 i) (subvec v (inc i))))"));
+    public static final IFn shuffle = (IFn)eval.invoke(readString.invoke(
+            "(fn [^java.util.Collection coll seed]" +
+            "  (let [al (java.util.ArrayList. coll)" +
+            "        rng (java.util.Random. seed)]" +
+            "    (java.util.Collections/shuffle al rng)" +
+            "    (clojure.lang.RT/vector (.toArray al))))"));
         
     static {
         IFn require = Clojure.var("clojure.core", "require");
@@ -51,6 +56,9 @@ public class C {
     }
 
     public static final IFn pprint = Clojure.var("clojure.pprint", "pprint");
+
+
+
 
     public static Collection removeAll(Collection a, Collection b) {
         ArrayList list = new ArrayList(a);

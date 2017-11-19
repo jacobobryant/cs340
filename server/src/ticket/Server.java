@@ -80,6 +80,7 @@ public class Server extends NanoHTTPD {
             State.deserialize(blob);
         }
         int eventId = State.getState().getLatestEventId();
+        System.out.println("latest eventid in state: " + eventId);
         for (Event e : jones.getEventsAfter(eventId)) {
             State.swap(Facade.swapfn, e.endpoint, e.json);
         }

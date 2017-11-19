@@ -1,10 +1,11 @@
 package shared.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class DestinationCard {
+public class DestinationCard implements Serializable {
     public static final List<DestinationCard> DECK;
     static {
         List<DestinationCard> ddeck = new ArrayList<>();
@@ -78,4 +79,6 @@ public class DestinationCard {
                 ", points=" + points +
                 '}';
     }
+
+
 }

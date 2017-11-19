@@ -24,10 +24,10 @@ public class Game extends BaseModel {
         super(new Object[] {"gameId", gameId, 
                             "sessionIds", C.vector.invoke(sessionId),
                             "started", started,
-                            "trainDeck", C.shuffle.invoke(TrainType.DECK),
+                            "trainDeck", C.shuffle.invoke(TrainType.DECK, sessionId.hashCode()),
                             "faceUpDeck", C.vector.invoke(),
                             "trainDiscard", C.vector.invoke(),
-                            "destDeck", C.shuffle.invoke(DestinationCard.DECK),
+                            "destDeck", C.shuffle.invoke(DestinationCard.DECK, sessionId.hashCode()),
                             "openRoutes", Route.ROUTES,
                             "messages", C.vector.invoke(),
                             "turnsLeft", 666,
@@ -140,7 +140,7 @@ public class Game extends BaseModel {
     private Game shuffleDiscardIfNeeded() {
         if (getTrainDeck().size() == 0 && getFaceUpDeck().size() > 0) {
             List<TrainType> newTrainDeck = (List)C.vconcat.invoke(
-                    getTrainDeck(), C.shuffle.invoke(getDiscard()));
+                    getTrainDeck(), C.shuffle.invoke(getDiscard(), data.hashCode()));
             Object data = C.assoc.invoke(this.data, "trainDeck", newTrainDeck);
             data = C.assoc.invoke(data, "trainDiscard", C.vector.invoke());
             return new Game((Map)data, path);

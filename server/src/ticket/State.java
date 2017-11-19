@@ -24,6 +24,10 @@ public class State {
         this(C.readString.invoke("{\"users\" {}, \"games\" {}, \"sessions\" {}, \"eventId\" 0}"));
     }
 
+    public State(int eventId) {
+        this(C.assoc.invoke(new State().state, "eventId", eventId));
+    }
+
     public State(Object state) {
         this.state = state;
     }

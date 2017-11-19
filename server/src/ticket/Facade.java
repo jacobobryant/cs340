@@ -8,7 +8,6 @@ import shared.model.*;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 
 import static shared.model.TrainType.any;
 import static shared.model.TurnState.*;
@@ -34,12 +33,10 @@ public class Facade {
                 s = State.swap(swapfn, endpoint, json);
 
                 int eventId = s.getLatestEventId();
-                jones.startTransaction();
                 jones.saveEvent(eventId, endpoint, json);
                 if (eventId % checkpoint == 0) {
                     jones.saveState(eventId, s.serialize());
                 }
-                jones.endTransaction();
             }
         } catch (BadJuju e) {
             return e.toMap();
@@ -96,7 +93,7 @@ public class Facade {
             BuildCommand cmd = gson.fromJson(json, BuildCommand.class);
             return Facade.build(state, cmd.sessionId, cmd.route, cmd.cards);
         } else if (endpoint.equals("/clear")) {
-            return new State();
+            return new State(state.getLatestEventId());
         } else if (endpoint.equals("/state")) {
             UserCommand cmd = gson.fromJson(json, UserCommand.class);
             state.authenticate(cmd.sessionId);
@@ -124,7 +121,7 @@ public class Facade {
         state.authenticate(sessionId);
         state.checkNoGame(sessionId);
 
-        String gameId = UUID.randomUUID().toString();
+        String gameId = "game" + String.valueOf(state.getLatestEventId());
         Object[] path = {"games", gameId};
         Game g = new Game(gameId, sessionId, false, path)
                 .addHistory(state, sessionId, "created the game");
@@ -309,10 +306,11 @@ public class Facade {
     }
 
     private static State createSession(State s, String username) {
-        String id = UUID.randomUUID().toString();
+        User u = s.getUser(username);
+        String id = username + String.valueOf(s.getLatestEventId());
         Object[] path = {"sessions", id};
         return s.commit(new Session(id, username, path),
-                        s.getUser(username).addSessionId(id));
+                        u.addSessionId(id));
     }
 
     private static State endTurn(State s, String sessionId) {
