@@ -138,7 +138,7 @@ public class Game extends BaseModel {
     }
 
     private Game shuffleDiscardIfNeeded() {
-        if (getTrainDeck().size() == 0 && getFaceUpDeck().size() > 0) {
+        if (getTrainDeck().size() == 0 && getDiscard().size() > 0) {
             List<TrainType> newTrainDeck = (List)C.vconcat.invoke(
                     getTrainDeck(), C.shuffle.invoke(getDiscard()));
             Object data = C.assoc.invoke(this.data, "trainDeck", newTrainDeck);
