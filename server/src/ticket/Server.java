@@ -5,6 +5,7 @@ import fi.iki.elonen.NanoHTTPD;
 import shared.dao.Dao;
 import shared.dao.Event;
 import shared.dao.GeneralPurposeToolBuildingFactoryFactoryFactory;
+import shared.dao.UserDao;
 
 import java.io.File;
 import java.io.IOException;
@@ -18,12 +19,14 @@ import java.util.ServiceLoader;
 
 public class Server extends NanoHTTPD {
     private final Dao jones;
+    private final UserDao udao;
     private final int checkpoint;
 
-    public Server(Dao jones, int checkpoint) throws IOException {
+    public Server(Dao jones, int checkpoint, UserDao udao) throws IOException {
         super(8080);
         this.jones = jones;
         this.checkpoint = checkpoint;
+        this.udao = udao;
         start(NanoHTTPD.SOCKET_READ_TIMEOUT, false);
         System.out.println("\nServer running on http://localhost:8080/ \n");
     }
@@ -71,8 +74,9 @@ public class Server extends NanoHTTPD {
         if (factory == null) {
             throw new RuntimeException("Couldn't find persistence provider \"" + persister + "\"");
         }
-        Dao jones = factory.makeDao();
-        jones.init(wipe);
+        factory.init(wipe);
+        Dao jones = factory.makeGameDao();
+        UserDao udao = factory.makeUserDao();
 
         // restore state
         Object blob = jones.loadState();
@@ -87,7 +91,7 @@ public class Server extends NanoHTTPD {
 
         // start server
         try {
-            new Server(jones, checkpoint);
+            new Server(jones, checkpoint, udao);
         } catch (IOException e) {
             System.err.println("Couldn't start server:\n" + e);
         }
@@ -126,6 +130,6 @@ public class Server extends NanoHTTPD {
         String json = (files.containsKey("postData"))
             ? files.get("postData") : session.getQueryParameterString();
 
-        return Facade.handle(this.jones, this.checkpoint, endpoint, json);
+        return Facade.handle(this.jones, this.checkpoint, endpoint, json, this.udao);
     }
 }

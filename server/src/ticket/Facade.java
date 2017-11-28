@@ -4,6 +4,7 @@ import clojure.lang.IFn;
 import com.google.gson.Gson;
 import shared.command.*;
 import shared.dao.Dao;
+import shared.dao.UserDao;
 import shared.model.*;
 
 import java.util.HashMap;
@@ -22,7 +23,8 @@ public class Facade {
             (State state, String endpoint, String json) ->
                 dispatch(state, endpoint, json).incrementEventId());
 
-    public static Object handle(Dao jones, int checkpoint, String endpoint, String json) {
+    public static Object handle(Dao jones, int checkpoint, String endpoint,
+            String json, UserDao udao) {
         List<String> readOnlyEndpoints = (List)C.vector.invoke("/state");
         State s;
 
@@ -31,6 +33,11 @@ public class Facade {
                 s = dispatch(State.getState(), endpoint, json);
             } else {
                 s = State.swap(swapfn, endpoint, json);
+                if ("/register".equals(endpoint)) {
+                    Gson gson = new Gson();
+                    LoginCommand cmd = gson.fromJson(json, LoginCommand.class);
+                    udao.saveUser(cmd.username, cmd.password);
+                }
 
                 int eventId = s.getLatestEventId();
                 jones.saveEvent(eventId, endpoint, json);

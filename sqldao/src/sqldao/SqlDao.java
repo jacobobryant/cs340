@@ -11,48 +11,9 @@ import java.util.List;
 public class SqlDao implements Dao {
     public static final String DB = "jdbc:sqlite:ticket.db";
 
-    interface Transaction {
-        void run(Connection conn) throws SQLException;
-    }
-
-    public void init(boolean wipe) {
-        System.out.println("SQLDao init");
-        runTransaction((Connection conn) -> {
-            Statement st = conn.createStatement();
-            if (wipe) {
-                st.executeUpdate("drop table if exists events");
-                st.executeUpdate("drop table if exists states");
-            }
-            st.executeUpdate("create table if not exists events " +
-                    "(id integer, endpoint string, json string)");
-            st.executeUpdate("create table if not exists states " +
-                    "(id integer, state blob)");
-        });
-    }
-
-    private void runTransaction(Transaction transaction) {
-        Connection conn = null;
-        try {
-            conn = DriverManager.getConnection(DB);
-            conn.setAutoCommit(false);
-            transaction.run(conn);
-            conn.commit();
-            conn.close();
-        } catch (SQLException e) {
-            if (conn != null) {
-                try {
-                    conn.rollback();
-                } catch (SQLException e2) {
-                    throw new RuntimeException(e2);
-                }
-            }
-            throw new RuntimeException(e);
-        }
-    }
-
     public void saveEvent(int eventId, String endpoint, String json) {
         System.out.println("saving event with id " + eventId);
-        runTransaction((Connection conn) -> {
+        SqlDaoFactory.sRunTransaction((Connection conn) -> {
             PreparedStatement st = conn.prepareStatement(
                     "insert into events (id, endpoint, json) values (?, ?, ?)");
             st.setInt(1, eventId);
