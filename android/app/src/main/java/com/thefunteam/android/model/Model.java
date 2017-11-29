@@ -4,6 +4,7 @@ import java.util.List;
 import com.thefunteam.android.model.shared.Game;
 import com.thefunteam.android.model.shared.AvailableGame;
 import com.thefunteam.android.model.shared.Player;
+import com.thefunteam.android.model.shared.RejoinableGame;
 
 public class Model {
 
@@ -11,14 +12,17 @@ public class Model {
     private List<AvailableGame> availableGames;
     private Game currentGame;
     private String errorMessage;
+    private List<RejoinableGame> rejoinableGames;
 
     public Model() {}
 
-    public Model(String sessionId, List<AvailableGame> availableGames, Game currentGame, String errorMessage) {
+    public Model(String sessionId, List<AvailableGame> availableGames, Game currentGame,
+                 String errorMessage, List<RejoinableGame> rejoinableGames) {
         this.sessionId = sessionId;
         this.availableGames = availableGames;
         this.currentGame = currentGame;
         this.errorMessage = errorMessage;
+        this.rejoinableGames = rejoinableGames;
     }
 
     public String getSessionId() {
@@ -27,6 +31,10 @@ public class Model {
 
     public List<AvailableGame> getAvailableGames() {
         return availableGames;
+    }
+
+    public List<RejoinableGame> getRejoinableGames() {
+        return rejoinableGames;
     }
 
     public Game getCurrentGame() {

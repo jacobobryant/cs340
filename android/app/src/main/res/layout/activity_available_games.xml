@@ -35,10 +35,15 @@
             android:id="@+id/createGame"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="22dp"
+            android:layout_marginTop="14dp"
             android:text="Create Game"
-            android:layout_below="@+id/gameList"
-            android:layout_centerHorizontal="true"/>
+            android:layout_below="@+id/gameList" android:layout_centerHorizontal="true"/>
+        <!--<Button-->
+                <!--android:text="Rejoinable Games"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:id="@+id/rejoinable" android:layout_below="@+id/createGame"-->
+                <!--android:layout_centerHorizontal="true"/>-->
 
     </RelativeLayout>
 </android.support.constraint.ConstraintLayout>
