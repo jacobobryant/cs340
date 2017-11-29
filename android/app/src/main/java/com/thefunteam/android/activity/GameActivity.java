@@ -120,10 +120,12 @@ public class GameActivity extends ObservingActivity {
             // Update dest choosing
             if(showDestPicker) {
                 List<DestinationCard> cards = currentPlayer.getDestCards();
-                destinationPicker.setVisibility(View.VISIBLE);
-                destChooser1.setText(cards.get(0).description());
-                destChooser2.setText(cards.get(1).description());
-                destChooser3.setText(cards.get(2).description());
+                if(cards.size() >= 3) {
+                    destinationPicker.setVisibility(View.VISIBLE);
+                    destChooser1.setText(cards.get(0).description());
+                    destChooser2.setText(cards.get(1).description());
+                    destChooser3.setText(cards.get(2).description());
+                }
             } else {
                 destinationPicker.setVisibility(View.GONE);
                 destChooser1.setChecked(false);

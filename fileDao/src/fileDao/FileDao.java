@@ -12,8 +12,6 @@ import java.util.Scanner;
 
 public class FileDao implements Dao {
 
-
-
     @Override
     public void saveEvent(int eventId, String endpoint, String json) {
         System.out.println("saving event with id " + eventId);
@@ -22,18 +20,26 @@ public class FileDao implements Dao {
         EventDTO eventDTO = new EventDTO(eventId, endpoint, json);
         String eventString = gson.toJson(eventDTO);
         try {
-            File source = new File("/tmp/event.ticket");
-            String old_data = new Scanner(source).useDelimiter("\\Z").next();
+            File source = new File("/tmp/events.ticket");
+            Scanner scanner = new Scanner(source).useDelimiter("\\Z");
+            String old_data = "";
+            if(scanner.hasNext()) {
+                 old_data = scanner.next();
+            }
             EventDTOArray eventDTOArray = gson.fromJson(old_data, EventDTOArray.class);
+            if(eventDTOArray == null) { eventDTOArray = new EventDTOArray(new ArrayList<>()); }
+            if(eventDTOArray.eventDTOS == null) { eventDTOArray.eventDTOS = new ArrayList<>(); }
             eventDTOArray.eventDTOS.add(eventDTO);
 
             FileWriter fileWriter = new FileWriter(source, false);
             fileWriter.write(gson.toJson(eventDTOArray));
+            fileWriter.flush();
 
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            e.printStackTrace(); System.out.println("save event");
+
         } catch (IOException e) {
-            e.printStackTrace();
+            e.printStackTrace(); System.out.println("save event");
         }
     }
 
@@ -56,9 +62,9 @@ public class FileDao implements Dao {
             File source = new File("/tmp/state.ticket");
             FileWriter fileWriter = new FileWriter(source, false);
             fileWriter.write(gson.toJson(eventString));
-
+            fileWriter.flush();
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println(e + " saveState");
         }
 
     }
@@ -69,9 +75,12 @@ public class FileDao implements Dao {
 
         // deserialize the object
         try {
-            File source = new File("/tmp/event.ticket");
-            String data = new Scanner(source).useDelimiter("\\Z").next();
-            StateDTO stateDTO = gson.fromJson(data, StateDTO.class);
+            File source = new File("/tmp/events.ticket");
+            Scanner scanner = new Scanner(source).useDelimiter("\\Z");
+            String data = "";
+            if(scanner.hasNext()) {
+                data = scanner.next();
+            }            StateDTO stateDTO = gson.fromJson(data, StateDTO.class);
 
             byte b[] = stateDTO.state.getBytes();
             ByteArrayInputStream bi = new ByteArrayInputStream(b);
@@ -79,7 +88,7 @@ public class FileDao implements Dao {
             return si.readObject();
 
         } catch (Exception e) {
-            System.out.println(e);
+            System.out.println(e + " loadState");
         }
 
         return null;
@@ -88,10 +97,13 @@ public class FileDao implements Dao {
     @Override
     public List<Event> getEventsAfter(int eventId) {
         Gson gson = new Gson();
-
         try {
-            File source = new File("/tmp/event.ticket");
-            String old_data = new Scanner(source).useDelimiter("\\Z").next();
+            File source = new File("/tmp/events.ticket");
+            Scanner scanner = new Scanner(source).useDelimiter("\\Z");
+            String old_data = "";
+            if(scanner.hasNext()) {
+                old_data = scanner.next();
+            }
             EventDTOArray eventDTOArray = gson.fromJson(old_data, EventDTOArray.class);
             List<EventDTO> eventDTOS = eventDTOArray.eventDTOS;
             Collections.sort(eventDTOS, EventDTO::idCompare);
@@ -110,8 +122,7 @@ public class FileDao implements Dao {
             }
             return events;
         } catch (Exception e) {
-
+            return new ArrayList<>();
         }
-        return null;
     }
 }
