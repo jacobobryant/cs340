@@ -42,6 +42,8 @@
         </activity>
         <activity android:name=".activity.GameOverActivity">
         </activity>
+        <activity android:name=".activity.RejoinableGameActivity">
+        </activity>
     </application>
 
 </manifest>

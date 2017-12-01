@@ -123,17 +123,28 @@ public class State {
             .collect(Collectors.toList());
     }
 
+    public List<RejoinableGame> getRejoinableGames(String sessionId) {
+        User u = getUserBySessionId(sessionId);
+        return getGames().stream()
+            .filter((game) -> game.isRejoinable(u))
+            .map((game) -> game.getRejoinableModel(this, u))
+            .collect(Collectors.toList());
+    }
+
     public ClientModel getClientModel(String sessionId) {
         String gameId = getSession(sessionId).getGameId();
         List<AvailableGame> availableGames = null;
-        shared.model.Game currentGame = null;
+        List<RejoinableGame> rejoinableGames = null;
+        shared.Game currentGame = null;
+        
         if (gameId == null) {
             availableGames = getAvailableGames(sessionId);
+            rejoinableGames = getRejoinableGames(sessionId);
         } else {
             currentGame = getGame(gameId).getCurrentModel(sessionId, this);
         }
 
-        return new ClientModel(sessionId, availableGames, currentGame);
+        return new ClientModel(sessionId, availableGames, rejoinableGames, currentGame);
     }
 
     // PRECONDITION CHECKERS

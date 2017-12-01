@@ -1,10 +1,9 @@
 package com.thefunteam.android.activity;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,84 +14,81 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import com.thefunteam.android.R;
 import com.thefunteam.android.model.Atom;
-import com.thefunteam.android.model.shared.AvailableGame;
-import com.thefunteam.android.model.shared.Game;
 import com.thefunteam.android.model.Model;
-import com.thefunteam.android.presenter.AvailableGamesPresenter;
+import com.thefunteam.android.model.shared.AvailableGame;
+import com.thefunteam.android.model.shared.RejoinableGame;
+import com.thefunteam.android.presenter.RejoinableGamePresenter;
 
 import java.util.List;
 
-public class AvailableGamesActivity extends ObservingActivity {
+public class RejoinableGameActivity extends  ObservingActivity{
 
-    AvailableGamesPresenter availableGamesPresenter = new AvailableGamesPresenter(this);
+    RejoinableGamePresenter rgPresenter = new RejoinableGamePresenter(this);
 
-    private RecyclerView gameListView;
-    private List<AvailableGame> gameList;
+    RecyclerView gameListView;
+    private List<RejoinableGame> gameList;
     private ListAdapter adapter;
-    private Button createGameButton;
-//    private Button goRejoinable;
+    private Button goAvailableList;
 
-
-    public AvailableGamesActivity() {
+    public RejoinableGameActivity(){
         super();
-
-        presenter = availableGamesPresenter;
+        presenter = rgPresenter;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_available_games);
+        setContentView(R.layout.activity_rejoinable_game);
 
         gameListView = (RecyclerView) findViewById(R.id.gameList);
         gameListView.setHasFixedSize(true);
         gameListView.setLayoutManager(new LinearLayoutManager(this));
-        gameList = Atom.getInstance().getModel().getAvailableGames();
+        gameList = Atom.getInstance().getModel().getRejoinableGames();
 
-        adapter = new ListAdapter(gameList);
+        adapter = new RejoinableGameActivity.ListAdapter(gameList);
         gameListView.setAdapter(adapter);
 
-        createGameButton = (Button) findViewById(R.id.createGame);
-        createGameButton.setOnClickListener(new View.OnClickListener() {
+        goAvailableList = (Button) findViewById(R.id.createGame);
+        goAvailableList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                availableGamesPresenter.createGame();
+                startActivity(new Intent(RejoinableGameActivity.this, AvailableGamesActivity.class));
             }
         });
+
     }
 
-    private void askToJoinGame(View view, final AvailableGame game) {
+    private void askToReJoinGame(View view, final RejoinableGame game) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
         builder.setTitle("Join Game")
-                .setMessage("Do you want to join this game?")
+                .setMessage("Do you want to rejoin this game?")
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        availableGamesPresenter.joinGame(game.getGameId());
+                        RejoinableGamePresenter.rejoinGame(game.getGameId());
                     }
                 })
                 .setNegativeButton("No", null)
                 .show();
     }
 
-    public void presentCurrentGame() {
-        startActivity(new Intent(this, CurrentGameActivity.class));
-    }
-
-    public void update(Model model) {
-        List<AvailableGame> games = model.getAvailableGames();
-        gameList.clear();
-        if (games != null) {
+    public void update(Model model){
+        List<RejoinableGame> games = model.getRejoinableGames();
+        gameList.clear();;
+        if(games != null){
             gameList.addAll(games);
         }
         adapter.notifyDataSetChanged();
     }
 
+
     class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
 
-        public List<AvailableGame> listItems;
 
-        ListAdapter(List<AvailableGame> listItems) {
+
+        public List<RejoinableGame> listItems;
+
+        ListAdapter(List<RejoinableGame> listItems) {
             this.listItems = listItems;
         }
 
@@ -105,7 +101,7 @@ public class AvailableGamesActivity extends ObservingActivity {
 
         @Override
         public void onBindViewHolder(ViewHolder holder, int position) {
-            final AvailableGame game = listItems.get(position);
+            final RejoinableGame game = listItems.get(position);
 
             String ownerName = game.getPlayers().get(0);
             holder.textDescription.setText(ownerName + "'s game (" + Integer.toString(game.getPlayers().size()) + " players)");
@@ -113,11 +109,10 @@ public class AvailableGamesActivity extends ObservingActivity {
             holder.cardview.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(final View view) {
-                    askToJoinGame(view, game);
+                    askToReJoinGame(view, game);
                 }
             });
         }
-
 
         @Override
         public int getItemCount() {
@@ -129,13 +124,10 @@ public class AvailableGamesActivity extends ObservingActivity {
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {
-
             TextView textDescription;
             LinearLayout cardview;
-
             ViewHolder(View itemView) {
                 super(itemView);
-
                 textDescription = (TextView) itemView.findViewById(R.id.description);
                 cardview = (LinearLayout) itemView.findViewById(R.id.cardView);
             }
