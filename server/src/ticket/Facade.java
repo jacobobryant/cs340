@@ -231,13 +231,14 @@ public class Facade {
             throw new BadJuju("You may return at most " + max + " card(s)");
         }
 
+
         ses = ses.returnCards(cards);
         Game game = state.getGame(ses.getGameId())
                    .discard(cards)
                    .addHistory(state, sessionId, "returned " + cards.length +
                            " destination card(s)");
         state = state.commit(ses, game);
-        state = updatePoints(state, game, sessionId, false);
+        state = updatePoints(state, game, sessionId);
         return endTurn(state, sessionId);
     }
 
@@ -298,7 +299,7 @@ public class Facade {
             game = game.setLastRound();
         }
         state = state.commit(game, ses);
-        state = updatePoints(state, game, sessionId, true);
+        state = updatePoints(state, game, sessionId);
         return endTurn(state, sessionId);
     }
 
@@ -351,17 +352,13 @@ public class Facade {
         return s;
     }
 
-    private static State updatePoints(State s, Game g, String sessionId,
-            boolean builtRoute) {
+    private static State updatePoints(State s, Game g, String sessionId) {
         final State sf = s;
         int longestRouteLength = g.getSessionIds().stream().mapToInt((sid) ->
                 sf.getSession(sid).getLongestRouteLength()).max().orElse(0);
         for (String sid : g.getSessionIds()) {
             boolean cur = sessionId.equals(sid);
-            s = s.commit(s.getSession(sid).updatePoints(
-                        builtRoute && cur,
-                        !builtRoute && cur,
-                        longestRouteLength));
+            s = s.commit(s.getSession(sid).updatePoints(cur, longestRouteLength));
         }
         return s;
     }

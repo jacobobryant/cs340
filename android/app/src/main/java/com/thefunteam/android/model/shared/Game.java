@@ -12,10 +12,11 @@ public class Game {
     public final List<String> history;
     public final String longestRouteHolder;
     public final boolean started;
+    public final int turnsLeft;
 
     public Game(List<Player> players, int trainDeck, List<TrainType> faceUpDeck,
                 int destDeck, List<Route> openRoutes, List<String> messages,
-                List<String> history, String longestRouteHolder, boolean started) {
+                List<String> history, String longestRouteHolder, boolean started, int turnsLeft) {
         this.players = players;
         this.trainDeck = trainDeck;
         this.faceUpDeck = faceUpDeck;
@@ -25,6 +26,7 @@ public class Game {
         this.history = history;
         this.longestRouteHolder = longestRouteHolder;
         this.started = started;
+        this.turnsLeft = turnsLeft;
     }
 
     public List<Player> getPlayers() {
@@ -61,5 +63,9 @@ public class Game {
 
     public boolean isStarted() {
         return started;
+    }
+
+    public int getTurnsLeft() {
+        return turnsLeft;
     }
 }

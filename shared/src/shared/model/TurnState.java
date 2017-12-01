@@ -1,14 +1,22 @@
 package shared.model;
 
 public enum TurnState {
-    lobby, init, beginning, returnDest, drawTrain, waiting;
-
-    public int maxReturnCards() {
-        if (this.equals(init)) {
+    lobby,
+    init {
+        public int maxReturnCards() {
             return 1;
-        } else if (this.equals(returnDest)) {
+        }
+    },
+    beginning,
+    returnDest {
+        public int maxReturnCards() {
             return 2;
         }
+    },
+    drawTrain,
+    waiting;
+
+    public int maxReturnCards() {
         throw new UnsupportedOperationException("wrong state: " + this);
     }
 }

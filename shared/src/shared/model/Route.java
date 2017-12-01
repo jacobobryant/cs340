@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.*;
 
 public class Route implements Serializable {
+
     public static final List<Route> ROUTES;
     public static final Map<Integer, Integer> POINTS;
     static {
@@ -114,7 +115,7 @@ public class Route implements Serializable {
 
         POINTS = new HashMap<>();
         POINTS.put(1, 1);
-        POINTS.put(2, 1);
+        POINTS.put(2, 2);
         POINTS.put(3, 4);
         POINTS.put(4, 7);
         POINTS.put(5, 10);
