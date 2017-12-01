@@ -1,5 +1,7 @@
 package shared.model;
 
+import shared.RejoinableGame;
+
 import java.util.Collections;
 import java.util.List;
 

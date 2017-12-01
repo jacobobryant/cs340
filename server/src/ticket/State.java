@@ -1,6 +1,7 @@
 package ticket;
 
 import clojure.lang.IFn;
+import shared.RejoinableGame;
 import shared.model.*;
 
 import java.util.*;
@@ -135,8 +136,8 @@ public class State {
         String gameId = getSession(sessionId).getGameId();
         List<AvailableGame> availableGames = null;
         List<RejoinableGame> rejoinableGames = null;
-        shared.Game currentGame = null;
-        
+        shared.model.Game currentGame = null;
+
         if (gameId == null) {
             availableGames = getAvailableGames(sessionId);
             rejoinableGames = getRejoinableGames(sessionId);

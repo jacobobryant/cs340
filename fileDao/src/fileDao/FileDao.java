@@ -5,10 +5,7 @@ import shared.dao.Dao;
 import shared.dao.Event;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class FileDao implements Dao {
 
@@ -18,7 +15,6 @@ public class FileDao implements Dao {
 
         Gson gson = new Gson();
         EventDTO eventDTO = new EventDTO(eventId, endpoint, json);
-        String eventString = gson.toJson(eventDTO);
         try {
             File source = new File("/tmp/events.ticket");
             Scanner scanner = new Scanner(source).useDelimiter("\\Z");
@@ -45,7 +41,6 @@ public class FileDao implements Dao {
 
     @Override
     public void saveState(int eventId, Object state) {
-        Gson gson = new Gson();
 
         // serialize the object
         try {
@@ -53,42 +48,47 @@ public class FileDao implements Dao {
             ObjectOutputStream so = new ObjectOutputStream(bo);
             so.writeObject(state);
             so.flush();
-            String serializedState = bo.toString();
+            byte[] serializedState = bo.toByteArray();
 
+            File stateFile = new File("/tmp/state.ticket");
+            FileOutputStream fileOutputStream = new FileOutputStream(stateFile);
+            fileOutputStream.write(serializedState);
+            fileOutputStream.flush();
+//            FileWriter fileWriter = new FileWriter(stateFile, false);
+//            fileWriter.write(serializedState);
+//            fileWriter.flush();
 
-            StateDTO stateDTO = new StateDTO(eventId, serializedState);
-            String eventString = gson.toJson(stateDTO);
-
-            File source = new File("/tmp/state.ticket");
-            FileWriter fileWriter = new FileWriter(source, false);
-            fileWriter.write(gson.toJson(eventString));
-            fileWriter.flush();
         } catch (Exception e) {
-            System.out.println(e + " saveState");
+            e.printStackTrace(); System.out.print("saveState");
         }
 
     }
 
     @Override
     public Object loadState() {
-        Gson gson = new Gson();
 
         // deserialize the object
         try {
-            File source = new File("/tmp/events.ticket");
-            Scanner scanner = new Scanner(source).useDelimiter("\\Z");
-            String data = "";
+            File source = new File("/tmp/state.ticket");
+            Scanner scanner = new Scanner(source);
+
             if(scanner.hasNext()) {
-                data = scanner.next();
-            }            StateDTO stateDTO = gson.fromJson(data, StateDTO.class);
-
-            byte b[] = stateDTO.state.getBytes();
-            ByteArrayInputStream bi = new ByteArrayInputStream(b);
-            ObjectInputStream si = new ObjectInputStream(bi);
-            return si.readObject();
-
+                List<Byte> bytes = new LinkedList<>();
+                while(scanner.hasNextByte()) {
+                    bytes.add(scanner.nextByte());
+                }
+                byte b[] = new byte[bytes.size()];
+                int i = 0;
+                for(Byte B : bytes) {
+                    b[i] = B.byteValue();
+                    i++;
+                }
+                ByteArrayInputStream bi = new ByteArrayInputStream(b);
+                ObjectInputStream si = new ObjectInputStream(bi);
+                return si.readObject();
+            }
         } catch (Exception e) {
-            System.out.println(e + " loadState");
+            e.printStackTrace(); System.out.print("loadState");
         }
 
         return null;

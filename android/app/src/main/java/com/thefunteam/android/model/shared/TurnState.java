@@ -63,9 +63,9 @@ public enum TurnState implements TurnStateInterface {
     public int maxReturnCards() {
         if (this.equals(init)) {
             return 1;
-        } else if (this.equals(returnDest)) {
+        } else {//if (this.equals(returnDest)) {
             return 2;
         }
-        throw new UnsupportedOperationException("wrong state: " + this);
+        //throw new UnsupportedOperationException("wrong state: " + this);
     }
 }
