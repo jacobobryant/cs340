@@ -66,6 +66,7 @@ public class Server extends NanoHTTPD {
         ServiceLoader<GeneralPurposeToolBuildingFactoryFactoryFactory> loader =
                 ServiceLoader.load(GeneralPurposeToolBuildingFactoryFactoryFactory.class);
         for (GeneralPurposeToolBuildingFactoryFactoryFactory f : loader) {
+            System.out.println("found provider: " + f.getName());
             if (f.getName().equals(persister)) {
                 factory = f;
                 break;

@@ -20,6 +20,12 @@ public class SqlDaoFactory implements GeneralPurposeToolBuildingFactoryFactoryFa
 
     public void init(boolean wipe) {
         System.out.println("SQLDaoFactory init");
+        try {
+            Class.forName("org.sqlite.JDBC");
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
         runTransaction((Connection conn) -> {
             Statement st = conn.createStatement();
             if (wipe) {
@@ -103,5 +109,11 @@ public class SqlDaoFactory implements GeneralPurposeToolBuildingFactoryFactoryFa
             }
             throw new RuntimeException(e);
         }
+    }
+
+    public static void main(String[] args) {
+        SqlDaoFactory f = new SqlDaoFactory();
+        System.out.println("name: " + f.getName());
+        f.init(false);
     }
 }
