@@ -53,6 +53,7 @@ public class GameActivity extends ObservingActivity {
     private Button faceUp2;
     private Button faceUp3;
     private Button faceUp4;
+    private Button returnButton;
 
     public GameActivity() {
         super();
@@ -120,6 +121,11 @@ public class GameActivity extends ObservingActivity {
             faceUpButtons[i].setOnClickListener(v -> gamePresenter.drawFaceUpCard(index));
         }
 
+        returnButton = (Button) findViewById(R.id.return_button);
+        returnButton.setOnClickListener(v -> {
+            gamePresenter.leaveGame();
+        });
+
 
         mDetector = new GestureDetector(this, new MyGestureListener(this));
         map.setOnTouchListener(touchListener);
@@ -132,7 +138,7 @@ public class GameActivity extends ObservingActivity {
     public void update(Model model) {
         Player currentPlayer = model.getCurrentPlayer();
         Game game = model.getCurrentGame();
-        if(currentPlayer != null) {
+        if(currentPlayer != null && game != null) {
 
             // Update dest choosing
 
@@ -214,6 +220,12 @@ public class GameActivity extends ObservingActivity {
 
     public void showGameOver() {
         startActivity(new Intent(GameActivity.this, GameOverActivity.class));
+    }
+
+    public void leaveGame() {
+        Intent intent = new Intent(this, AvailableGamesActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
     }
 
     class MyGestureListener extends GestureDetector.SimpleOnGestureListener {

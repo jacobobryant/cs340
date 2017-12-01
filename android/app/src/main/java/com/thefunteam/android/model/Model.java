@@ -85,4 +85,8 @@ public class Model {
 
         return players.get(topIndex).username;
     }
+
+    public void setSessionId(String sessionId) {
+        this.sessionId = sessionId;
+    }
 }

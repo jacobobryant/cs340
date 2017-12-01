@@ -27,7 +27,7 @@ public class RejoinableGamePresenter extends  Presenter{
                     Ractivity.finish();
                 }
                 else if (model.getCurrentGame() != null){
-                    //join  to the concurrent game
+                    Ractivity.showGameView();
                 }
                 Ractivity.update(model);
                 if(model.getErrorMessage() != null) {
@@ -37,10 +37,8 @@ public class RejoinableGamePresenter extends  Presenter{
         });
     }
 
-    public static void rejoinGame(String gameId){
-        //case 1 if the game was gone while I was trying to join
-        //case 2 else -> the game exist
-        //how to rejoin specific game and the phase?
+    public void rejoinGame(String sessionId){
+        Atom.getInstance().getModel().setSessionId(sessionId);
     }
 
 }

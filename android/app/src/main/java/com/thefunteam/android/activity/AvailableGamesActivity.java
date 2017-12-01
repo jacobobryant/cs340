@@ -30,7 +30,7 @@ public class AvailableGamesActivity extends ObservingActivity {
     private List<AvailableGame> gameList;
     private ListAdapter adapter;
     private Button createGameButton;
-//    private Button goRejoinable;
+    private Button goRejoinable;
 
 
     public AvailableGamesActivity() {
@@ -58,6 +58,11 @@ public class AvailableGamesActivity extends ObservingActivity {
             public void onClick(View view) {
                 availableGamesPresenter.createGame();
             }
+        });
+
+        goRejoinable = (Button) findViewById(R.id.rejoinable);
+        goRejoinable.setOnClickListener(v -> {
+            startActivity(new Intent(this, RejoinableGameActivity.class));
         });
     }
 

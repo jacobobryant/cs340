@@ -1,9 +1,14 @@
 package com.thefunteam.android.presenter;
 
+import android.content.Intent;
+import com.thefunteam.android.NextLayerFacade;
 import com.thefunteam.android.activity.GameActivity;
+import com.thefunteam.android.activity.GameOverActivity;
+import com.thefunteam.android.activity.LoginActivity;
 import com.thefunteam.android.model.Atom;
 import com.thefunteam.android.model.Model;
 import com.thefunteam.android.model.shared.*;
+import com.thefunteam.android.model.userInfo;
 
 import java.util.Collections;
 import java.util.LinkedList;
@@ -28,6 +33,12 @@ public class GamePresenter extends Presenter {
             @Override
             public void run() {
                 Model model = Atom.getInstance().getModel();
+
+                if(model.getCurrentGame() == null) {
+                    gameActivity.leaveGame();
+                    return;
+                }
+
                 turnState = model.getCurrentPlayer().getTurnState();
                 if(model.getCurrentGame().getTurnsLeft() == 0) {
                     gameActivity.showGameOver();
@@ -83,4 +94,7 @@ public class GamePresenter extends Presenter {
         }
     }
 
+    public void leaveGame() {
+        NextLayerFacade.getInstance().login(userInfo.username, userInfo.password);
+    }
 }

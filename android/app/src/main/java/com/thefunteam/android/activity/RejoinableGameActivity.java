@@ -48,11 +48,11 @@ public class RejoinableGameActivity extends  ObservingActivity{
         adapter = new RejoinableGameActivity.ListAdapter(gameList);
         gameListView.setAdapter(adapter);
 
-        goAvailableList = (Button) findViewById(R.id.createGame);
+        goAvailableList = (Button) findViewById(R.id.backGameList);
         goAvailableList.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(RejoinableGameActivity.this, AvailableGamesActivity.class));
+                finish();
             }
         });
 
@@ -65,7 +65,7 @@ public class RejoinableGameActivity extends  ObservingActivity{
                 .setIcon(android.R.drawable.ic_dialog_info)
                 .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        RejoinableGamePresenter.rejoinGame(game.getGameId());
+                        rgPresenter.rejoinGame(game.getSessionId());
                     }
                 })
                 .setNegativeButton("No", null)
@@ -81,10 +81,11 @@ public class RejoinableGameActivity extends  ObservingActivity{
         adapter.notifyDataSetChanged();
     }
 
+    public void showGameView() {
+        startActivity(new Intent(this, GameActivity.class));
+    }
 
-    class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder>{
-
-
+    class ListAdapter extends RecyclerView.Adapter<ListAdapter.ViewHolder> {
 
         public List<RejoinableGame> listItems;
 

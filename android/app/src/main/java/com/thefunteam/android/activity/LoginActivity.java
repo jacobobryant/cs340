@@ -8,6 +8,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import com.thefunteam.android.Poller;
+import com.thefunteam.android.model.userInfo;
 import com.thefunteam.android.presenter.LoginPresenter;
 import com.thefunteam.android.R;
 
@@ -43,7 +44,9 @@ public class LoginActivity extends ObservingActivity {
         mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-            loginPresenter.login(mUsernameView.getText().toString(), mPasswordView.getText().toString());
+                userInfo.username = mUsernameView.getText().toString();
+                userInfo.password = mPasswordView.getText().toString();
+                loginPresenter.login(mUsernameView.getText().toString(), mPasswordView.getText().toString());
             }
         });
 

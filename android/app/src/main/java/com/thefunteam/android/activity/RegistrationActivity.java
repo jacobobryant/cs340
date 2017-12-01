@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import com.thefunteam.android.R;
+import com.thefunteam.android.model.userInfo;
 import com.thefunteam.android.presenter.RegistrationPresenter;
 
 
@@ -44,6 +45,8 @@ public class RegistrationActivity extends ObservingActivity {
             @Override
             public void onClick(View view) {
                 if (mPasswordView.getText().toString().equals(mReenterPasswordView.getText().toString())) {
+                    userInfo.username = mEmailView.getText().toString();
+                    userInfo.password = mPasswordView.getText().toString();
                     registrationPresenter.register(mEmailView.getText().toString(), mPasswordView.getText().toString());
                 } else {
                     Toast toast = Toast.makeText(getApplicationContext(), "Passwords don't match!", Toast.LENGTH_SHORT);

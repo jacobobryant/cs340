@@ -30,6 +30,13 @@
             app:layout_constraintBottom_toBottomOf="parent" android:layout_marginBottom="16dp"
             android:layout_marginLeft="10dp" app:layout_constraintLeft_toRightOf="@+id/chatbutton"
             android:layout_marginStart="10dp"/>
+    <Button
+            android:text="Return"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/return_button"
+            app:layout_constraintBottom_toTopOf="@id/chatbutton" android:layout_marginBottom="16dp"
+            app:layout_constraintLeft_toLeftOf="parent"/>
 
     <android.support.v7.widget.RecyclerView
             android:id="@+id/playerinfo"

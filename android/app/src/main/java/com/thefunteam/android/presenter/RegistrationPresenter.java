@@ -22,19 +22,16 @@ public class RegistrationPresenter extends Presenter {
 
     @Override
     public void update(Observable observable, Object o) {
-        registrationActivity.runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
+        registrationActivity.runOnUiThread(() -> {
 
-                Model model = Atom.getInstance().getModel();
+            Model model = Atom.getInstance().getModel();
 
-                if(model.getSessionId() != null) {
-                    registrationActivity.finish();
-                }
+            if(model.getSessionId() != null) {
+                registrationActivity.finish();
+            }
 
-                if(model.getErrorMessage() != null) {
-                    registrationActivity.showError(model.getErrorMessage());
-                }
+            if(model.getErrorMessage() != null) {
+                registrationActivity.showError(model.getErrorMessage());
             }
         });
     }
